@@ -9,7 +9,7 @@ export const api = createApi({
     // 2. Описываем эндпоинты
     login: builder.mutation<
       { token: string },
-      { email: string; password: string }
+      { loginInput: string; password: string }
     >({
       query: (credentials) => ({
         url: "/auth/login",

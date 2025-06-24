@@ -1,22 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLoginMutation } from "@/lib/api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState("");
+  const [loginInput, setLoginInput] = useState("");
   const [password, setPassword] = useState("");
   const [login, { isLoading, isError }] = useLoginMutation();
+  const router = useRouter();
+
+  // Проверка авторизации при загрузке компонента
+  /*useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/events");
+    }
+  }, [router]);
+  */
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const result = await login({ email, password }).unwrap();
+      const result = await login({ loginInput, password }).unwrap();
       localStorage.setItem("token", result.token);
-      window.location.href = "/events";
+      router.push("/events");
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -35,15 +46,15 @@ export const LoginForm = () => {
 
         <div className="space-y-3">
           <div>
-            <Label htmlFor="email" className="text-gray-700">
-              Email
+            <Label htmlFor="login" className="text-gray-700">
+              Логин
             </Label>
             <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              id="login"
+              type="login"
+              value={loginInput}
+              onChange={(e) => setLoginInput(e.target.value)}
+              placeholder="Ваш логин"
               className="h-11"
               autoFocus
             />
@@ -51,7 +62,7 @@ export const LoginForm = () => {
 
           <div>
             <Label htmlFor="password" className="text-gray-700">
-              Password
+              Пароль
             </Label>
             <Input
               id="password"

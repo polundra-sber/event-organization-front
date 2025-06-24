@@ -8,7 +8,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     /* Redux хранилище */
     <Provider store={store}>
-      <Component {...pageProps} /> {/* Текущая страница (например, /login) */}
+      <Component {...pageProps} />
     </Provider>
   );
 }
