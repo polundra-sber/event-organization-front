@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLoginMutation } from "@/lib/api";
+import { useLoginMutation } from "@/lib/api/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +34,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center p-6 min-h-[80vh]">
+    <div className="flex flex-col justify-center p-4 sm:p-6 min-h-[calc(100vh-100px)]">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md mx-auto space-y-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100"

@@ -17,8 +17,19 @@ export const api = createApi({
         body: credentials,
       }),
     }),
+
+    register: builder.mutation<
+      { token: string },
+      { loginInput: string; password: string; email: string }
+    >({
+      query: (credentials) => ({
+        url: "/auth/register",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
   }),
 });
 
 // 3. Экспортируем автоматически сгенерированные хуки
-export const { useLoginMutation } = api;
+export const { useLoginMutation, useRegisterMutation } = api;
