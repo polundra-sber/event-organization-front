@@ -1,21 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { HomePageContent } from "@/components/events/HomePage";
 
 export default function EventsPage() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true); // Добавляем состояние загрузки
+  const Loader = () => (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
 
   useEffect(() => {
-    // Проверяем токен при загрузке страницы
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/"); // Перенаправляем на вход
+      router.push("/");
+    } else {
+      setIsLoading(false); // Останавливаем лоадер, если токен есть
     }
   }, []);
 
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Ваши мероприятия</h1>
-      <p>Здесь будет список...</p>
-    </div>
-  );
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  return <HomePageContent />;
 }
