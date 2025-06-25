@@ -1,4 +1,3 @@
-// src/components/auth/RegisterForm.tsx
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -61,45 +60,44 @@ export const RegisterForm = () => {
         </div>
 
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName" className="text-gray-700">
-                Имя
-              </Label>
-              <Input
-                id="firstName"
-                type="text"
-                value={formData.firstName}
-                onChange={handleChange}
-                placeholder="Ваше имя"
-                className="h-11"
-                required
-              />
-              {fieldErrors.firstName && (
-                <p className="text-red-500 text-xs mt-1">
-                  {fieldErrors.firstName}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="lastName" className="text-gray-700">
-                Фамилия
-              </Label>
-              <Input
-                id="lastName"
-                type="text"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="Ваша фамилия"
-                className="h-11"
-                required
-              />
-              {fieldErrors.lastName && (
-                <p className="text-red-500 text-xs mt-1">
-                  {fieldErrors.lastName}
-                </p>
-              )}
-            </div>
+          <div>
+            <Label htmlFor="firstName" className="text-gray-700">
+              Имя
+            </Label>
+            <Input
+              id="firstName"
+              type="text"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="Ваше имя"
+              className="h-11"
+              required
+            />
+            {fieldErrors.firstName && (
+              <p className="text-red-500 text-xs mt-1">
+                {fieldErrors.firstName}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="lastName" className="text-gray-700">
+              Фамилия
+            </Label>
+            <Input
+              id="lastName"
+              type="text"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Ваша фамилия"
+              className="h-11"
+              required
+            />
+            {fieldErrors.lastName && (
+              <p className="text-red-500 text-xs mt-1">
+                {fieldErrors.lastName}
+              </p>
+            )}
           </div>
 
           <div>
