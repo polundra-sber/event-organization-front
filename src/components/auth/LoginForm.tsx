@@ -81,7 +81,7 @@ export const LoginForm = () => {
           </p>
         )}
 
-        <Button type="submit" className="w-full h-11" disabled={isLoading}>
+        <Button variant = "pink" type="submit" className="w-full h-11" disabled={isLoading}>
           {isLoading ? "Вход..." : "Войти"}
         </Button>
       </form>
