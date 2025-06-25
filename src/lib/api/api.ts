@@ -28,8 +28,12 @@ export const api = createApi({
         body: credentials,
       }),
     }),
+
+    getProfile: builder.query({
+      query: () => "/profile",
+    }),
   }),
 });
 
 // 3. Экспортируем автоматически сгенерированные хуки
-export const { useLoginMutation, useRegisterMutation } = api;
+export const { useLoginMutation, useRegisterMutation, useGetProfileQuery } = api;

@@ -76,4 +76,17 @@ export const handlers = [
       { status: 201 }
     );
   }),
+
+        // Мок для /api/profile
+    http.get("/api/profile", () => {
+      return HttpResponse.json({
+        firstName: "Анна",
+        lastName: "Иванова",
+        login: "anna_ivanova",
+        password: "••••••••",
+        email: "anna@example.com",
+        requisites: "Банковская карта: 1234 5678 9012 3456",
+      });
+    }),
+
 ];
