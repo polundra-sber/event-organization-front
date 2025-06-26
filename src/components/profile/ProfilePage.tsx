@@ -8,6 +8,18 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useGetProfileQuery, useUpdateProfileMutation, api } from "@/lib/api/api";
 import { useDispatch } from "react-redux";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 
 // Функция для получения начальных букв
 function getInitials(firstName: string, lastName: string) {
@@ -17,6 +29,8 @@ function getInitials(firstName: string, lastName: string) {
 }
 
 export const ProfilePageContent = () => {
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+
   const { data: profile, isLoading, isError } = useGetProfileQuery();
   const [updateProfile] = useUpdateProfileMutation();
 
@@ -38,42 +52,79 @@ export const ProfilePageContent = () => {
   }, [profile]);
 
   const dispatch = useDispatch();
-const toggleEdit = async () => {
-  if (isEditing) {
-    try {
-      const { login, ...dataToUpdate } = editedProfile;
-      const result = await updateProfile(dataToUpdate).unwrap();
+  const toggleEdit = async () => {
+    if (isEditing) {
+      try {
+        const { login, ...dataToUpdate } = editedProfile;
+        const result = await updateProfile(dataToUpdate).unwrap();
 
-      // ОБНОВЛЯЕМ кэш через dispatch
-      dispatch(
-        api.util.updateQueryData("getProfile", undefined, (draft) => {
-          Object.assign(draft, result);
-        })
-      );
+        // ОБНОВЛЯЕМ кэш через dispatch
+        dispatch(
+          api.util.updateQueryData("getProfile", undefined, (draft) => {
+            Object.assign(draft, result);
+          })
+        );
 
-      setEditedProfile(result);
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Ошибка сохранения:", error);
+        setEditedProfile(result);
+        setIsEditing(false);
+      } catch (error) {
+        console.error("Ошибка сохранения:", error);
+      }
+    } else {
+      setIsEditing(true);
     }
-  } else {
-    setIsEditing(true);
-  }
-};
+  };
 
 
-
+  
   if (isLoading) return <p>Загрузка профиля...</p>;
   if (isError) return <p>Ошибка загрузки профиля</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
-      {/* Кнопка "На главную" */}
-      <div className="flex justify-start mb-6">
+    <div className="flex justify-start mb-6">
+      {isEditing ? (
+        <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="pink"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowLeaveDialog(true);
+              }}
+              asChild
+            >
+              <Link href="/events">← На главную</Link>
+            </Button>
+          </AlertDialogTrigger>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Вы действительно хотите уйти?</AlertDialogTitle>
+              <AlertDialogDescription>
+                У вас есть несохранённые изменения. Если вы уйдёте, они будут потеряны.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setShowLeaveDialog(false)}>
+                Отмена
+              </AlertDialogCancel>
+              <AlertDialogAction asChild>
+                <Link href="/events" onClick={() => setShowLeaveDialog(false)}>
+                  Всё равно уйти
+                </Link>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      ) : (
         <Button variant="pink" size="sm" asChild>
           <Link href="/events">← На главную</Link>
         </Button>
-      </div>
+      )}
+    </div>
+
 
       {/* Блок профиля */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
@@ -120,7 +171,6 @@ const toggleEdit = async () => {
 
         {/* Логин */}
         <div className="bg-pink-100 p-2 rounded-xl space-y-1">
-          <label className="text-sm text-gray-500">Логин</label>
           <p className="text-gray-900">{profile.login}</p>
         </div>
 
