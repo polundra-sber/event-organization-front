@@ -20,3 +20,13 @@ export type RegisterRequest = {
 export type RegisterResponse = {
   token: string;
 };
+
+
+export type Profile = {
+  firstName: string;
+  lastName: string;
+  login: string;
+  password: string;
+  email: string;
+  requisites: string;
+};

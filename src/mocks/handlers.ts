@@ -1,5 +1,15 @@
 import { http, HttpResponse } from "msw";
 
+
+let mockProfile = {
+  firstName: "Анна",
+  lastName: "Иванова",
+  login: "anna_ivanova",
+  password: "••••••••",
+  email: "anna@example.com",
+  requisites: "Банковская карта: 1234 5678 9012 3456",
+};
+
 export const handlers = [
   http.post("/api/auth/login", async ({ request }) => {
     const { loginInput, password } = (await request.json()) as {
@@ -77,16 +87,21 @@ export const handlers = [
     );
   }),
 
-        // Мок для /api/profile
-    http.get("/api/profile", () => {
-      return HttpResponse.json({
-        firstName: "Анна",
-        lastName: "Иванова",
-        login: "anna_ivanova",
-        password: "••••••••",
-        email: "anna@example.com",
-        requisites: "Банковская карта: 1234 5678 9012 3456",
-      });
-    }),
+      // Мок для /api/profile
+  http.get("/api/profile", () => {
+    return HttpResponse.json(mockProfile);
+  }),
+
+  http.patch("/api/profile", async ({ request }) => {
+    const updatedData = await request.json();
+
+    // Обновляем мок-профиль
+    mockProfile = {
+      ...mockProfile,
+      ...updatedData
+    };
+
+    return HttpResponse.json(mockProfile);
+  }),
 
 ];

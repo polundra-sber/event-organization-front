@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useGetProfileQuery } from "@/lib/api/api";
+import { useGetProfileQuery, useUpdateProfileMutation, api } from "@/lib/api/api";
+import { useDispatch } from "react-redux";
+
 
 // Функция для получения начальных букв
 function getInitials(firstName: string, lastName: string) {
@@ -16,43 +18,77 @@ function getInitials(firstName: string, lastName: string) {
 
 export const ProfilePageContent = () => {
   const { data: profile, isLoading, isError } = useGetProfileQuery();
+  const [updateProfile] = useUpdateProfileMutation();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState(profile || {});
+  const [editedProfile, setEditedProfile] = useState({
+    firstName: "",
+    lastName: "",
+    login: "",
+    password: "",
+    email: "",
+    requisites: "",
+  });
+
+  // 🔁 Обновляем editedProfile, когда profile загрузился
+  useEffect(() => {
+    if (profile) {
+      setEditedProfile(profile);
+    }
+  }, [profile]);
+
+  const dispatch = useDispatch();
+const toggleEdit = async () => {
+  if (isEditing) {
+    try {
+      const { login, ...dataToUpdate } = editedProfile;
+      const result = await updateProfile(dataToUpdate).unwrap();
+
+      // ОБНОВЛЯЕМ кэш через dispatch
+      dispatch(
+        api.util.updateQueryData("getProfile", undefined, (draft) => {
+          Object.assign(draft, result);
+        })
+      );
+
+      setEditedProfile(result);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Ошибка сохранения:", error);
+    }
+  } else {
+    setIsEditing(true);
+  }
+};
+
+
 
   if (isLoading) return <p>Загрузка профиля...</p>;
   if (isError) return <p>Ошибка загрузки профиля</p>;
 
-  const toggleEdit = () => {
-    if (isEditing) {
-      // Здесь можно вызвать updateProfile мутацию
-      console.log("Сохранить изменения:", editedProfile);
-    }
-    setIsEditing((prev) => !prev);
-  };
-
   return (
     <div className="p-4 min-h-screen bg-gray-50">
       {/* Кнопка "На главную" */}
-    <div className="flex justify-start mb-6">
-      <Button variant="pink" size="sm" asChild>
-        <Link href="/events">← На главную</Link>
-      </Button>
-    </div>
+      <div className="flex justify-start mb-6">
+        <Button variant="pink" size="sm" asChild>
+          <Link href="/events">← На главную</Link>
+        </Button>
+      </div>
 
       {/* Блок профиля */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
         {/* Имя + Аватар */}
         <div className="flex items-center gap-4 bg-pink-100 p-1 rounded-xl">
           <Avatar className="w-16 h-16">
-            {/* Выбрать единый аватар */}
-            <AvatarFallback>{getInitials(profile.firstName, profile.lastName)}</AvatarFallback> 
+            <AvatarFallback>
+              {getInitials(editedProfile.firstName, editedProfile.lastName)}
+            </AvatarFallback>
           </Avatar>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full bg-pink-100">
             {isEditing ? (
               <>
                 <Input
-                  value={editedProfile.firstName}
+                  value={editedProfile.firstName || ""}
                   onChange={(e) =>
                     setEditedProfile({
                       ...editedProfile,
@@ -63,7 +99,7 @@ export const ProfilePageContent = () => {
                   className="w-full sm:w-auto"
                 />
                 <Input
-                  value={editedProfile.lastName}
+                  value={editedProfile.lastName || ""}
                   onChange={(e) =>
                     setEditedProfile({
                       ...editedProfile,
@@ -88,32 +124,13 @@ export const ProfilePageContent = () => {
           <p className="text-gray-900">{profile.login}</p>
         </div>
 
-        {/* Пароль */}
-        <div className="bg-pink-100 p-2 rounded-xl space-y-1">
-          <label className="text-sm text-gray-500">Пароль</label>
-          {isEditing ? (
-            <Input
-              type="password"
-              value={editedProfile.password}
-              onChange={(e) =>
-                setEditedProfile({
-                  ...editedProfile,
-                  password: e.target.value,
-                })
-              }
-              placeholder="Новый пароль"
-            />
-          ) : (
-            <p className="text-gray-900">{profile.password}</p>
-          )}
-        </div>
 
         {/* Email */}
         <div className="bg-pink-100 p-2 rounded-xl space-y-1">
           <label className="text-sm text-gray-500">Email</label>
           {isEditing ? (
             <Input
-              value={editedProfile.email}
+              value={editedProfile.email || ""}
               onChange={(e) =>
                 setEditedProfile({
                   ...editedProfile,
@@ -132,7 +149,7 @@ export const ProfilePageContent = () => {
           <label className="text-sm text-gray-500">Реквизиты</label>
           {isEditing ? (
             <Input
-              value={editedProfile.requisites}
+              value={editedProfile.requisites || ""}
               onChange={(e) =>
                 setEditedProfile({
                   ...editedProfile,
