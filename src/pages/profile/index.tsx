@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { ProfilePageContent } from "@/components/profile/ProfilePage";
+import Link from "next/link";
 
-export default function EventsPage() {
+export default function ProfilePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true); // Добавляем состояние загрузки
   const Loader = () => (
