@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useGetProfileQuery, useUpdateProfileMutation, api } from "@/lib/api/api";
 import { useDispatch } from "react-redux";
+import { ButtonToMain } from "@/components/common/ButtonToMain";
 
 import {
   AlertDialog,
@@ -82,48 +83,8 @@ export const ProfilePageContent = () => {
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
-    <div className="flex justify-start mb-6">
-      {isEditing ? (
-        <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="pink"
-              size="sm"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowLeaveDialog(true);
-              }}
-              asChild
-            >
-              <Link href="/events">← На главную</Link>
-            </Button>
-          </AlertDialogTrigger>
+    <ButtonToMain isEditing={isEditing} />
 
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Вы действительно хотите уйти?</AlertDialogTitle>
-              <AlertDialogDescription>
-                У вас есть несохранённые изменения. Если вы уйдёте, они будут потеряны.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setShowLeaveDialog(false)}>
-                Отмена
-              </AlertDialogCancel>
-              <AlertDialogAction asChild>
-                <Link href="/events" onClick={() => setShowLeaveDialog(false)}>
-                  Всё равно уйти
-                </Link>
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      ) : (
-        <Button variant="pink" size="sm" asChild>
-          <Link href="/events">← На главную</Link>
-        </Button>
-      )}
-    </div>
 
 
       {/* Блок профиля */}
