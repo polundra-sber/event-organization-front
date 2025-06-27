@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,9 +8,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export const LoginForm = () => {
-  const [loginInput, setLoginInput] = useState("");
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [login, { isLoading, isError }] = useLoginMutation();
+  const [loginUser, { isLoading, isError, error }] = useLoginMutation();
   const router = useRouter();
 
   // Проверка авторизации при загрузке компонента
@@ -25,7 +25,7 @@ export const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const result = await login({ loginInput, password }).unwrap();
+      const result = await loginUser({ login, password }).unwrap();
       localStorage.setItem("token", result.token);
       router.push("/events");
     } catch (error) {
@@ -51,11 +51,14 @@ export const LoginForm = () => {
             </Label>
             <Input
               id="login"
-              type="login"
-              value={loginInput}
-              onChange={(e) => setLoginInput(e.target.value)}
+              type="text"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
               placeholder="Ваш логин"
               className="h-11"
+              required
+              minLength={3}
+              maxLength={20}
               autoFocus
             />
           </div>
@@ -71,13 +74,19 @@ export const LoginForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="h-11"
+              required
+              minLength={8}
+              maxLength={20}
             />
           </div>
         </div>
 
         {isError && (
           <p className="text-red-500 text-sm text-center py-1">
-            Неверные учетные данные. Пожалуйста, попробуйте снова.
+            {error && "data" in error
+              ? (error.data as { error?: string }).error ||
+                "Неверный логин или пароль"
+              : "Неверный логин или пароль"}
           </p>
         )}
 
@@ -88,7 +97,10 @@ export const LoginForm = () => {
 
       <div className="text-center mt-6 text-sm text-gray-600">
         Нет учетной записи?{" "}
-        <Link href="/register" className="text-blue-600 font-medium">
+        <Link
+          href="/register"
+          className="text-blue-600 font-medium hover:text-blue-700 transition-colors"
+        >
           Зарегистрироваться
         </Link>
       </div>

@@ -1,22 +1,13 @@
-export type ApiError = {
-  status: number;
-  data: {
-    error: string;
-    details?: {
-      field: string;
-      message: string;
-    };
-  };
-};
-
-export type RegisterRequest = {
-  loginInput: string;
-  password: string;
+export type User = {
+  login: string;
+  password?: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  surname: string;
+  comment_money_transfer?: string;
 };
 
-export type RegisterResponse = {
-  token: string;
+export type LoginRequest = {
+  login: string;
+  password: string;
 };

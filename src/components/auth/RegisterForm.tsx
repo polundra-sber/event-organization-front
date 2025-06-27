@@ -6,15 +6,15 @@ import { Label } from "@/components/ui/label";
 import { useRegisterMutation } from "@/lib/api/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ApiError, RegisterRequest } from "@/lib/api/auth-types";
 
 export const RegisterForm = () => {
-  const [formData, setFormData] = useState<RegisterRequest>({
-    loginInput: "",
+  const [formData, setFormData] = useState({
+    login: "",
     email: "",
     password: "",
-    firstName: "",
-    lastName: "",
+    name: "",
+    surname: "",
+    comment_money_transfer: "",
   });
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -35,14 +35,7 @@ export const RegisterForm = () => {
       localStorage.setItem("token", result.token);
       router.push("/events");
     } catch (err) {
-      const error = err as ApiError;
-      console.error("Registration failed:", error);
-
-      if (error.data?.details) {
-        setFieldErrors({
-          [error.data.details.field]: error.data.details.message,
-        });
-      }
+      console.error("Registration failed:", err);
     }
   };
 
@@ -61,63 +54,54 @@ export const RegisterForm = () => {
 
         <div className="space-y-3">
           <div>
-            <Label htmlFor="firstName" className="text-gray-700">
+            <Label htmlFor="name" className="text-gray-700">
               Имя
             </Label>
             <Input
-              id="firstName"
+              id="name"
               type="text"
-              value={formData.firstName}
+              value={formData.name}
               onChange={handleChange}
               placeholder="Ваше имя"
               className="h-11"
               required
+              minLength={1}
+              maxLength={20}
             />
-            {fieldErrors.firstName && (
-              <p className="text-red-500 text-xs mt-1">
-                {fieldErrors.firstName}
-              </p>
-            )}
           </div>
 
           <div>
-            <Label htmlFor="lastName" className="text-gray-700">
+            <Label htmlFor="surname" className="text-gray-700">
               Фамилия
             </Label>
             <Input
-              id="lastName"
+              id="surname"
               type="text"
-              value={formData.lastName}
+              value={formData.surname}
               onChange={handleChange}
               placeholder="Ваша фамилия"
               className="h-11"
               required
+              minLength={1}
+              maxLength={50}
             />
-            {fieldErrors.lastName && (
-              <p className="text-red-500 text-xs mt-1">
-                {fieldErrors.lastName}
-              </p>
-            )}
           </div>
 
           <div>
-            <Label htmlFor="loginInput" className="text-gray-700">
+            <Label htmlFor="login" className="text-gray-700">
               Логин
             </Label>
             <Input
-              id="loginInput"
+              id="login"
               type="text"
-              value={formData.loginInput}
+              value={formData.login}
               onChange={handleChange}
               placeholder="Придумайте логин"
               className="h-11"
               required
+              minLength={3}
+              maxLength={20}
             />
-            {fieldErrors.loginInput && (
-              <p className="text-red-500 text-xs mt-1">
-                {fieldErrors.loginInput}
-              </p>
-            )}
           </div>
 
           <div>
@@ -132,10 +116,9 @@ export const RegisterForm = () => {
               placeholder="Ваш email"
               className="h-11"
               required
+              minLength={1}
+              maxLength={254}
             />
-            {fieldErrors.email && (
-              <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
-            )}
           </div>
 
           <div>
@@ -150,19 +133,31 @@ export const RegisterForm = () => {
               placeholder="••••••••"
               className="h-11"
               required
+              minLength={8}
+              maxLength={20}
             />
-            {fieldErrors.password && (
-              <p className="text-red-500 text-xs mt-1">
-                {fieldErrors.password}
-              </p>
-            )}
+          </div>
+
+          <div>
+            <Label htmlFor="comment_money_transfer" className="text-gray-700">
+              Реквизиты для переводов (необязательно)
+            </Label>
+            <Input
+              id="comment_money_transfer"
+              type="text"
+              value={formData.comment_money_transfer}
+              onChange={handleChange}
+              placeholder="Например: Сбербанк 1234 5678 9012 3456"
+              className="h-11"
+              maxLength={254}
+            />
           </div>
         </div>
 
         {isError && (
           <p className="text-red-500 text-sm text-center py-1">
             {error && "data" in error
-              ? (error.data as { error: string }).error
+              ? (error.data as { error?: string }).error || "Ошибка регистрации"
               : "Ошибка регистрации. Пожалуйста, попробуйте снова."}
           </p>
         )}
@@ -174,7 +169,10 @@ export const RegisterForm = () => {
 
       <div className="text-center mt-6 text-sm text-gray-600">
         Уже есть аккаунт?{" "}
-        <Link href="/" className="text-blue-600 font-medium">
+        <Link
+          href="/"
+          className="text-blue-600 font-medium hover:text-blue-700 transition-colors"
+        >
           Войти
         </Link>
       </div>
