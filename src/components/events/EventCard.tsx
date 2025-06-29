@@ -9,72 +9,251 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import Link from "next/link";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 
 interface EventCardProps {
-  id: number;
-  title: string;
-  date: string;
-  location: string;
-  role: string;
-  onLeave: (id: number) => Promise<void> | void;
+  event_id: number;
+  event_name: string;
+  event_date: string;
+  event_time?: string;
+  location?: string;
+  role_name: "участник" | "организатор" | "создатель";
+  event_status_name?: "активно" | "завершено";
+  onLeave?: (id: number) => Promise<void> | void;
+  onDelete?: (id: number) => Promise<void> | void;
+  onComplete?: (id: number) => Promise<void> | void;
   className?: string;
-  isLeaving?: boolean;
+  isLoading?: boolean;
 }
 
 export const EventCard = ({
-  id,
-  title,
-  date,
-  location,
-  role,
+  event_id,
+  event_name,
+  event_date,
+  event_time,
+  location = "место не указано",
+  role_name,
+  event_status_name = "активно",
   onLeave,
+  onDelete,
+  onComplete,
   className,
-  isLeaving = false,
+  isLoading = false,
 }: EventCardProps) => {
-  const handleLeave = async () => {
+  const [actionType, setActionType] = useState<
+    "leave" | "delete" | "complete" | null
+  >(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const isCompleted = event_status_name === "завершено";
+  const isEventDatePassed = new Date(event_date) < new Date();
+
+  const formattedDate = format(new Date(event_date), "d MMMM yyyy", {
+    locale: ru,
+  });
+  const timeString = event_time ? `, ${event_time}` : "";
+
+  const handleAction = async () => {
     try {
-      await onLeave(id);
+      if (actionType === "leave" && onLeave) {
+        await onLeave(event_id);
+      } else if (actionType === "delete" && onDelete) {
+        await onDelete(event_id);
+      } else if (actionType === "complete" && onComplete) {
+        await onComplete(event_id);
+      }
     } catch (error) {
-      console.error("Ошибка при покидании мероприятия:", error);
+      console.error("Ошибка при выполнении действия:", error);
+    } finally {
+      setIsDialogOpen(false);
+      setActionType(null);
     }
   };
 
+  const getActionButtons = () => {
+    if (isCompleted) return null;
+
+    const buttons = [];
+
+    // Кнопка "Покинуть" для всех, кроме создателя
+    if (role_name !== "создатель") {
+      buttons.push(
+        <Button
+          key="leave"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            setActionType("leave");
+            setIsDialogOpen(true);
+          }}
+          size="sm"
+          disabled={isLoading}
+        >
+          Покинуть
+        </Button>
+      );
+    }
+
+    // Кнопки для создателя
+    if (role_name === "создатель") {
+      buttons.push(
+        <Button
+          key="delete"
+          variant="destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            setActionType("delete");
+            setIsDialogOpen(true);
+          }}
+          size="sm"
+          disabled={isLoading}
+          className="ml-2"
+        >
+          Удалить
+        </Button>
+      );
+
+      buttons.push(
+        <Button
+          key="complete"
+          variant="default"
+          onClick={(e) => {
+            e.stopPropagation();
+            setActionType("complete");
+            setIsDialogOpen(true);
+          }}
+          size="sm"
+          disabled={isLoading || !isEventDatePassed}
+          className="ml-2"
+          title={!isEventDatePassed ? "Доступно после даты мероприятия" : ""}
+        >
+          Завершить
+        </Button>
+      );
+    }
+
+    return buttons;
+  };
+
+  const getDialogContent = () => {
+    switch (actionType) {
+      case "leave":
+        return {
+          title: "Покинуть мероприятие",
+          description: "Вы уверены, что хотите покинуть это мероприятие?",
+        };
+      case "delete":
+        return {
+          title: "Удалить мероприятие",
+          description:
+            "Вы уверены, что хотите удалить это мероприятие? Это действие нельзя отменить.",
+        };
+      case "complete":
+        return {
+          title: "Завершить мероприятие",
+          description:
+            "Вы уверены, что хотите завершить это мероприятие? После завершения изменить его будет нельзя.",
+        };
+      default:
+        return {
+          title: "Подтвердите действие",
+          description: "Вы уверены, что хотите выполнить это действие?",
+        };
+    }
+  };
+
+  const dialogContent = getDialogContent();
+
   return (
-    <div className={cn("w-full transition-all hover:scale-[1.02]", className)}>
-      <Card className="hover:shadow-lg transition-shadow duration-300 border-border/50">
-        <CardHeader className="pb-3 space-y-1">
-          <CardTitle className="text-xl font-semibold text-foreground">
-            {title}
-          </CardTitle>
-          <div className="text-sm text-muted-foreground">📅 {date}</div>
-        </CardHeader>
+    <div className={cn("w-full", className)}>
+      <Card className="hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
+        <Link href={`/events/${event_id}`} className="hover:no-underline">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold line-clamp-2">
+              {event_name}
+            </CardTitle>
+            <div className="text-sm text-muted-foreground">
+              {formattedDate}
+              {timeString}
+            </div>
+          </CardHeader>
 
-        <CardContent className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">📍</span>
-            <span className="text-foreground">{location}</span>
-          </div>
+          <CardContent className="flex-1 space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">📍</span>
+              <span className="line-clamp-1">{location}</span>
+            </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">👤</span>
-            <span className="text-foreground">
-              Роль: <span className="font-medium text-primary">{role}</span>
-            </span>
-          </div>
-        </CardContent>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">👤</span>
+              <span>
+                Роль: <span className="font-medium">{role_name}</span>
+              </span>
+            </div>
 
-        <CardFooter className="justify-end pt-3">
-          <Button
-            variant="destructive"
-            onClick={handleLeave}
-            size="sm"
-            disabled={isLeaving}
-            className="transition-all hover:shadow-md hover:bg-destructive/90"
-          >
-            {isLeaving ? "Покидаем..." : "Покинуть мероприятие"}
-          </Button>
-        </CardFooter>
+            {event_status_name && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">📊</span>
+                <span>
+                  Статус:{" "}
+                  <span
+                    className={cn(
+                      "font-medium",
+                      isCompleted ? "text-green-600" : "text-blue-600"
+                    )}
+                  >
+                    {event_status_name}
+                  </span>
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Link>
+
+        {!isCompleted && (
+          <CardFooter className="justify-end pt-3 border-t">
+            <div className="flex">{getActionButtons()}</div>
+          </CardFooter>
+        )}
       </Card>
+
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogContent.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {dialogContent.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleAction}
+              disabled={isLoading}
+              className={
+                actionType === "delete" || actionType === "leave"
+                  ? "bg-destructive hover:bg-destructive/90"
+                  : ""
+              }
+            >
+              {isLoading ? "Выполняем..." : "Подтвердить"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

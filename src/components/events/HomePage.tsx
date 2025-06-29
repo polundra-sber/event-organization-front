@@ -11,44 +11,58 @@ import { Button } from "@/components/ui/button";
 import { EventCard } from "./EventCard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
+import { useGetEventsQuery } from "@/lib/api/api";
+
+// Вынести в event-types и сравнить с openapi
+type ApiEvent = {
+  event_id: number;
+  event_name: string;
+  event_date: string;
+  event_time?: string;
+  location?: string;
+  role_name: "участник" | "организатор" | "создатель";
+  event_status_name?: "активно" | "завершено";
+};
 
 export const HomePageContent = () => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "День рождения Марии",
-      date: "15 июля, 19:00",
-      location: "Кафе «Уют»",
-      role: "участник",
-    },
-    {
-      id: 2,
-      title: "Пикник в парке",
-      date: "20 июля, 19:00",
-      location: "Центральный парк",
-      role: "организатор",
-    },
-  ]);
+  const {
+    data: events = [],
+    isLoading: isEventsLoading,
+    isError,
+  } = useGetEventsQuery();
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
-  const [leavingId, setLeavingId] = useState<number | null>(null);
-
-  // TODO: спрашивать об удалении
-  const handleLeave = async (id: number) => {
-    setLeavingId(id);
+  const handleAction = async (
+    id: number,
+    actionType: "leave" | "delete" | "complete"
+  ) => {
+    setActionLoadingId(id);
     try {
-      // Здесь должен быть реальный API-запрос
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Имитация запроса
-
-      // Удаляем мероприятие из списка
-      setEvents((prev) => prev.filter((event) => event.id !== id));
-
-      console.log(`Мероприятие ${id} успешно покинуто`);
+      // Имитация API запроса
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log(
+        `Мероприятие ${id} ${
+          actionType === "leave"
+            ? "покинуто"
+            : actionType === "delete"
+            ? "удалено"
+            : "завершено"
+        }`
+      );
     } catch (error) {
-      console.error("Ошибка при покидании мероприятия:", error);
+      console.error(`Ошибка при выполнении действия ${actionType}:`, error);
     } finally {
-      setLeavingId(null);
+      setActionLoadingId(null);
     }
   };
+
+  if (isEventsLoading) return null;
+  if (isError)
+    return (
+      <div className="text-center py-8 text-red-500">
+        Ошибка загрузки мероприятий
+      </div>
+    );
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
@@ -75,11 +89,21 @@ export const HomePageContent = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem>Мои покупки</DropdownMenuItem>
-            <DropdownMenuItem>Мои вещи</DropdownMenuItem>
-            <DropdownMenuItem>Мои задачи</DropdownMenuItem>
-            <DropdownMenuItem>Мои долги</DropdownMenuItem>
-            <DropdownMenuItem>Мне должны</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/my-purchases">Мои покупки</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/my-items">Мои вещи</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/my-tasks">Мои задачи</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/my-debts">Мои долги</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/owed-to-me">Мне должны</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -97,28 +121,38 @@ export const HomePageContent = () => {
 
       {/* Actions */}
       <div className="flex gap-4 mb-6">
-        <Button variant="secondary" className="flex-1">
-          Создать
+        <Button variant="secondary" className="flex-1" asChild>
+          <Link href="/events/create-event">Создать</Link>
         </Button>
-        <Button variant="secondary" className="flex-1">
+        <Button variant="secondary" className="flex-1" disabled>
           Присоединиться
         </Button>
       </div>
 
       {/* Events list */}
       <div className="space-y-4">
-        {events.map((event) => (
-          <EventCard
-            key={event.id}
-            id={event.id}
-            title={event.title}
-            date={event.date}
-            location={event.location}
-            role={event.role}
-            onLeave={handleLeave}
-            isLeaving={leavingId === event.id}
-          />
-        ))}
+        {events.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            У вас нет мероприятий. Создайте первое!
+          </div>
+        ) : (
+          (events as ApiEvent[]).map((event) => (
+            <EventCard
+              key={event.event_id}
+              event_id={event.event_id}
+              event_name={event.event_name}
+              event_date={event.event_date}
+              event_time={event.event_time}
+              location={event.location}
+              role_name={event.role_name}
+              event_status_name={event.event_status_name}
+              onLeave={() => handleAction(event.event_id, "leave")}
+              onDelete={() => handleAction(event.event_id, "delete")}
+              onComplete={() => handleAction(event.event_id, "complete")}
+              isLoading={actionLoadingId === event.event_id}
+            />
+          ))
+        )}
       </div>
     </div>
   );
