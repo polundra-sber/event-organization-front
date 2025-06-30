@@ -10,16 +10,7 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -88,7 +79,6 @@ export const EventCard = ({
 
     const buttons = [];
 
-    // Кнопка "Покинуть" для всех, кроме создателя
     if (role_name !== "создатель") {
       buttons.push(
         <Button
@@ -107,7 +97,6 @@ export const EventCard = ({
       );
     }
 
-    // Кнопки для создателя
     if (role_name === "создатель") {
       buttons.push(
         <Button
@@ -154,23 +143,27 @@ export const EventCard = ({
         return {
           title: "Покинуть мероприятие",
           description: "Вы уверены, что хотите покинуть это мероприятие?",
+          confirmLabel: "Покинуть",
         };
       case "delete":
         return {
           title: "Удалить мероприятие",
           description:
             "Вы уверены, что хотите удалить это мероприятие? Это действие нельзя отменить.",
+          confirmLabel: "Удалить",
         };
       case "complete":
         return {
           title: "Завершить мероприятие",
           description:
             "Вы уверены, что хотите завершить это мероприятие? После завершения изменить его будет нельзя.",
+          confirmLabel: "Завершить",
         };
       default:
         return {
           title: "Подтвердите действие",
           description: "Вы уверены, что хотите выполнить это действие?",
+          confirmLabel: "Подтвердить",
         };
     }
   };
@@ -230,30 +223,15 @@ export const EventCard = ({
         )}
       </Card>
 
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{dialogContent.title}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {dialogContent.description}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleAction}
-              disabled={isLoading}
-              className={
-                actionType === "delete" || actionType === "leave"
-                  ? "bg-destructive hover:bg-destructive/90"
-                  : ""
-              }
-            >
-              {isLoading ? "Выполняем..." : "Подтвердить"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        title={dialogContent.title}
+        description={dialogContent.description}
+        onConfirm={handleAction}
+        confirmLabel={dialogContent.confirmLabel}
+        cancelLabel="Отмена"
+      />
     </div>
   );
 };
