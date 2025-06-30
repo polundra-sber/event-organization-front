@@ -4,10 +4,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useGetProfileQuery, useUpdateProfileMutation, api } from "@/lib/api/api";
+import { 
+  useGetProfileQuery, 
+  useUpdateProfileMutation,
+  profileApi
+} from "@/lib/api/profile"; // Измененный импорт API профиля
 import { useDispatch } from "react-redux";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
-import { UserEditor, UserProfile } from "@/lib/types";
+import { UserEditor, UserProfile } from "@/lib/api/types/profile-types";
 
 function getInitials(firstName: string, lastName: string) {
   const firstInitial = firstName?.charAt(0).toUpperCase() || "?";
@@ -32,6 +36,7 @@ export const ProfilePageContent = () => {
   const [nameError, setNameError] = useState<string | null>(null);
   const [editedProfile, setEditedProfile] = useState<UserEditor>({});
 
+  // Используем хуки из profileApi
   const { data: profile, isLoading, isError } = useGetProfileQuery();
   const [updateProfile] = useUpdateProfileMutation();
   const dispatch = useDispatch();
@@ -85,9 +90,9 @@ export const ProfilePageContent = () => {
       }
 
       try {
-        const result = await updateProfile(changedFields).unwrap();
+         const result = await updateProfile(changedFields).unwrap();
         dispatch(
-          api.util.updateQueryData("getProfile", undefined, (draft) => {
+          profileApi.util.updateQueryData("getProfile", undefined, (draft) => {
             Object.assign(draft, result);
           })
         );
@@ -105,6 +110,7 @@ export const ProfilePageContent = () => {
 
   if (isLoading) return <p>Загрузка профиля...</p>;
   if (isError) return <p>Ошибка загрузки профиля</p>;
+  if (!profile) return <p>Профиль не найден</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
