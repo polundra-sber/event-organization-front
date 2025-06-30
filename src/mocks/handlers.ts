@@ -5,7 +5,6 @@ let mockProfile = {
   firstName: "Анна",
   lastName: "Иванова",
   login: "anna_ivanova",
-  password: "••••••••",
   email: "anna@example.com",
   requisites: "Банковская карта: 1234 5678 9012 3456",
 };
@@ -87,21 +86,32 @@ export const handlers = [
     );
   }),
 
-      // Мок для /api/profile
-  http.get("/api/profile", () => {
-    return HttpResponse.json(mockProfile);
+   http.get("/api/profile", () => {
+    return HttpResponse.json({
+      firstName: mockProfile.firstName,
+      lastName: mockProfile.lastName,
+      login: mockProfile.login,
+      email: mockProfile.email,
+      requisites: mockProfile.requisites,
+    });
   }),
 
   http.patch("/api/profile", async ({ request }) => {
     const updatedData = await request.json();
 
-    // Обновляем мок-профиль
+    if (updatedData.email && updatedData.email === "existing@example.com") {
+      return HttpResponse.json(
+        { error: "Пользователь с такой почтой уже существует" },
+        { status: 409 }
+      );
+    }
+
     mockProfile = {
       ...mockProfile,
-      ...updatedData
+      ...updatedData,
     };
 
-    return HttpResponse.json(mockProfile);
+    return HttpResponse.json(updatedData, { status: 201 });
   }),
-
 ];
+

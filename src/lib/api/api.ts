@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Profile } from "@/lib/types";
+import { UserProfile, UserEditor } from "@/lib/api/auth-types";
 
 // 1. Создаем API клиент
 export const api = createApi({
@@ -30,11 +30,11 @@ export const api = createApi({
       }),
     }),
 
-    getProfile: builder.query({
+    getProfile: builder.query<UserProfile, void>({
       query: () => "/profile",
     }),
 
-    updateProfile: builder.mutation<Profile, Partial<Profile>>({
+    updateProfile: builder.mutation<UserEditor, Partial<UserEditor>>({
       query: (updatedData) => ({
         url: "/profile",
         method: "PATCH",
