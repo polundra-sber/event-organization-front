@@ -9,3 +9,15 @@ export type Event = {
   event_time?: string;
   chat_link?: string;
 };
+
+export type EventEditor = {
+  event_name?: string;
+  event_description?: string;
+  location?: string;
+  event_date?: string;
+  event_time?: string;
+  chat_link?: string;
+};
+
+export type EventRole = "участник" | "организатор" | "создатель";
+export type EventStatus = "активно" | "завершено";

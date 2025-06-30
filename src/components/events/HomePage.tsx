@@ -11,52 +11,66 @@ import { Button } from "@/components/ui/button";
 import { EventCard } from "./EventCard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
-import { useGetEventsQuery } from "@/lib/api/events";
-
-// Вынести в event-types и сравнить с openapi
-type ApiEvent = {
-  event_id: number;
-  event_name: string;
-  event_date: string;
-  event_time?: string;
-  location?: string;
-  role_name: "участник" | "организатор" | "создатель";
-  event_status_name?: "активно" | "завершено";
-};
+import {
+  useGetEventsQuery,
+  useLeaveEventMutation,
+  useDeleteEventMutation,
+  useCompleteEventMutation,
+  useJoinEventMutation,
+} from "@/lib/api/events";
+import { toast } from "sonner";
+import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 
 export const HomePageContent = () => {
   const {
     data: events = [],
     isLoading: isEventsLoading,
     isError,
+    refetch,
   } = useGetEventsQuery();
+
+  const [leaveEvent] = useLeaveEventMutation();
+  const [deleteEvent] = useDeleteEventMutation();
+  const [completeEvent] = useCompleteEventMutation();
+  const [joinEvent] = useJoinEventMutation();
+
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
   const handleAction = async (
     id: number,
-    actionType: "leave" | "delete" | "complete"
+    actionType: "leave" | "delete" | "complete" | "join"
   ) => {
     setActionLoadingId(id);
     try {
-      // Имитация API запроса
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(
-        `Мероприятие ${id} ${
-          actionType === "leave"
-            ? "покинуто"
-            : actionType === "delete"
-            ? "удалено"
-            : "завершено"
-        }`
-      );
+      switch (actionType) {
+        case "leave":
+          await leaveEvent(id).unwrap();
+          toast.success("Вы покинули мероприятие");
+          break;
+        case "delete":
+          await deleteEvent(id).unwrap();
+          toast.success("Мероприятие удалено");
+          break;
+        case "complete":
+          await completeEvent(id).unwrap();
+          toast.success("Мероприятие завершено");
+          break;
+        case "join":
+          await joinEvent(id).unwrap();
+          toast.success("Заявка на участие отправлена");
+          break;
+      }
+      refetch();
     } catch (error) {
+      toast.error("Произошла ошибка");
       console.error(`Ошибка при выполнении действия ${actionType}:`, error);
     } finally {
       setActionLoadingId(null);
     }
   };
 
-  if (isEventsLoading) return null;
+  if (isEventsLoading)
+    return <div className="text-center py-8">Загрузка мероприятий...</div>;
   if (isError)
     return (
       <div className="text-center py-8 text-red-500">
@@ -124,7 +138,16 @@ export const HomePageContent = () => {
         <Button variant="secondary" className="flex-1" asChild>
           <Link href="/events/create-event">Создать</Link>
         </Button>
-        <Button variant="secondary" className="flex-1" disabled>
+        <Button
+          variant="secondary"
+          className="flex-1"
+          onClick={() => {
+            const eventId = prompt("Введите ID мероприятия для присоединения");
+            if (eventId) {
+              handleAction(Number(eventId), "join");
+            }
+          }}
+        >
           Присоединиться
         </Button>
       </div>
@@ -136,7 +159,7 @@ export const HomePageContent = () => {
             У вас нет мероприятий. Создайте первое!
           </div>
         ) : (
-          (events as ApiEvent[]).map((event) => (
+          events.map((event) => (
             <EventCard
               key={event.event_id}
               event_id={event.event_id}
@@ -144,8 +167,8 @@ export const HomePageContent = () => {
               event_date={event.event_date}
               event_time={event.event_time}
               location={event.location}
-              role_name={event.role_name}
-              event_status_name={event.event_status_name}
+              role_name={event.role_name as EventRole}
+              event_status_name={event.event_status_name as EventStatus}
               onLeave={() => handleAction(event.event_id, "leave")}
               onDelete={() => handleAction(event.event_id, "delete")}
               onComplete={() => handleAction(event.event_id, "complete")}
