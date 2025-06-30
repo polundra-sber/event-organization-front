@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { EventCard } from "./EventCard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
-import { useGetEventsQuery } from "@/lib/api/api";
+import { useGetEventsQuery } from "@/lib/api/events";
 
 // Вынести в event-types и сравнить с openapi
 type ApiEvent = {
