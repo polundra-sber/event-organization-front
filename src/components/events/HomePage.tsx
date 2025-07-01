@@ -194,7 +194,7 @@ export const HomePageContent = () => {
               <Link href="/my-purchases">Мои покупки</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/my-items">Мои вещи</Link>
+              <Link href="/my-stuffs">Мои вещи</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/my-tasks">Мои задачи</Link>
@@ -203,7 +203,7 @@ export const HomePageContent = () => {
               <Link href="/my-debts">Мои долги</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/owed-to-me">Мне должны</Link>
+              <Link href="/my-incomes">Мне должны</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
