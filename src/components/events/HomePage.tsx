@@ -20,15 +20,13 @@ import {
 } from "@/lib/api/events";
 import { toast } from "sonner";
 import { EventRole, EventStatus } from "@/lib/api/types/event-types";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { FilterButton } from "@/components/common/FilterButton";
+import { FilterModal } from "@/components/common/FilterModal";
+
+interface EventFilters extends Record<string, boolean> {
+  active: boolean;
+  completed: boolean;
+}
 
 export const HomePageContent = () => {
   const {
@@ -44,15 +42,16 @@ export const HomePageContent = () => {
   const [joinEvent] = useJoinEventMutation();
 
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
-  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
-  const [tempFilters, setTempFilters] = useState({
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<EventFilters>({
     active: true,
     completed: true,
   });
-  const [appliedFilters, setAppliedFilters] = useState({
-    active: true,
-    completed: true,
-  });
+
+  const filterOptions = [
+    { id: "active", label: "Активные мероприятия" },
+    { id: "completed", label: "Завершенные мероприятия" },
+  ];
 
   const handleAction = async (
     id: number,
@@ -88,7 +87,6 @@ export const HomePageContent = () => {
   };
 
   const filteredEvents = events.filter((event) => {
-    // Если ни один фильтр не выбран, показываем все мероприятия
     if (!appliedFilters.active && !appliedFilters.completed) return true;
     if (appliedFilters.active && event.event_status_name === "активно")
       return true;
@@ -97,18 +95,6 @@ export const HomePageContent = () => {
     return false;
   });
 
-  const openFilterDialog = () => {
-    setTempFilters(appliedFilters);
-    setIsFilterDialogOpen(true);
-  };
-
-  const applyFilters = () => {
-    setAppliedFilters(tempFilters);
-    setIsFilterDialogOpen(false);
-  };
-
-  if (isEventsLoading)
-    return <div className="text-center py-8">Загрузка мероприятий...</div>;
   if (isError)
     return (
       <div className="text-center py-8 text-red-500">
@@ -190,29 +176,9 @@ export const HomePageContent = () => {
         </Button>
       </div>
 
-      {/* Filter Button - теперь в одной строке с другими кнопками */}
+      {/* Filter Button */}
       <div className="flex justify-start mb-6">
-        <Button
-          variant="secondary"
-          size="sm"
-          className="flex items-center gap-2"
-          onClick={openFilterDialog}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-          </svg>
-          Фильтры
-        </Button>
+        <FilterButton onClick={() => setIsFilterOpen(true)} />
       </div>
 
       {/* Events list */}
@@ -243,45 +209,15 @@ export const HomePageContent = () => {
         )}
       </div>
 
-      {/* Filter Dialog */}
-      <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Фильтры мероприятий</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="active-events"
-                checked={tempFilters.active}
-                onCheckedChange={(checked) =>
-                  setTempFilters({ ...tempFilters, active: !!checked })
-                }
-              />
-              <Label htmlFor="active-events">Активные мероприятия</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="completed-events"
-                checked={tempFilters.completed}
-                onCheckedChange={(checked) =>
-                  setTempFilters({ ...tempFilters, completed: !!checked })
-                }
-              />
-              <Label htmlFor="completed-events">Завершенные мероприятия</Label>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsFilterDialogOpen(false)}
-            >
-              Отмена
-            </Button>
-            <Button onClick={applyFilters}>Применить</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Filter Modal */}
+      <FilterModal<EventFilters>
+        isOpen={isFilterOpen}
+        onOpenChange={setIsFilterOpen}
+        initialFilters={appliedFilters}
+        onApply={setAppliedFilters}
+        options={filterOptions}
+        title="Фильтры мероприятий"
+      />
     </div>
   );
 };
