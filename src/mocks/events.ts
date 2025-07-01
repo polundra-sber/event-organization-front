@@ -35,6 +35,13 @@ export const mockEvents: Event[] = [
     role_name: "создатель",
     event_status_name: "активно",
   },
+  {
+    event_id: 123,
+    event_name: "Концерт 2 id 123 участник",
+    event_date: "2025-01-25",
+    role_name: "участник",
+    event_status_name: "активно",
+  },
 ];
 
 export const eventHandlers = [
@@ -105,7 +112,7 @@ export const eventHandlers = [
       );
     }
 
-    if (event.role_name !== "участник") {
+    if (event.event_id !== 15) {
       return HttpResponse.json(
         { error: "Вы уже присоединены к данному мероприятию" },
         { status: 409 }
