@@ -42,9 +42,6 @@ export const eventsApi = api.injectEndpoints({
         url: `/join_event_request/${eventId}`,
         method: "POST",
       }),
-      invalidatesTags: (result, error, eventId) => [
-        { type: "Event", id: eventId },
-      ],
     }),
 
     // Покинуть мероприятие
