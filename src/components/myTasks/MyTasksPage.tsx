@@ -101,7 +101,7 @@ export const MyTasksPageContent = () => {
   return (
     <div className="p-4 min-h-screen bg-gray-50">
       <ButtonToMain className="mb-10"/>
-      <div className="flex items-center justify-center bg-my-light-orange px-6 py-3 rounded-xl mb-4">
+      <div className="flex items-center justify-center  bg-my-yellow-green   px-6 py-3 rounded-xl mb-4">
         <label className="text-lg font-bold text-my-black text-lg">
           Мои задачи
         </label>
@@ -157,8 +157,19 @@ export const MyTasksPageContent = () => {
                   </div>
 
                   <div className="flex gap-2 ml-auto">
+
                     {task.task_status_name !== "выполнена" && (
+                      <Button 
+                        variant="light_green"
+                        size="sm"
+                        onClick={() => openConfirmDialog(task)}
+                      >
+                        Отказаться
+                      </Button>
+                    )}
+                                        {task.task_status_name !== "выполнена" && (
                       <Button
+                        variant="dark_green"
                         size="sm"
                         onClick={async () => {
                           try {
@@ -173,15 +184,6 @@ export const MyTasksPageContent = () => {
                         }}
                       >
                         Выполнено
-                      </Button>
-                    )}
-                    {task.task_status_name !== "выполнена" && (
-                      <Button 
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => openConfirmDialog(task)}
-                      >
-                        Отказаться
                       </Button>
                     )}
                   </div>

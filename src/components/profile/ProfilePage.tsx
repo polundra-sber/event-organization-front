@@ -126,7 +126,7 @@ export const ProfilePageContent = () => {
           </p>
         )}
 
-        <div className="flex items-center justify-center bg-my-light-orange px-6 py-3 rounded-xl mb-4">
+        <div className="flex items-center justify-center  bg-my-yellow-green  px-6 py-3 rounded-xl mb-4">
           <label className="text-lg font-bold text-my-black text-lg">
             Мой профиль
           </label>

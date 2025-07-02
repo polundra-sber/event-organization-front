@@ -83,7 +83,7 @@ export const EventCard = ({
       buttons.push(
         <Button
           key="leave"
-          variant="outline"
+          variant="yellow_green"
           onClick={(e) => {
             e.stopPropagation();
             setActionType("leave");
@@ -101,7 +101,7 @@ export const EventCard = ({
       buttons.push(
         <Button
           key="delete"
-          variant="destructive"
+          variant="yellow_green"
           onClick={(e) => {
             e.stopPropagation();
             setActionType("delete");
@@ -118,7 +118,7 @@ export const EventCard = ({
       buttons.push(
         <Button
           key="complete"
-          variant="default"
+          variant="dark_green"
           onClick={(e) => {
             e.stopPropagation();
             setActionType("complete");

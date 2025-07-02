@@ -36,8 +36,9 @@
   --sidebar-ring: #999999;
     /* Новые цвета для авокадо */
   --my-dark-green: #256C34;    /* темно-зеленый (над авокадо) */
-  --my-light-orange: #ffdcbb;   /* светло-зеленый (где авокадо) */
-  --my-light-green: #f4f7e5;            /* фон картинки */
+  --my-yellow-green: #e3ebbe;  /* светло-зеленый (где авокадо) */
+  --my-bright-green:  #97d381;/* две кнопки на главной стр #81d392; /*#4ec266;/*#F9A860; */  /* светло-зеленый (где авокадо) */
+  --my-light-green:  #f4f7e5 ;            /* фон картинки */
 }
 
 @theme inline {
@@ -81,7 +82,8 @@
 
     /* Подключаем новые цвета */
   --color-my-dark-green: var(--my-dark-green);
-  --color-my-light-orange: var(--my-light-orange);
+  --color-my-yellow-green: var(--my-yellow-green);
+  --color-my-bright-green: var(--my-bright-green);
   --color-my-light-green: var(--my-light-green);
 }
 
