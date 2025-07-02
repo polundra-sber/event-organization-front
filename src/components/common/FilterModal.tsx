@@ -18,72 +18,120 @@ interface FilterOption {
   label: string;
 }
 
-interface FilterModalProps<T extends Record<string, boolean>> {
+interface CategoryOption {
+  id: string;
+  label: string;
+  options: FilterOption[];
+  withSearch?: boolean;
+}
+
+interface BaseProps<T extends Record<string, boolean>> {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   initialFilters: T;
   onApply: (filters: T) => void;
-  options: FilterOption[];
   title?: string;
-  withSearch?: boolean; 
 }
 
+type FilterModalPropsSingle<T extends Record<string, boolean>> = BaseProps<T> & {
+  mode?: "single";
+  options: FilterOption[];
+  withSearch?: boolean;
+};
+
+type FilterModalPropsMulti<T extends Record<string, boolean>> = BaseProps<T> & {
+  mode: "multi";
+  categories: CategoryOption[];
+};
+
+type FilterModalProps<T extends Record<string, boolean>> =
+  | FilterModalPropsSingle<T>
+  | FilterModalPropsMulti<T>;
+
+
 /**
- * Модальное окно для выбора фильтров с чекбоксами
+ * FilterModal — универсальный модальный компонент для выбора фильтров.
  *
- * @description
- * Компонент `FilterModal` предоставляет:
- * - Модальное окно с настраиваемым заголовком
- * - Список фильтров в виде чекбоксов
- * - Кнопки "Отмена" и "Применить"
- * - Сохранение временного состояния фильтров перед применением
- * - Поддержку generic типа для фильтров
+ * Поддерживает два режима:
+ * - "single": один список опций.
+ * - "multi": список категорий с опциями внутри.
  *
- * @typeParam T - Объект типа Record<string, boolean>, где ключи - ID фильтров, значения - их состояние
+ * @template T Тип фильтров: Record<string, boolean>
  *
- * @param props - Свойства компонента
- * @param props.isOpen - Флаг видимости модального окна
- * @param props.onOpenChange - Callback для изменения видимости окна
- * @param props.initialFilters - Начальные значения фильтров
- * @param props.onApply - Callback, вызываемый при применении фильтров
- * @param props.options - Массив вариантов фильтров
- * @param props.title - Заголовок модального окна (по умолчанию "Фильтры")
+ * @param {object} props
+ * @param {boolean} props.isOpen - Открыта ли модалка.
+ * @param {(open: boolean) => void} props.onOpenChange - Изменяет состояние открытия.
+ * @param {T} props.initialFilters - Начальные выбранные фильтры: ключ — id опции, значение — выбрана ли.
+ * @param {(filters: T) => void} props.onApply - Вызывается при применении фильтров.
+ * @param {string} [props.title] - Заголовок модалки. По умолчанию: "Фильтры".
+ * @param {"single"} [props.mode] - Режим single: отображает один список фильтров.
+ * @param {FilterOption[]} [props.options] - Список фильтров (для single).
+ * @param {boolean} [props.withSearch] - Включить поиск (для single или категории).
+ * @param {"multi"} [props.mode] - Режим multi: список категорий.
+ * @param {CategoryOption[]} [props.categories] - Список категорий с опциями (для multi).
  *
  * @example
- * // Базовое использование
+ * // Single mode
  * <FilterModal
- *   isOpen={isFilterOpen}
- *   onOpenChange={setIsFilterOpen}
- *   initialFilters={{ all: true, completed: false }}
- *   onApply={(filters) => setActiveFilters(filters)}
+ *   isOpen={isOpen}
+ *   onOpenChange={setIsOpen}
+ *   initialFilters={{ draft: true, published: false }}
+ *   onApply={(filters) => console.log(filters)}
  *   options={[
- *     { id: "all", label: "Все задачи" },
- *     { id: "completed", label: "Только выполненные" }
+ *     { id: "draft", label: "Черновик" },
+ *     { id: "published", label: "Опубликовано" },
+ *   ]}
+ *   withSearch={true}
+ * />
+ *
+ * @example
+ * // Multi mode
+ * <FilterModal
+ *   isOpen={isOpen}
+ *   onOpenChange={setIsOpen}
+ *   initialFilters={{ draft: true, event1: true }}
+ *   onApply={(filters) => console.log(filters)}
+ *   mode="multi"
+ *   categories={[
+ *     {
+ *       id: "status",
+ *       label: "Статус",
+ *       options: [
+ *         { id: "draft", label: "Черновик" },
+ *         { id: "published", label: "Опубликовано" },
+ *       ],
+ *     },
+ *     {
+ *       id: "event",
+ *       label: "Мероприятие",
+ *       withSearch: true,
+ *       options: [
+ *         { id: "event1", label: "Конференция A" },
+ *         { id: "event2", label: "Семинар B" },
+ *       ],
+ *     },
  *   ]}
  * />
- *
- * @example
- * // С кастомным заголовком
- * <FilterModal
- *   title="Фильтры задач"
- *   // остальные пропсы...
- * />
  */
+
+
 export function FilterModal<T extends Record<string, boolean>>({
   isOpen,
   onOpenChange,
   initialFilters,
   onApply,
-  options,
   title = "Фильтры",
-  withSearch = false,
+  ...props
 }: FilterModalProps<T>) {
- const [tempFilters, setTempFilters] = useState<T>(initialFilters);
+  const [tempFilters, setTempFilters] = useState<T>(initialFilters);
   const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   useEffect(() => {
     setTempFilters(initialFilters);
-  }, [initialFilters]);
+    setActiveCategory(null); // Сбрасываем активную категорию при открытии
+    setSearch(""); // Сбрасываем поиск при открытии
+  }, [isOpen, initialFilters]);
 
   const handleFilterChange = (id: keyof T, checked: boolean) => {
     setTempFilters((prev) => ({ ...prev, [id]: checked }));
@@ -94,11 +142,39 @@ export function FilterModal<T extends Record<string, boolean>>({
     onOpenChange(false);
   };
 
-  const filteredOptions = withSearch
-    ? options.filter((option) =>
-        option.label.toLowerCase().includes(search.toLowerCase())
-      )
-    : options;
+  const handleCancel = () => {
+    setTempFilters(initialFilters);
+    onOpenChange(false);
+  };
+
+  const currentCategory = props.mode === "multi" && activeCategory 
+    ? props.categories.find(cat => cat.id === activeCategory)
+    : null;
+
+  const shouldShowSearch = currentCategory?.withSearch || 
+    (props.mode !== "multi" && (props as FilterModalPropsSingle<T>).withSearch);
+
+  const filteredOptions = () => {
+    if (props.mode !== "multi") {
+      const options = props.options;
+      return shouldShowSearch
+        ? options.filter(option =>
+            option.label.toLowerCase().includes(search.toLowerCase())
+          )
+        : options;
+    }
+
+    if (activeCategory) {
+      const options = currentCategory?.options || [];
+      return shouldShowSearch
+        ? options.filter(option =>
+            option.label.toLowerCase().includes(search.toLowerCase())
+          )
+        : options;
+    }
+
+    return [];
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -107,7 +183,7 @@ export function FilterModal<T extends Record<string, boolean>>({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
-        {withSearch && (
+        {shouldShowSearch && (
           <div className="mb-4">
             <Input
               placeholder="Поиск..."
@@ -117,30 +193,80 @@ export function FilterModal<T extends Record<string, boolean>>({
           </div>
         )}
 
-        <div className="space-y-4 max-h-30 overflow-y-auto">
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option) => (
-              <div key={option.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={option.id}
-                  checked={tempFilters[option.id as keyof T] ?? false}
-                  onCheckedChange={(checked) =>
-                    handleFilterChange(option.id as keyof T, !!checked)
-                  }
-                />
-                <Label htmlFor={option.id}>{option.label}</Label>
+        {/* multi mode */}
+        {props.mode === "multi" && (
+          <>
+            {activeCategory === null ? (
+              <div className="space-y-4">
+                {props.categories.map((category) => (
+                  <Button
+                    key={category.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => setActiveCategory(category.id)}
+                  >
+                    {category.label}
+                  </Button>
+                ))}
               </div>
-            ))
-          ) : (
-            <p className="text-sm text-gray-500">Ничего не найдено</p>
-          )}
-        </div>
+            ) : (
+              <div className="space-y-4 max-h-40 overflow-y-auto">
+                {filteredOptions().length > 0 ? (
+                  filteredOptions().map((option) => (
+                    <div key={option.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={option.id}
+                        checked={tempFilters[option.id as keyof T] ?? false}
+                        onCheckedChange={(checked) =>
+                          handleFilterChange(option.id as keyof T, !!checked)
+                        }
+                      />
+                      <Label htmlFor={option.id}>{option.label}</Label>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">Ничего не найдено</p>
+                )}
+              </div>
+            )}
+          </>
+        )}
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Отмена
-          </Button>
-          <Button onClick={handleApply}>Применить</Button>
+        {/* single mode */}
+        {(!props.mode || props.mode === "single") && (
+          <div className="space-y-4 max-h-40 overflow-y-auto">
+            {filteredOptions().length > 0 ? (
+              filteredOptions().map((option) => (
+                <div key={option.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={option.id}
+                    checked={tempFilters[option.id as keyof T] ?? false}
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(option.id as keyof T, !!checked)
+                    }
+                  />
+                  <Label htmlFor={option.id}>{option.label}</Label>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">Ничего не найдено</p>
+            )}
+          </div>
+        )}
+
+        <DialogFooter className="mt-4">
+          {activeCategory === null ? (
+            <>
+              <Button variant="outline" onClick={handleCancel}>
+                Отмена
+              </Button>
+              <Button onClick={handleApply}>Применить</Button>
+            </>
+          ) : (
+            <Button onClick={() => setActiveCategory(null)} className="w-full">
+              Выбрать
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -28,8 +28,7 @@ export const MyTasksPageContent = () => {
 
   const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    all: true,
+  const [filters, setFilters] = useState<Record<string, boolean>>({
     done: false,
     in_progress: false,
   });
@@ -74,10 +73,26 @@ export const MyTasksPageContent = () => {
   const tasks = data || [];
   
   const filteredTasks = tasks.filter((task) => {
-    if (filters.all) return true;
-    if (filters.done && task.task_status_name === "выполнена") return true;
-    if (filters.in_progress && task.task_status_name !== "выполнена") return true;
-    return false;
+    // Проверяем фильтры по статусу
+    const statusFiltersActive = filters.done || filters.in_progress;
+    const statusMatch =
+      !statusFiltersActive || // если ни один статус не выбран - показываем все
+      (filters.done && task.task_status_name === "выполнена") ||
+      (filters.in_progress && task.task_status_name !== "выполнена");
+
+    // Проверяем фильтры по мероприятиям
+    const eventFiltersActive = Object.keys(filters).some(key => 
+      key.startsWith('event_') && filters[key]
+    );
+    const eventMatch =
+      !eventFiltersActive || // если ни одно мероприятие не выбрано - показываем все
+      Object.keys(filters).some(
+        key => key.startsWith('event_') && 
+        filters[key] && 
+        key === `event_${task.event_id}`
+      );
+
+    return statusMatch && eventMatch;
   });
 
   if (isLoading) return <p>Загрузка...</p>;
@@ -85,10 +100,14 @@ export const MyTasksPageContent = () => {
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain />
-      <h1 className="text-2xl text-center font-bold mb-6">Мои задачи</h1>
+      <ButtonToMain className="mb-10"/>
+      <div className="flex items-center justify-center bg-my-light-orange px-6 py-3 rounded-xl mb-4">
+        <label className="text-lg font-bold text-my-black text-lg">
+          Мои задачи
+        </label>
+      </div>
 
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-start mb-4">
         <FilterButton onClick={() => setIsFilterOpen(true)} />
       </div>
 
@@ -102,7 +121,7 @@ export const MyTasksPageContent = () => {
             return (
               <Card key={task.task_id}>
                 <CardHeader>
-                  <CardTitle>{task.event_name} </CardTitle>
+                  <CardTitle>{task.event_name}</CardTitle>
                   <CardDescription className="text-black">
                     {task.task_name}
                   </CardDescription>
@@ -116,15 +135,17 @@ export const MyTasksPageContent = () => {
 
                 <CardContent className="flex justify-between items-center relative flex-wrap gap-4">
                   <div className="relative">
-                    <button
-                      onClick={() => toggleDescription(task.task_id)}
-                      className="flex items-center text-sm text-gray-700 hover:text-gray-900"
-                    >
-                      <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
-                        {isOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                      </span>
-                      Описание
-                    </button>
+                    {task.task_description && (
+                      <button
+                        onClick={() => toggleDescription(task.task_id)}
+                        className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+                      >
+                        <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
+                          {isOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                        </span>
+                        Описание
+                      </button>
+                    )}
 
                     {isOpen && (
                       <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
@@ -135,7 +156,7 @@ export const MyTasksPageContent = () => {
                     )}
                   </div>
 
-                  <div className="flex gap-2  ml-auto">
+                  <div className="flex gap-2 ml-auto">
                     {task.task_status_name !== "выполнена" && (
                       <Button
                         size="sm"
@@ -154,13 +175,15 @@ export const MyTasksPageContent = () => {
                         Выполнено
                       </Button>
                     )}
-                    <Button 
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => openConfirmDialog(task)}
-                    >
-                      Отказаться
-                    </Button>
+                    {task.task_status_name !== "выполнена" && (
+                      <Button 
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => openConfirmDialog(task)}
+                      >
+                        Отказаться
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -181,14 +204,33 @@ export const MyTasksPageContent = () => {
       />
 
       <FilterModal
+        mode="multi"
         isOpen={isFilterOpen}
         onOpenChange={setIsFilterOpen}
         initialFilters={filters}
         onApply={setFilters}
-        options={[
-          { id: "all", label: "Все задачи" },
-          { id: "done", label: "Выполненные" },
-          { id: "in_progress", label: "В процессе" },
+        categories={[
+          {
+            id: "status",
+            label: "Статус",
+            options: [
+              { id: "done", label: "Выполненные" },
+              { id: "in_progress", label: "В процессе" },
+            ],
+          },
+          {
+            id: "event",
+            label: "Мероприятие",
+            withSearch: true,
+            options: Array.from(
+              new Map(
+                tasks.map(task => [`event_${task.event_id}`, {
+                  id: `event_${task.event_id}`,
+                  label: task.event_name,
+                }])
+              ).values()
+            ),
+          },
         ]}
       />
     </div>
