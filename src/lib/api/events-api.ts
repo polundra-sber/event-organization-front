@@ -19,7 +19,7 @@ export const eventsApi = api.injectEndpoints({
     }),
 
     // Создание мероприятия
-    createEvent: builder.mutation<EventEditor, Partial<EventEditor>>({
+    createEvent: builder.mutation<Event, Partial<EventEditor>>({
       query: (eventData) => ({
         url: "/create_event",
         method: "POST",

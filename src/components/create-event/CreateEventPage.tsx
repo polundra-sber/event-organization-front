@@ -20,10 +20,12 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function CreateEventPage() {
   const router = useRouter();
   const [createEvent, { isLoading }] = useCreateEventMutation();
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     event_name: "",
@@ -109,6 +111,7 @@ export default function CreateEventPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
 
     if (!validateForm()) return;
 
@@ -122,8 +125,18 @@ export default function CreateEventPage() {
         chat_link: formData.chat_link,
       }).unwrap();
 
-      router.push(`/events`);
-    } catch (error) {
+      // Показываем успех и перенаправляем
+      toast.success("Мероприятие успешно создано!");
+      router.push(`/events/${response.event_id}`);
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message || "Не удалось создать мероприятие";
+
+      // Показываем ошибку через sonner
+      toast.error("Ошибка", {
+        description: errorMessage,
+      });
+
       console.error("Failed to create event:", error);
     }
   };

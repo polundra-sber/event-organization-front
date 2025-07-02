@@ -58,6 +58,8 @@ export const eventHandlers = [
 
   // Создание мероприятия
   http.post("/api/create_event", async ({ request }) => {
+    //return HttpResponse.json({ error: "Специальная ошибка" }, { status: 409 });
+
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return HttpResponse.json({ error: "Не авторизован" }, { status: 401 });
@@ -70,8 +72,8 @@ export const eventHandlers = [
       event_description: newEvent.event_description,
       event_date: newEvent.event_date || new Date().toISOString().split("T")[0],
       event_time: newEvent.event_time,
-      location: newEvent.location,
-      role_name: "организатор",
+      location: newEvent.location || "Место не указано",
+      role_name: "создатель",
       event_status_name: "активно",
       chat_link: newEvent.chat_link,
     };
