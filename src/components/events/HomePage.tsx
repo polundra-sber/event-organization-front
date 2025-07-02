@@ -1,12 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "./EventCard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -31,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { MyListsMenu } from "../common/MyListsMenu";
 
 interface EventFilters extends Record<string, boolean> {
   active: boolean;
@@ -169,44 +164,7 @@ export const HomePageContent = () => {
     <div className="p-4 min-h-screen bg-gray-50">
       {/* Header */}
       <header className="flex items-center justify-between mb-6">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="3" x2="21" y1="6" y2="6" />
-                <line x1="3" x2="21" y1="12" y2="12" />
-                <line x1="3" x2="21" y1="18" y2="18" />
-              </svg>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem asChild>
-              <Link href="/my-purchases">Мои покупки</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/my-stuffs">Мои вещи</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/my-tasks">Мои задачи</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/my-debts">Мои долги</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/my-incomes">Мне должны</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <MyListsMenu />
 
         <h1 className="text-xl font-bold">Мероприятия</h1>
 
@@ -219,7 +177,6 @@ export const HomePageContent = () => {
           </Avatar>
         </div>
       </header>
-
       {/* Actions */}
       <div className="flex gap-4 mb-4">
         <Button variant="secondary" className="flex-1" asChild>
@@ -233,12 +190,10 @@ export const HomePageContent = () => {
           Присоединиться
         </Button>
       </div>
-
       {/* Filter Button */}
       <div className="flex justify-start mb-6">
         <FilterButton onClick={() => setIsFilterOpen(true)} />
       </div>
-
       {/* Events list */}
       <div className="space-y-4">
         {filteredEvents.length === 0 ? (
@@ -266,7 +221,6 @@ export const HomePageContent = () => {
           ))
         )}
       </div>
-
       {/* Filter Modal */}
       <FilterModal<EventFilters>
         isOpen={isFilterOpen}
@@ -276,7 +230,6 @@ export const HomePageContent = () => {
         options={filterOptions}
         title="Фильтры мероприятий"
       />
-
       {/* Диалог поиска мероприятия */}
       <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
         <DialogContent>
