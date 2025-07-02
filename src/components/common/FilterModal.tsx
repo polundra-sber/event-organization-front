@@ -11,6 +11,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface FilterOption {
   id: string;
@@ -24,6 +25,7 @@ interface FilterModalProps<T extends Record<string, boolean>> {
   onApply: (filters: T) => void;
   options: FilterOption[];
   title?: string;
+  withSearch?: boolean; 
 }
 
 /**
@@ -74,8 +76,10 @@ export function FilterModal<T extends Record<string, boolean>>({
   onApply,
   options,
   title = "Фильтры",
+  withSearch = false,
 }: FilterModalProps<T>) {
-  const [tempFilters, setTempFilters] = useState<T>(initialFilters);
+ const [tempFilters, setTempFilters] = useState<T>(initialFilters);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     setTempFilters(initialFilters);
@@ -90,26 +94,48 @@ export function FilterModal<T extends Record<string, boolean>>({
     onOpenChange(false);
   };
 
+  const filteredOptions = withSearch
+    ? options.filter((option) =>
+        option.label.toLowerCase().includes(search.toLowerCase())
+      )
+    : options;
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          {options.map((option) => (
-            <div key={option.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={option.id}
-                checked={tempFilters[option.id as keyof T] ?? false}
-                onCheckedChange={(checked) =>
-                  handleFilterChange(option.id as keyof T, !!checked)
-                }
-              />
-              <Label htmlFor={option.id}>{option.label}</Label>
-            </div>
-          ))}
+
+        {withSearch && (
+          <div className="mb-4">
+            <Input
+              placeholder="Поиск..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        )}
+
+        <div className="space-y-4 max-h-30 overflow-y-auto">
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option) => (
+              <div key={option.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={option.id}
+                  checked={tempFilters[option.id as keyof T] ?? false}
+                  onCheckedChange={(checked) =>
+                    handleFilterChange(option.id as keyof T, !!checked)
+                  }
+                />
+                <Label htmlFor={option.id}>{option.label}</Label>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">Ничего не найдено</p>
+          )}
         </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Отмена
