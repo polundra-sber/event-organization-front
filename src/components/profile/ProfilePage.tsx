@@ -114,16 +114,22 @@ export const ProfilePageContent = () => {
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain isEditing={isEditing} />
+      <ButtonToMain isEditing={isEditing} className="mb-10"/>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+      
         {errorMessage && (
           <p className="text-red-600 font-medium text-sm bg-red-50 border border-red-200 p-2 rounded">
             {errorMessage}
           </p>
         )}
 
-        <div className="flex items-start gap-4 bg-pink-100 p-4 rounded-xl">
+        <div className="flex items-center justify-center bg-my-light-orange px-6 py-3 rounded-xl mb-4">
+          <label className="text-lg font-bold text-my-black text-lg">
+            Мой профиль
+          </label>
+        </div>
+
+        <div className="flex items-start gap-4 bg-my-light-green p-4 rounded-xl mb-4">
           <Avatar className="w-16 h-16 flex-shrink-0">
             <AvatarFallback>
               {getInitials(profile.firstName, profile.lastName)}
@@ -162,10 +168,10 @@ export const ProfilePageContent = () => {
               </div>
             ) : (
               <div className="space-y-1 min-w-0">
-                <p className="text-xl font-semibold truncate overflow-hidden">
+                <p className="text-lg truncate overflow-hidden">
                   {profile.firstName}
                 </p>
-                <p className="text-xl font-semibold truncate overflow-hidden">
+                <p className="text-lg truncate overflow-hidden">
                   {profile.lastName}
                 </p>
               </div>
@@ -173,12 +179,12 @@ export const ProfilePageContent = () => {
           </div>
         </div>
 
-        <div className="bg-pink-100 p-4 rounded-xl space-y-1">
+        <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
           <label className="text-sm text-gray-500">Логин</label>
           <p className="text-gray-900 truncate">{profile.login}</p>
         </div>
 
-        <div className="bg-pink-100 p-4 rounded-xl space-y-1">
+        <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
           <label className="text-sm text-gray-500">Email</label>
           {isEditing ? (
             <>
@@ -197,7 +203,7 @@ export const ProfilePageContent = () => {
           )}
         </div>
 
-        <div className="bg-pink-100 p-4 rounded-xl space-y-1">
+        <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
           <label className="text-sm text-gray-500">Реквизиты</label>
           {isEditing ? (
             <Input
@@ -210,18 +216,17 @@ export const ProfilePageContent = () => {
               className="bg-white"
             />
           ) : (
-            <p className="text-gray-900 line-clamp-4 break-words">
+            <p className="text-gray-900 line-clamp-4 break-words ">
               {profile.requisites}
             </p>
           )}
         </div>
 
         <div className="mt-4">
-          <Button onClick={toggleEdit} variant="dark_pink" className="w-full">
+          <Button onClick={toggleEdit} variant="dark_green" className="w-full">
             {isEditing ? "Сохранить" : "Редактировать"}
           </Button>
         </div>
-      </div>
     </div>
   );
 };

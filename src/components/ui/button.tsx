@@ -24,8 +24,7 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
-        pink: "bg-pink-500 text-white hover:bg-pink-600",
-        dark_pink: "bg-pink-900 text-white hover:bg-pink-600",
+        dark_green: "bg-my-dark-green text-white font-bold",
         
       },
       size: {
