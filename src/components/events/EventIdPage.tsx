@@ -81,7 +81,7 @@ export function EventPage() {
           className="h-12 w-12 rounded-full"
           asChild
         >
-          <Link href={`/events/${event.event_id}/participants`}>
+          <Link href={`/events/${event.event_id}/participants-list`}>
             <User className="h-5 w-5" />
           </Link>
         </Button>
@@ -91,7 +91,7 @@ export function EventPage() {
           className="h-12 w-12 rounded-full"
           asChild
         >
-          <Link href={`/events/${event.event_id}/expenses`}>
+          <Link href={`/events/${event.event_id}/purchases-list`}>
             <ShoppingCart className="h-5 w-5" />
           </Link>
         </Button>
@@ -101,7 +101,7 @@ export function EventPage() {
           className="h-12 w-12 rounded-full"
           asChild
         >
-          <Link href={`/events/${event.event_id}/items`}>
+          <Link href={`/events/${event.event_id}/stuffs-list`}>
             <Package className="h-5 w-5" />
           </Link>
         </Button>
@@ -111,7 +111,7 @@ export function EventPage() {
           className="h-12 w-12 rounded-full"
           asChild
         >
-          <Link href={`/events/${event.event_id}/tasks`}>
+          <Link href={`/events/${event.event_id}/tasks-list`}>
             <ListChecks className="h-5 w-5" />
           </Link>
         </Button>
@@ -121,7 +121,7 @@ export function EventPage() {
           className="h-12 w-12 rounded-full"
           asChild
         >
-          <Link href={`/events/${event.event_id}/debts`}>
+          <Link href={`/events/${event.event_id}/cost-list`}>
             <HandCoins className="h-5 w-5" />
           </Link>
         </Button>
