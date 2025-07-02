@@ -27,13 +27,13 @@ export const MyStuffsPageContent = () => {
   const { data = [], isLoading, isError } = useGetMyStuffsListQuery();
   const [denyStuff] = useDenyStuffInMyStuffsListMutation();
 
-  const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(null);
+  const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(
+    null
+  );
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const allEvents = Array.from(
-    new Set(data.map((stuff) => stuff.event_name))
-  );
+  const allEvents = Array.from(new Set(data.map((stuff) => stuff.event_name)));
 
   const filterOptions = allEvents.map((event) => ({
     id: event,
@@ -193,9 +193,7 @@ export const MyStuffsPageContent = () => {
         isOpen={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
         title="Вы уверены, что хотите отказаться?"
-        description={
-          selectedStuff ? `Вещь: ${selectedStuff.name}` : undefined
-        }
+        description={selectedStuff ? `Вещь: ${selectedStuff.name}` : undefined}
         onConfirm={handleConfirmDeny}
         onCancel={() => setConfirmDialogOpen(false)}
         confirmLabel="Да"

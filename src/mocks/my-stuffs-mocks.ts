@@ -28,7 +28,8 @@ let mockStuffs: MyStuffListItem[] = [
     event_id: 1,
     event_name: "Вечеринка",
   },
-  { stuff_id: 5,
+  {
+    stuff_id: 5,
     name: "Плед",
     description: "Для пикника",
     event_id: 1,
@@ -55,7 +56,6 @@ let mockStuffs: MyStuffListItem[] = [
   },
 ];
 
-
 export const myStuffHandlers = [
   http.get(`/api/events/my-stuffs-list`, ({ request }) => {
     const authHeader = request.headers.get("Authorization");
@@ -66,18 +66,21 @@ export const myStuffHandlers = [
     return HttpResponse.json(mockStuffs);
   }),
 
-  http.delete(`/api/events/:event_id/my-stuffs-list/:stuff_id/deny-stuff`, ({ params }) => {
-    const { event_id, stuff_id } = params;
+  http.delete(
+    `/api/events/:event_id/my-stuffs-list/:stuff_id/deny-stuff`,
+    ({ params }) => {
+      const { event_id, stuff_id } = params;
 
-    if (stuff_id === 999) {
-      return HttpResponse.json(
-        { error: "Мероприятие или вещь не найдены" },
-        { status: 404 }
-      );
+      if (stuff_id === 999) {
+        return HttpResponse.json(
+          { error: "Мероприятие или вещь не найдены" },
+          { status: 404 }
+        );
+      }
+
+      mockStuffs = mockStuffs.filter((s) => s.stuff_id !== stuff_id);
+
+      return HttpResponse.json({ message: "Вещь удалена" }, { status: 200 });
     }
-
-    mockStuffs = mockStuffs.filter((s) => s.stuff_id !== stuff_id);
-
-    return HttpResponse.json({ message: "Вещь удалена" }, { status: 200 });
-  }),
+  ),
 ];

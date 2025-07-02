@@ -69,9 +69,7 @@ export const SelectButton = ({
       className={className}
       onClick={handleClick}
     >
-      <Link href={href}>
-        {selected ? "✓ Выбрано" : label}
-      </Link>
+      <Link href={href}>{selected ? "✓ Выбрано" : label}</Link>
     </Button>
   ) : (
     <Button

@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { 
-  useGetProfileQuery, 
+import {
+  useGetProfileQuery,
   useUpdateProfileMutation,
-  profileApi
-} from "@/lib/api/profile"; // Измененный импорт API профиля
+  profileApi,
+} from "@/lib/api/profile-api"; // Измененный импорт API профиля
 import { useDispatch } from "react-redux";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
 import { UserEditor, UserProfile } from "@/lib/api/types/profile-types";
@@ -19,7 +19,10 @@ function getInitials(firstName: string, lastName: string) {
   return `${firstInitial}.${lastInitial}`;
 }
 
-function getChangedFields(original: Partial<UserEditor>, edited: Partial<UserEditor>) {
+function getChangedFields(
+  original: Partial<UserEditor>,
+  edited: Partial<UserEditor>
+) {
   const changed: Partial<UserEditor> = {};
   for (const key in edited) {
     if (edited[key as keyof UserEditor] !== original[key as keyof UserEditor]) {
@@ -90,7 +93,7 @@ export const ProfilePageContent = () => {
       }
 
       try {
-         const result = await updateProfile(changedFields).unwrap();
+        const result = await updateProfile(changedFields).unwrap();
         dispatch(
           profileApi.util.updateQueryData("getProfile", undefined, (draft) => {
             Object.assign(draft, result);
@@ -136,7 +139,10 @@ export const ProfilePageContent = () => {
                   <Input
                     value={editedProfile.firstName || ""}
                     onChange={(e) => {
-                      setEditedProfile({ ...editedProfile, firstName: e.target.value });
+                      setEditedProfile({
+                        ...editedProfile,
+                        firstName: e.target.value,
+                      });
                       if (e.target.value.trim()) setNameError(null);
                     }}
                     placeholder="Имя"
@@ -148,7 +154,10 @@ export const ProfilePageContent = () => {
                   <Input
                     value={editedProfile.lastName || ""}
                     onChange={(e) => {
-                      setEditedProfile({ ...editedProfile, lastName: e.target.value });
+                      setEditedProfile({
+                        ...editedProfile,
+                        lastName: e.target.value,
+                      });
                       if (e.target.value.trim()) setNameError(null);
                     }}
                     placeholder="Фамилия"
@@ -203,7 +212,10 @@ export const ProfilePageContent = () => {
             <Input
               value={editedProfile.requisites || ""}
               onChange={(e) =>
-                setEditedProfile({ ...editedProfile, requisites: e.target.value })
+                setEditedProfile({
+                  ...editedProfile,
+                  requisites: e.target.value,
+                })
               }
               placeholder="Реквизиты"
               maxLength={128}

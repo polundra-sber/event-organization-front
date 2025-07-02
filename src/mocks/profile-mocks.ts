@@ -11,10 +11,9 @@ let mockProfile = {
   requisites: "Банковская карта: 1234 5678 9012 3456",
 };
 
-
 export const profileHandlers = [
   // Получение профиля текущего пользователя
- http.get("/api/profile", () => {
+  http.get("/api/profile", () => {
     return HttpResponse.json({
       firstName: mockProfile.firstName,
       lastName: mockProfile.lastName,

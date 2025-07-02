@@ -1,7 +1,7 @@
 "use client";
 
 import { EventDetailedCard } from "./EventDetailedCard";
-import { useGetEventByIdQuery } from "@/lib/api/events";
+import { useGetEventByIdQuery } from "@/lib/api/events-api";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

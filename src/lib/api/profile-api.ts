@@ -20,12 +20,8 @@ export const profileApi = api.injectEndpoints({
   }),
 });
 
-
 // Экспортируем хуки
-export const {
-  useGetProfileQuery,
-  useUpdateProfileMutation,
-} = profileApi;
+export const { useGetProfileQuery, useUpdateProfileMutation } = profileApi;
 
 // 3. Экспортируем автоматически сгенерированные хуки
 

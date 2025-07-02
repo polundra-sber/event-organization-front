@@ -25,7 +25,7 @@ interface FilterModalProps<T extends Record<string, boolean>> {
   onApply: (filters: T) => void;
   options: FilterOption[];
   title?: string;
-  withSearch?: boolean; 
+  withSearch?: boolean;
 }
 
 /**
@@ -78,7 +78,7 @@ export function FilterModal<T extends Record<string, boolean>>({
   title = "Фильтры",
   withSearch = false,
 }: FilterModalProps<T>) {
- const [tempFilters, setTempFilters] = useState<T>(initialFilters);
+  const [tempFilters, setTempFilters] = useState<T>(initialFilters);
   const [search, setSearch] = useState("");
 
   useEffect(() => {

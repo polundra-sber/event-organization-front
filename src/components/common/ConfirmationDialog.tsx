@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react"; // Или любые другие иконки
 
 import {
@@ -14,7 +14,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-
 
 type ConfirmationDialogProps = {
   isOpen: boolean;

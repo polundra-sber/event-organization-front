@@ -12,7 +12,7 @@ import {
   useCompleteEventMutation,
   useJoinEventMutation,
   useFindEventQuery,
-} from "@/lib/api/events";
+} from "@/lib/api/events-api";
 import { toast } from "sonner";
 import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { FilterButton } from "@/components/common/FilterButton";

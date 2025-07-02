@@ -8,7 +8,10 @@ export const myStuffApi = api.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ stuff_id }) => ({ type: "MyStuff" as const, id: stuff_id })),
+              ...result.map(({ stuff_id }) => ({
+                type: "MyStuff" as const,
+                id: stuff_id,
+              })),
               { type: "MyStuff", id: "LIST" },
             ]
           : [{ type: "MyStuff", id: "LIST" }],
@@ -30,9 +33,7 @@ export const myStuffApi = api.injectEndpoints({
   }),
 });
 
-export const {
-  useGetMyStuffsListQuery,
-  useDenyStuffInMyStuffsListMutation,
-} = myStuffApi;
+export const { useGetMyStuffsListQuery, useDenyStuffInMyStuffsListMutation } =
+  myStuffApi;
 
 export const { updateQueryData } = myStuffApi.util;

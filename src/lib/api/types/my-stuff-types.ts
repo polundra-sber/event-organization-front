@@ -6,8 +6,6 @@ export interface MyStuffListItem {
   event_name: string;
 }
 
-
-
 export type EventNotExistResponse = {
   error: string;
   details?: {

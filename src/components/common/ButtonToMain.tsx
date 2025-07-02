@@ -22,22 +22,22 @@ type Props = {
 
 /**
  * Кнопка "На главную"
- * 
+ *
  * Предназначена для перехода на главную страницу.
  * Если передано `isEditing={true}`, показывает диалог с предупреждением.
- * 
+ *
  * @param props - Свойства кнопки
  * @param props.className - Дополнительные стили
  * @param props.isEditing - Если `true`, активирует предупреждение о несохранённых изменениях
- * 
+ *
  *  !!!Примеры использования:
  *
  * // 1. Простой переход на главную без подтверждения
  * <ButtonToMain />
  *
  * // 2. Переход на главную с предупреждением, если есть несохранённые изменения
- * <ButtonToMain isEditing={isEditing} /> 
- * <ButtonToMain isEditing={true} /> 
+ * <ButtonToMain isEditing={isEditing} />
+ * <ButtonToMain isEditing={true} />
  *
  * // 3. С дополнительным позиционированием
  * <ButtonToMain className="mt-8" />
@@ -67,7 +67,8 @@ export const ButtonToMain = ({ className, isEditing = false }: Props) => {
             <AlertDialogHeader>
               <AlertDialogTitle>Вы действительно хотите уйти?</AlertDialogTitle>
               <AlertDialogDescription>
-                У вас есть несохранённые изменения. Если вы уйдёте, они будут потеряны.
+                У вас есть несохранённые изменения. Если вы уйдёте, они будут
+                потеряны.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

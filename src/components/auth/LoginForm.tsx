@@ -1,26 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLoginMutation } from "@/lib/api/auth";
+import { useLoginMutation } from "@/lib/api/auth-api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export const LoginForm = () => {
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginUser, { isLoading, isError, error }] = useLoginMutation();
   const router = useRouter();
 
   // Проверка авторизации при загрузке компонента
-  /*useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       router.push("/events");
     }
   }, [router]);
-  */
+
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginUser, { isLoading, isError, error }] = useLoginMutation();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,7 +90,12 @@ export const LoginForm = () => {
           </p>
         )}
 
-        <Button variant = "pink" type="submit" className="w-full h-11" disabled={isLoading}>
+        <Button
+          variant="pink"
+          type="submit"
+          className="w-full h-11"
+          disabled={isLoading}
+        >
           {isLoading ? "Вход..." : "Войти"}
         </Button>
       </form>
