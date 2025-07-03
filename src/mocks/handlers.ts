@@ -4,6 +4,7 @@ import { profileHandlers } from "./profile-mocks";
 import { myStuffHandlers } from "./my-stuffs-mocks";
 import { myTaskHandlers } from "./my-tasks-mocks";
 import { taskHandlers } from "./tasks-mocks";
+import { participantsHandlers } from "./participants-mocks";
 
 export const handlers = [
   ...myStuffHandlers,
@@ -12,4 +13,5 @@ export const handlers = [
   ...authHandlers,
   ...profileHandlers,
   ...taskHandlers,
+  ...participantsHandlers,
 ];
