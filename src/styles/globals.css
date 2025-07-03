@@ -34,6 +34,10 @@
   --sidebar-accent-foreground: #333333;
   --sidebar-border: #e5e5e5;
   --sidebar-ring: #999999;
+    /* Новые цвета для авокадо */
+  --my-dark-green: #256C34;    /* темно-зеленый (над авокадо) */
+  --my-light-orange: #ffdcbb;   /* светло-зеленый (где авокадо) */
+  --my-light-green: #f4f7e5;            /* фон картинки */
 }
 
 @theme inline {
@@ -74,6 +78,11 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+    /* Подключаем новые цвета */
+  --color-my-dark-green: var(--my-dark-green);
+  --color-my-light-orange: var(--my-light-orange);
+  --color-my-light-green: var(--my-light-green);
 }
 
 body {
