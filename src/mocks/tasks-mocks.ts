@@ -190,6 +190,7 @@ export const taskHandlers = [
       const updatedTask = {
         ...mockTasks[event_id as unknown as number][taskIndex],
         responsible_user: currentUser,
+        task_status_name: "В работе",
       };
 
       mockTasks[event_id as unknown as number][taskIndex] = updatedTask;

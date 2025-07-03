@@ -33,18 +33,6 @@ export default function EventTasksPage() {
   }, [router]);
 
   useEffect(() => {
-    if (!metadataLoading && metadata) {
-      // Проверяем, что мероприятие активно
-      const isEventActive = metadata.event_status_name === "активно";
-
-      if (!isEventActive) {
-        setDeniedReason(
-          "Просмотр задач доступен только для активных мероприятий"
-        );
-        setAccessDenied(true);
-      }
-    }
-
     if (error) {
       setDeniedReason("Мероприятие не найдено или произошла ошибка");
       setAccessDenied(true);
