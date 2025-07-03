@@ -27,7 +27,6 @@ interface EventPreviewCardProps {
 }
 
 export const EventPreviewCard = ({
-  event_id,
   event_name,
   event_date,
   event_time,
@@ -35,8 +34,6 @@ export const EventPreviewCard = ({
   event_status_name = "активно",
   onJoin,
   isLoading = false,
-  joinStatus = "idle",
-  errorMessage,
 }: EventPreviewCardProps) => {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const formattedDate = format(new Date(event_date), "d MMMM yyyy", {
@@ -78,17 +75,6 @@ export const EventPreviewCard = ({
             {event_status_name}
           </span>
         </div>
-
-        {joinStatus === "success" && (
-          <div className="mt-4 p-2 bg-green-100 text-green-800 rounded text-sm">
-            Заявка успешно отправлена!
-          </div>
-        )}
-        {joinStatus === "error" && errorMessage && (
-          <div className="mt-4 p-2 bg-red-100 text-red-800 rounded text-sm">
-            {errorMessage}
-          </div>
-        )}
       </CardContent>
       <CardFooter>
         <Button
