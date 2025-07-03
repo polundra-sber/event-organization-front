@@ -220,6 +220,7 @@ export function FilterModal<T extends Record<string, boolean>>({
                         onCheckedChange={(checked) =>
                           handleFilterChange(option.id as keyof T, !!checked)
                         }
+                        className="border-my-dark-green data-[state=checked]:bg-my-dark-green data-[state=checked]:border-my-dark-green"
                       />
                       <Label htmlFor={option.id}>{option.label}</Label>
                     </div>
@@ -244,6 +245,7 @@ export function FilterModal<T extends Record<string, boolean>>({
                     onCheckedChange={(checked) =>
                       handleFilterChange(option.id as keyof T, !!checked)
                     }
+                    className="border-my-dark-green data-[state=checked]:bg-my-dark-green data-[state=checked]:border-my-dark-green"
                   />
                   <Label htmlFor={option.id}>{option.label}</Label>
                 </div>
@@ -257,13 +259,13 @@ export function FilterModal<T extends Record<string, boolean>>({
         <DialogFooter className="mt-4">
           {activeCategory === null ? (
             <>
-              <Button variant="outline" onClick={handleCancel}>
+              <Button variant="light_green" onClick={handleCancel}>
                 Отмена
               </Button>
-              <Button onClick={handleApply}>Применить</Button>
+              <Button variant="dark_green" onClick={handleApply}>Применить</Button>
             </>
           ) : (
-            <Button onClick={() => setActiveCategory(null)} className="w-full">
+            <Button variant="dark_green" onClick={() => setActiveCategory(null)} className="w-full">
               Выбрать
             </Button>
           )}

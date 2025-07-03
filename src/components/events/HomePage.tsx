@@ -169,7 +169,7 @@ export const HomePageContent = () => {
         <h1 className="text-xl font-bold">Мероприятия</h1>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="dark_green" size="sm" asChild>
             <Link href="/profile">Профиль</Link>
           </Button>
           <Avatar>
@@ -179,11 +179,11 @@ export const HomePageContent = () => {
       </header>
       {/* Actions */}
       <div className="flex gap-4 mb-4">
-        <Button variant="secondary" className="flex-1" asChild>
+        <Button variant="bright_green" className="flex-1" asChild>
           <Link href="/events/create-event">Создать</Link>
         </Button>
         <Button
-          variant="secondary"
+          variant="bright_green"
           className="flex-1"
           onClick={() => setIsJoinDialogOpen(true)}
         >

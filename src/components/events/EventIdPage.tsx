@@ -78,7 +78,7 @@ export function EventPage() {
       {/* Навигационные кнопки - круглые с иконками */}
       <div className="flex justify-between mb-6">
         <Button
-          variant="outline"
+          variant="light_green"
           size="icon"
           className="h-12 w-12 rounded-full"
           asChild
@@ -88,7 +88,7 @@ export function EventPage() {
           </Link>
         </Button>
         <Button
-          variant="outline"
+          variant="light_green"
           size="icon"
           className="h-12 w-12 rounded-full"
           asChild
@@ -98,7 +98,7 @@ export function EventPage() {
           </Link>
         </Button>
         <Button
-          variant="outline"
+          variant="light_green"
           size="icon"
           className="h-12 w-12 rounded-full"
           asChild
@@ -108,7 +108,7 @@ export function EventPage() {
           </Link>
         </Button>
         <Button
-          variant="outline"
+          variant="light_green"
           size="icon"
           className="h-12 w-12 rounded-full"
           asChild
@@ -118,7 +118,7 @@ export function EventPage() {
           </Link>
         </Button>
         <Button
-          variant="outline"
+          variant="light_green"
           size="icon"
           className="h-12 w-12 rounded-full"
           asChild

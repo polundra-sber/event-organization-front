@@ -38,7 +38,7 @@ export const FilterButton = ({
 }: FilterButtonProps) => {
   return (
     <Button
-      variant="secondary"
+      variant="light_green"
       size="sm"
       className="flex items-center gap-2"
       onClick={onClick}
