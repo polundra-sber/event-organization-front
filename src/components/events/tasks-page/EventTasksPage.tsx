@@ -83,12 +83,12 @@ export const EventTasksPageContent = ({
 
     if (
       filters.completed &&
-      task.task_status_name.toLowerCase() === "выполнена"
+      task.task_status_name.toLowerCase() === "завершена"
     ) {
       return true;
     }
 
-    if (filters.active && task.task_status_name.toLowerCase() !== "выполнена") {
+    if (filters.active && task.task_status_name.toLowerCase() !== "завершена") {
       return true;
     }
 
