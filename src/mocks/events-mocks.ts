@@ -1,4 +1,8 @@
-import { Event, EventEditor } from "@/lib/api/types/event-types";
+import {
+  Event,
+  EventEditor,
+  EventUserMetadata,
+} from "@/lib/api/types/event-types";
 import { http, HttpResponse } from "msw";
 
 // Моковые данные
@@ -205,5 +209,26 @@ export const eventHandlers = [
 
     Object.assign(event, updates);
     return HttpResponse.json(event, { status: 201 });
+  }),
+
+  http.get("/api/events/:event_id/user-metadata", ({ params }) => {
+    const { event_id } = params;
+
+    // Мероприятие не найдено
+    if (event_id === "999") {
+      return HttpResponse.json(
+        { error: "Мероприятие с данным идентификатором не найдено" },
+        { status: 404 }
+      );
+    }
+
+    // Успешный ответ
+    return HttpResponse.json<EventUserMetadata>(
+      {
+        role_name: "создатель",
+        event_status_name: "активно",
+      },
+      { status: 200 }
+    );
   }),
 ];

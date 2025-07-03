@@ -21,3 +21,12 @@ export type EventEditor = {
 
 export type EventRole = "участник" | "организатор" | "создатель";
 export type EventStatus = "активно" | "завершено";
+
+export type EventUserMetadata = {
+  role_name: string;
+  event_status_name: string;
+};
+
+export type EventNotExistResponse = {
+  error: string;
+};

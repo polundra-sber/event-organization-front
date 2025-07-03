@@ -4,7 +4,6 @@ import { EventPage } from "@/components/events/EventIdPage";
 
 export default function EventsPage() {
   const router = useRouter();
-  const { eventId } = router.query;
   const [isLoading, setIsLoading] = useState(true); // Добавляем состояние загрузки
   const Loader = () => (
     <div className="flex justify-center items-center h-screen">

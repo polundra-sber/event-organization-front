@@ -1,10 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useCreateEventMutation } from "@/lib/api/events-api";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FormInput, RequiredFieldLabel } from "./FormInput";
 import {
   validateEventDate,
@@ -22,18 +21,39 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-export default function CreateEventPage() {
-  const router = useRouter();
-  const [createEvent, { isLoading }] = useCreateEventMutation();
+interface EventFormProps {
+  initialData?: {
+    event_name?: string;
+    event_description?: string;
+    event_date?: string;
+    event_time?: string;
+    location?: string;
+    chat_link?: string;
+  };
+  eventId?: number;
+  isEditing?: boolean;
+  onSubmit: (data: any) => Promise<void>;
+  onCancel?: () => void;
+  isLoading: boolean;
+}
+
+export function EventForm({
+  initialData,
+  eventId,
+  isEditing = false,
+  onSubmit,
+  onCancel,
+  isLoading,
+}: EventFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    event_name: "",
-    event_description: "",
-    event_date: "",
-    event_time: "",
-    location: "",
-    chat_link: "",
+    event_name: initialData?.event_name || "",
+    event_description: initialData?.event_description || "",
+    event_date: initialData?.event_date || "",
+    event_time: initialData?.event_time || "",
+    location: initialData?.location || "",
+    chat_link: initialData?.chat_link || "",
   });
 
   const [errors, setErrors] = useState({
@@ -41,6 +61,20 @@ export default function CreateEventPage() {
     event_date: "",
     event_time: "",
   });
+
+  // Заполняем форму начальными данными при редактировании
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        event_name: initialData.event_name,
+        event_description: initialData.event_description,
+        event_date: initialData.event_date,
+        event_time: initialData.event_time,
+        location: initialData.location,
+        chat_link: initialData.chat_link,
+      });
+    }
+  }, [initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -116,40 +150,41 @@ export default function CreateEventPage() {
     if (!validateForm()) return;
 
     try {
-      const response = await createEvent({
+      await onSubmit({
         event_name: formData.event_name,
         event_description: formData.event_description,
         event_date: formData.event_date.split("/").reverse().join("-"),
         event_time: formData.event_time,
         location: formData.location,
         chat_link: formData.chat_link,
-      }).unwrap();
-
-      // Показываем успех и перенаправляем
-      toast.success("Мероприятие успешно создано!");
-      router.push(`/events/${response.event_id}`);
+      });
     } catch (error: any) {
       const errorMessage =
-        error?.data?.message || "Не удалось создать мероприятие";
+        error?.data?.message || "Не удалось сохранить мероприятие";
 
-      // Показываем ошибку через sonner
       toast.error("Ошибка", {
         description: errorMessage,
       });
 
-      console.error("Failed to create event:", error);
+      console.error("Failed to save event:", error);
     }
   };
 
   return (
     <div className="p-4 pt-10 min-h-screen bg-gray-50">
       <div className="mb-8">
-        <ButtonToMain />
+        {isEditing ? (
+          <Button variant="dark_green" onClick={onCancel}>
+            ← Назад к мероприятию
+          </Button>
+        ) : (
+          <ButtonToMain />
+        )}
       </div>
 
       <header className="flex items-center justify-between mb-6 relative">
         <h1 className="text-xl font-bold absolute left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-          Создание мероприятия
+          {isEditing ? "Редактирование мероприятия" : "Создание мероприятия"}
         </h1>
       </header>
 
@@ -173,7 +208,7 @@ export default function CreateEventPage() {
         />
 
         {/* Дата мероприятия (обязательная) */}
-        <div className="bg-pink-100 p-4 rounded-xl space-y-1">
+        <div className="bg-my-light-green p-4 rounded-xl space-y-1">
           <label className="text-sm text-gray-500">
             <RequiredFieldLabel text="Дата мероприятия" />
           </label>
@@ -227,7 +262,7 @@ export default function CreateEventPage() {
         </div>
 
         {/* Время мероприятия (необязательное) */}
-        <div className="bg-pink-100 p-4 rounded-xl space-y-1">
+        <div className="bg-my-light-green p-4 rounded-xl space-y-1">
           <label className="text-sm text-gray-500">Время начала</label>
           <div className="relative flex items-center">
             <input
@@ -243,11 +278,10 @@ export default function CreateEventPage() {
                 "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2",
                 "focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
                 errors.event_time && "border-red-500",
-                "[&::-webkit-calendar-picker-indicator]:opacity-0" // Скрываем стандартную иконку
+                "[&::-webkit-calendar-picker-indicator]:opacity-0"
               )}
               step="60"
             />
-            {/* Кастомная иконка часов (некликабельная) */}
             <div className="absolute -left-4 top-1/2 transform -translate-y-1/2 pointer-events-none ml-[4.5rem]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -294,11 +328,17 @@ export default function CreateEventPage() {
         <div className="pt-2">
           <Button
             type="submit"
-            variant="dark_pink"
+            variant="dark_green"
             className="w-full"
             disabled={isLoading}
           >
-            {isLoading ? "Создание..." : "Создать"}
+            {isLoading
+              ? isEditing
+                ? "Сохранение..."
+                : "Создание..."
+              : isEditing
+              ? "Сохранить"
+              : "Создать"}
           </Button>
         </div>
       </form>

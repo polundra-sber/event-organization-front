@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import CreateEventPage from "@/components/create-event/CreateEventPage";
+import CreateEventPage from "@/components/create-edit-event/CreateEventPage";
 
 export default function EventsPage() {
   const router = useRouter();

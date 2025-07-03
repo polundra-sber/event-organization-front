@@ -29,7 +29,7 @@ export const FormInput = ({
   className = "",
 }: FormInputProps) => {
   return (
-    <div className={`bg-pink-100 p-4 rounded-xl space-y-1 ${className}`}>
+    <div className={`bg-my-light-green p-4 rounded-xl space-y-1 ${className}`}>
       <label className="text-sm text-gray-500">
         {required ? <RequiredFieldLabel text={label} /> : label}
       </label>

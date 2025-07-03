@@ -1,5 +1,9 @@
 import { api } from "./api";
-import { Event, EventEditor } from "@/lib/api/types/event-types";
+import {
+  Event,
+  EventEditor,
+  EventUserMetadata,
+} from "@/lib/api/types/event-types";
 
 export const eventsApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -99,6 +103,14 @@ export const eventsApi = api.injectEndpoints({
         { type: "Event", id: eventId },
       ],
     }),
+
+    // Получение метаданных пользователя по мероприятию
+    getUserMetadata: builder.query<EventUserMetadata, number>({
+      query: (event_id) => ({
+        url: `/events/${event_id}/user-metadata`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -113,4 +125,5 @@ export const {
   useCompleteEventMutation,
   useGetEventByIdQuery,
   useEditEventMutation,
+  useGetUserMetadataQuery,
 } = eventsApi;
