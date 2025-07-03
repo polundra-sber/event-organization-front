@@ -1,18 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   useGetTasksListQuery,
   useTakeTaskFromTasksListMutation,
   useDeleteTaskFromTasksListMutation,
+  useAddTaskToTasksListMutation,
 } from "@/lib/api/tasks-api";
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "./TaskCard";
 import { FilterModal } from "@/components/common/FilterModal";
 import { FilterButton } from "@/components/common/FilterButton";
-import Link from "next/link";
 import { useGetUserMetadataQuery } from "@/lib/api/events-api";
 import { EventRole, EventStatus } from "@/lib/api/types/event-types";
+import { TaskForm } from "./create-edit-modal/TaskForm";
+import { toast } from "sonner";
 
 interface EventTasksPageContentProps {
   event_id: number;
@@ -29,11 +32,13 @@ export const EventTasksPageContent = ({
   const { data: metadata } = useGetUserMetadataQuery(event_id);
   const [takeTask] = useTakeTaskFromTasksListMutation();
   const [deleteTask] = useDeleteTaskFromTasksListMutation();
+  const [addTask] = useAddTaskToTasksListMutation();
 
   const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(
     null
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     completed: false,
     active: false,
@@ -48,6 +53,27 @@ export const EventTasksPageContent = ({
 
   const toggleDescription = (id: number) => {
     setOpenedDescriptionId((prev) => (prev === id ? null : id));
+  };
+
+  const handleCreateTask = async (data: {
+    task_name: string;
+    task_description?: string;
+  }) => {
+    try {
+      await addTask({
+        event_id,
+        taskData: {
+          task_name: data.task_name,
+          task_description: data.task_description,
+          task_status_name: "Новая",
+          responsible_user: "Не назначен",
+        },
+      }).unwrap();
+      toast.success("Задача успешно создана");
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      toast.error("Ошибка при создании задачи");
+    }
   };
 
   const tasks = tasksData || [];
@@ -79,19 +105,26 @@ export const EventTasksPageContent = ({
           <Link href={`/events/${event_id}`}>← Назад</Link>
         </Button>
       </div>
+
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
         <label className="text-lg font-bold text-my-black text-lg">
           Задачи мероприятия
         </label>
       </div>
+
       <div className="flex justify-between items-center mb-4">
+        <FilterButton onClick={() => setIsFilterOpen(true)} />
         {canEditDelete && (
-          <Button variant="bright_green" disabled={!isEventActive}>
+          <Button
+            variant="bright_green"
+            onClick={() => setIsCreateModalOpen(true)}
+            disabled={!isEventActive}
+          >
             Создать
           </Button>
         )}
-        <FilterButton onClick={() => setIsFilterOpen(true)} />
       </div>
+
       {filteredTasks.length === 0 ? (
         <p className="text-gray-500 text-center py-8">Нет задач</p>
       ) : (
@@ -127,6 +160,22 @@ export const EventTasksPageContent = ({
           ))}
         </div>
       )}
+
+      {/* Модалка создания задачи */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+            <h3 className="text-lg font-bold mb-4">Создать новую задачу</h3>
+            <TaskForm
+              onSubmit={handleCreateTask}
+              onCancel={() => setIsCreateModalOpen(false)}
+              isLoading={false}
+              submitButtonText="Создать"
+            />
+          </div>
+        </div>
+      )}
+
       <FilterModal
         isOpen={isFilterOpen}
         onOpenChange={setIsFilterOpen}

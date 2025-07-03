@@ -1,6 +1,7 @@
 import {
   TaskListItem,
   TaskListItemResponsible,
+  TaskListItemEditor,
 } from "@/lib/api/types/tasks-types";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,8 @@ import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { useState } from "react";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 import { toast } from "sonner";
+import { TaskForm } from "./create-edit-modal/TaskForm";
+import { useEditTaskInTasksListMutation } from "@/lib/api/tasks-api";
 
 interface TaskCardProps {
   task: TaskListItem;
@@ -43,6 +46,7 @@ export const TaskCard = ({
   onTakeTask,
   onDeleteTask,
 }: TaskCardProps) => {
+  const [editTask] = useEditTaskInTasksListMutation();
   const isEventActive = eventStatus === "активно";
   const canEditDelete =
     (userRole === "создатель" || userRole === "организатор") && isEventActive;
@@ -53,6 +57,7 @@ export const TaskCard = ({
   // Состояния для диалогов и загрузки
   const [isTakeDialogOpen, setIsTakeDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isTaking, setIsTaking] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -88,111 +93,151 @@ export const TaskCard = ({
     }
   };
 
+  const handleEditTask = async (data: TaskListItemEditor) => {
+    try {
+      await editTask({
+        event_id,
+        task_id: task.task_id,
+        taskData: data,
+      }).unwrap();
+      toast.success("Задача успешно обновлена");
+      setIsEditing(false);
+    } catch (error) {
+      toast.error("Ошибка при обновлении задачи");
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold line-clamp-2">
-            {task.task_name}
-          </CardTitle>
-          {canEditDelete && isEventActive && (
-            <button className="text-gray-500 hover:text-gray-700">
-              <Pencil className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-        <CardDescription className="text-black">
-          Срок: {task.deadline_date} {task.deadline_time || ""}
-        </CardDescription>
-        <p className="text-sm mt-1">
-          Статус:{" "}
-          <span className={isCompleted ? "text-green-600" : "text-blue-600"}>
-            {task.task_status_name}
-          </span>
-        </p>
-        <p className="text-sm mt-1">
-          Ответственный: {task.responsible_user || "Не назначен"}
-        </p>
-      </CardHeader>
-
-      <CardContent className="flex justify-between items-center relative flex-wrap gap-4">
-        <div className="relative">
-          {task.task_description && (
-            <button
-              onClick={() => onToggleDescription(task.task_id)}
-              className="flex items-center text-sm text-gray-700 hover:text-gray-900"
-            >
-              <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
-                {isOpen ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
-              </span>
-              Описание
-            </button>
-          )}
-
-          {isOpen && (
-            <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-              <p className="text-sm text-gray-600">
-                {task.task_description || "Описание не добавлено"}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Показываем кнопки только для активных мероприятий */}
-        {isEventActive && (
-          <div className="flex gap-2 ml-auto">
-            {canEditDelete && (
-              <>
-                <Button
-                  variant="yellow_green"
-                  size="sm"
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                  disabled={isDeleting}
-                >
-                  Удалить
-                </Button>
-
-                <ConfirmationDialog
-                  isOpen={isDeleteDialogOpen}
-                  onOpenChange={setIsDeleteDialogOpen}
-                  title="Удалить задачу?"
-                  description={`Вы уверены, что хотите удалить задачу "${task.task_name}"?`}
-                  onConfirm={handleDeleteTask}
-                  confirmLabel={isDeleting ? "Удаление..." : "Удалить"}
-                  cancelLabel="Отмена"
-                />
-              </>
-            )}
-
-            {!isCompleted && isTaskAvailable && (
-              <>
-                <Button
-                  variant="dark_green"
-                  size="sm"
-                  onClick={() => setIsTakeDialogOpen(true)}
-                  disabled={isTaking}
-                >
-                  Взять задачу
-                </Button>
-
-                <ConfirmationDialog
-                  isOpen={isTakeDialogOpen}
-                  onOpenChange={setIsTakeDialogOpen}
-                  title="Взять задачу?"
-                  description={`Вы уверены, что хотите взять задачу "${task.task_name}"?`}
-                  onConfirm={handleTakeTask}
-                  confirmLabel={isTaking ? "Принятие..." : "Взять"}
-                  cancelLabel="Отмена"
-                />
-              </>
+    <>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-lg font-semibold line-clamp-2">
+              {task.task_name}
+            </CardTitle>
+            {canEditDelete && isEventActive && (
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setIsEditing(true)}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
             )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <CardDescription className="text-black">
+            Срок: {task.deadline_date} {task.deadline_time || ""}
+          </CardDescription>
+          <p className="text-sm mt-1">
+            Статус:{" "}
+            <span className={isCompleted ? "text-green-600" : "text-blue-600"}>
+              {task.task_status_name}
+            </span>
+          </p>
+          <p className="text-sm mt-1">
+            Ответственный: {task.responsible_user || "Не назначен"}
+          </p>
+        </CardHeader>
+
+        <CardContent className="flex justify-between items-center relative flex-wrap gap-4">
+          <div className="relative">
+            {task.task_description && (
+              <button
+                onClick={() => onToggleDescription(task.task_id)}
+                className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+              >
+                <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
+                  {isOpen ? (
+                    <ChevronUp className="w-3 h-3" />
+                  ) : (
+                    <ChevronDown className="w-3 h-3" />
+                  )}
+                </span>
+                Описание
+              </button>
+            )}
+
+            {isOpen && (
+              <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
+                <p className="text-sm text-gray-600">
+                  {task.task_description || "Описание не добавлено"}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Показываем кнопки только для активных мероприятий */}
+          {isEventActive && (
+            <div className="flex gap-2 ml-auto">
+              {canEditDelete && (
+                <>
+                  <Button
+                    variant="yellow_green"
+                    size="sm"
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                    disabled={isDeleting}
+                  >
+                    Удалить
+                  </Button>
+
+                  <ConfirmationDialog
+                    isOpen={isDeleteDialogOpen}
+                    onOpenChange={setIsDeleteDialogOpen}
+                    title="Удалить задачу?"
+                    description={`Вы уверены, что хотите удалить задачу "${task.task_name}"?`}
+                    onConfirm={handleDeleteTask}
+                    confirmLabel={isDeleting ? "Удаление..." : "Удалить"}
+                    cancelLabel="Отмена"
+                  />
+                </>
+              )}
+
+              {!isCompleted && isTaskAvailable && (
+                <>
+                  <Button
+                    variant="dark_green"
+                    size="sm"
+                    onClick={() => setIsTakeDialogOpen(true)}
+                    disabled={isTaking}
+                  >
+                    Взять задачу
+                  </Button>
+
+                  <ConfirmationDialog
+                    isOpen={isTakeDialogOpen}
+                    onOpenChange={setIsTakeDialogOpen}
+                    title="Взять задачу?"
+                    description={`Вы уверены, что хотите взять задачу "${task.task_name}"?`}
+                    onConfirm={handleTakeTask}
+                    confirmLabel={isTaking ? "Принятие..." : "Взять"}
+                    cancelLabel="Отмена"
+                  />
+                </>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Модалка редактирования */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+            <h3 className="text-lg font-bold mb-4">Редактировать задачу</h3>
+            <TaskForm
+              defaultValues={{
+                task_name: task.task_name,
+                task_description: task.task_description,
+                deadline_date: task.deadline_date,
+                deadline_time: task.deadline_time,
+              }}
+              onSubmit={handleEditTask}
+              onCancel={() => setIsEditing(false)}
+              isLoading={false}
+              submitButtonText="Сохранить"
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
