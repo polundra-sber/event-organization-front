@@ -68,7 +68,9 @@ export function EventPage() {
             size="icon"
             className="h-12 w-12 rounded-full -mt-7"
           >
-            <Pencil className="h-6 w-6" />{" "}
+            <Link href={`/events/${event.event_id}/edit`}>
+              <Pencil className="h-6 w-6" />{" "}
+            </Link>
           </Button>
         )}
       </div>
