@@ -31,3 +31,9 @@ export const participantsApi = api.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useGetEventParticipantsListQuery,
+  useSearchUsersQuery,
+  useAddParticipantsMutation,
+} = participantsApi;
