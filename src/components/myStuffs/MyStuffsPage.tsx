@@ -57,7 +57,7 @@ export const MyStuffsPageContent = () => {
   const [selectedStuff, setSelectedStuff] = useState<{
     stuff_id: number;
     event_id: number;
-    name: string;
+    stuff_name: string;
   } | null>(null);
 
   const handleDeny = async (event_id: number, stuff_id: number) => {
@@ -73,7 +73,7 @@ export const MyStuffsPageContent = () => {
   const openConfirmDialog = (stuff: {
     stuff_id: number;
     event_id: number;
-    name: string;
+    stuff_name: string;
   }) => {
     setSelectedStuff(stuff);
     setConfirmDialogOpen(true);
@@ -143,11 +143,12 @@ export const MyStuffsPageContent = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>{stuff.event_name}</CardTitle>
-                  <CardDescription>{stuff.name}</CardDescription>
+                  <CardDescription>{stuff.stuff_name}</CardDescription>
                 </CardHeader>
 
                 <CardContent className="flex justify-between items-center relative">
                   <div className="relative">
+                    {stuff.stuff_description && (
                     <button
                       onClick={() => toggleDescription(stuff.stuff_id)}
                       className="flex items-center text-sm text-gray-700 hover:text-gray-900"
@@ -161,12 +162,13 @@ export const MyStuffsPageContent = () => {
                       </span>
                       Описание
                     </button>
+                    )}
 
                     {isOpen && (
                       <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-                        <h3 className="font-semibold mb-1">{stuff.name}</h3>
+                        <h3 className="font-semibold mb-1">{stuff.stuff_name}</h3>
                         <p className="text-sm text-gray-600">
-                          {stuff.description || "Нет дополнительного описания"}
+                          {stuff.stuff_description || "Нет дополнительного описания"}
                         </p>
                       </div>
                     )}
@@ -179,7 +181,7 @@ export const MyStuffsPageContent = () => {
                       openConfirmDialog({
                         stuff_id: stuff.stuff_id,
                         event_id: stuff.event_id,
-                        name: stuff.name,
+                        stuff_name: stuff.stuff_name,
                       })
                     }
                   >
@@ -197,7 +199,7 @@ export const MyStuffsPageContent = () => {
         isOpen={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
         title="Вы уверены, что хотите отказаться?"
-        description={selectedStuff ? `Вещь: ${selectedStuff.name}` : undefined}
+        description={selectedStuff ? `${selectedStuff.stuff_name}` : undefined}
         onConfirm={handleConfirmDeny}
         onCancel={() => setConfirmDialogOpen(false)}
         confirmLabel="Да"

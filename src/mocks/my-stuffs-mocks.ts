@@ -4,53 +4,53 @@ import { MyStuffListItem } from "@/lib/api/types/my-stuff-types";
 let mockStuffs: MyStuffListItem[] = [
   {
     stuff_id: 1,
-    name: "Плед",
-    description: "Для пикника",
+    stuff_name: "Плед",
+    stuff_description: "Для пикника",
     event_id: 1,
     event_name: "Пикник выходного дня",
   },
   {
     stuff_id: 2,
-    name: "Бумажник",
-    description: "На мероприятие",
+    stuff_name: "Бумажник",
+    stuff_description: "На мероприятие",
     event_id: 1,
     event_name: "Пикник выходного дня3",
   },
   {
     stuff_id: 3,
-    name: "Мяч",
+    stuff_name: "Мяч",
     event_id: 1,
     event_name: "Пикник",
   },
   {
     stuff_id: 4,
-    name: "Помада",
+    stuff_name: "Помада",
     event_id: 1,
     event_name: "Вечеринка",
   },
   {
     stuff_id: 5,
-    name: "Плед",
-    description: "Для пикника",
+    stuff_name: "Плед",
+    stuff_description: "Для пикника",
     event_id: 1,
     event_name: "Пикник выходного дня2",
   },
   {
     stuff_id: 6,
-    name: "Бумажник",
-    description: "На мероприятие",
+    stuff_name: "Бумажник",
+    stuff_description: "На мероприятие",
     event_id: 1,
     event_name: "Пикник выходного дня1",
   },
   {
     stuff_id: 7,
-    name: "Мяч",
+    stuff_name: "Мяч",
     event_id: 1,
     event_name: "Пикник1",
   },
   {
     stuff_id: 8,
-    name: "Помада",
+    stuff_name: "Помада",
     event_id: 1,
     event_name: "Вечеринка1",
   },
@@ -70,7 +70,7 @@ export const myStuffHandlers = [
     `/api/events/:event_id/my-stuffs-list/:stuff_id/deny-stuff`,
     ({ params }) => {
       const { event_id, stuff_id } = params;
-
+      //в будущем надо убрать и исправить
       if (stuff_id === 999) {
         return HttpResponse.json(
           { error: "Мероприятие или вещь не найдены" },
@@ -78,7 +78,7 @@ export const myStuffHandlers = [
         );
       }
 
-      mockStuffs = mockStuffs.filter((s) => s.stuff_id !== stuff_id);
+      mockStuffs = mockStuffs.filter((s) => s.stuff_id !== Number(stuff_id));
 
       return HttpResponse.json({ message: "Вещь удалена" }, { status: 200 });
     }
