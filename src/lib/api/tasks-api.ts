@@ -15,7 +15,14 @@ export const {
 } = api.injectEndpoints({
   endpoints: (builder) => ({
     // Получить список задач
-    getTasksList: builder.query<TaskListItem[], number>({
+    getTasksList: builder.query<
+      {
+        event_date: string;
+        event_time: string;
+        tasks: TaskListItem[];
+      },
+      number
+    >({
       query: (event_id) => ({
         url: `/events/${event_id}/tasks-list`,
         method: "GET",

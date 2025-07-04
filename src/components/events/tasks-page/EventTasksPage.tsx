@@ -16,6 +16,7 @@ import { useGetUserMetadataQuery } from "@/lib/api/events-api";
 import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { TaskForm } from "./create-edit-modal/TaskForm";
 import { toast } from "sonner";
+import { TaskListItemCreator } from "@/lib/api/types/tasks-types";
 
 interface EventTasksPageContentProps {
   event_id: number;
@@ -25,7 +26,7 @@ export const EventTasksPageContent = ({
   event_id,
 }: EventTasksPageContentProps) => {
   const {
-    data: tasksData,
+    data: tasksResponse,
     isLoading,
     isError,
   } = useGetTasksListQuery(event_id);
@@ -55,10 +56,7 @@ export const EventTasksPageContent = ({
     setOpenedDescriptionId((prev) => (prev === id ? null : id));
   };
 
-  const handleCreateTask = async (data: {
-    task_name: string;
-    task_description?: string;
-  }) => {
+  const handleCreateTask = async (data: TaskListItemCreator) => {
     try {
       await addTask({
         event_id,
@@ -67,6 +65,8 @@ export const EventTasksPageContent = ({
           task_description: data.task_description,
           task_status_name: "Новая",
           responsible_user: "Не назначен",
+          deadline_date: data.deadline_date,
+          deadline_time: data.deadline_time,
         },
       }).unwrap();
       toast.success("Задача успешно создана");
@@ -76,7 +76,7 @@ export const EventTasksPageContent = ({
     }
   };
 
-  const tasks = tasksData || [];
+  const tasks = tasksResponse?.tasks || [];
 
   const filteredTasks = tasks.filter((task) => {
     if (!filters.completed && !filters.active) return true;
@@ -171,6 +171,8 @@ export const EventTasksPageContent = ({
               onCancel={() => setIsCreateModalOpen(false)}
               isLoading={false}
               submitButtonText="Создать"
+              eventDate={tasksResponse?.event_date}
+              eventTime={tasksResponse?.event_time}
             />
           </div>
         </div>

@@ -13,7 +13,7 @@ export type TaskListItemCreator = {
   task_description?: string;
   task_status_name?: string;
   responsible_user?: string;
-  deadline_date?: string;
+  deadline_date: string;
   deadline_time?: string;
 };
 
