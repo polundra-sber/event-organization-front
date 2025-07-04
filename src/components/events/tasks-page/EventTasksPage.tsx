@@ -64,7 +64,7 @@ export const EventTasksPageContent = ({
           task_name: data.task_name,
           task_description: data.task_description,
           task_status_name: "Новая",
-          responsible_user: "Не назначен",
+          responsible_user: data.responsible_user || null,
           deadline_date: data.deadline_date,
           deadline_time: data.deadline_time,
         },
@@ -173,6 +173,7 @@ export const EventTasksPageContent = ({
               submitButtonText="Создать"
               eventDate={tasksResponse?.event_date}
               eventTime={tasksResponse?.event_time}
+              eventId={event_id}
             />
           </div>
         </div>

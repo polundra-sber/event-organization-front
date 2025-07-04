@@ -98,7 +98,10 @@ export const TaskCard = ({
       await editTask({
         event_id,
         task_id: task.task_id,
-        taskData: data,
+        taskData: {
+          ...data,
+          responsible_user: data.responsible_user || null,
+        },
       }).unwrap();
       toast.success("Задача успешно обновлена");
       setIsEditing(false);
@@ -229,11 +232,13 @@ export const TaskCard = ({
                 task_description: task.task_description,
                 deadline_date: task.deadline_date,
                 deadline_time: task.deadline_time,
+                responsible_user: task.responsible_user || null,
               }}
               onSubmit={handleEditTask}
               onCancel={() => setIsEditing(false)}
               isLoading={false}
               submitButtonText="Сохранить"
+              eventId={event_id}
             />
           </div>
         </div>

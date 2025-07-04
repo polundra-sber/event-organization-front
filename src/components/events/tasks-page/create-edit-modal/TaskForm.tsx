@@ -17,6 +17,8 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
+import { useGetEventParticipantsListQuery } from "@/lib/api/participants-api";
+import { ParticipantSelect } from "@/components/common/ParticipantSelect";
 
 interface TaskFormProps {
   defaultValues?: Partial<TaskListItemCreator>;
@@ -24,8 +26,9 @@ interface TaskFormProps {
   onCancel: () => void;
   isLoading: boolean;
   submitButtonText: string;
-  eventDate?: string; // Дата мероприятия
-  eventTime?: string; // Время мероприятия
+  eventDate?: string;
+  eventTime?: string;
+  eventId?: number;
 }
 
 export const TaskForm = ({
@@ -36,7 +39,11 @@ export const TaskForm = ({
   submitButtonText,
   eventDate,
   eventTime,
+  eventId,
 }: TaskFormProps) => {
+  const { data: participants = [], isLoading: isParticipantsLoading } =
+    useGetEventParticipantsListQuery(eventId || 0, { skip: !eventId });
+
   const {
     register,
     handleSubmit,
@@ -45,14 +52,16 @@ export const TaskForm = ({
     formState: { errors },
   } = useForm<TaskListItemCreator>({
     defaultValues: {
-      deadline_date: eventDate, // Устанавливаем дату мероприятия по умолчанию
-      deadline_time: eventTime, // Устанавливаем время мероприятия по умолчанию
+      deadline_date: eventDate,
+      deadline_time: eventTime,
+      responsible_user: null,
       ...defaultValues,
     },
   });
 
   const deadline_date = watch("deadline_date");
   const deadline_time = watch("deadline_time");
+  const responsible_user = watch("responsible_user");
 
   const handleDateSelect = (date?: Date) => {
     if (date) {
@@ -63,6 +72,10 @@ export const TaskForm = ({
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue("deadline_time", e.target.value, { shouldValidate: true });
+  };
+
+  const handleResponsibleChange = (login: string | null) => {
+    setValue("responsible_user", login, { shouldValidate: true });
   };
 
   return (
@@ -83,6 +96,17 @@ export const TaskForm = ({
       <div>
         <Label htmlFor="task_description">Описание</Label>
         <Textarea id="task_description" {...register("task_description")} />
+      </div>
+
+      {/* Поле выбора ответственного с использованием ParticipantSelect */}
+      <div>
+        <Label>Ответственный</Label>
+        <ParticipantSelect
+          participants={participants}
+          value={responsible_user}
+          onChange={handleResponsibleChange}
+          placeholder="Не назначен"
+        />
       </div>
 
       {/* Дата выполнения (обязательная) */}
@@ -123,7 +147,7 @@ export const TaskForm = ({
               onSelect={handleDateSelect}
               initialFocus
               locale={ru}
-              fromDate={new Date()} // Запрещаем выбирать даты раньше сегодня
+              fromDate={new Date()}
               className="bg-white"
             />
           </PopoverContent>
