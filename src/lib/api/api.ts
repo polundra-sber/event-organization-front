@@ -13,7 +13,7 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Event", "MyStuff", "MyTask", "MyDebt"],
+  tagTypes: ["Event", "MyStuff", "MyTask", "MyDebt", "MyIncomes"],
   endpoints: () => ({}),
 });
 
