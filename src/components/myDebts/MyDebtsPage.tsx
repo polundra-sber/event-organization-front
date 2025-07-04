@@ -84,7 +84,7 @@ export const MyDebtsPageContent = () => {
 
               <CardContent className="flex items-center gap-4 flex-wrap">
                 {/* Аватар */}
-                <Avatar className="w-12 h-12">
+                <Avatar className="w-12 h-12 border border-my-dark-green">
                   <AvatarFallback>
                     {debt.recipient_name
                       ? debt.recipient_name[0].toUpperCase()
