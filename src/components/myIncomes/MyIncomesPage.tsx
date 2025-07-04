@@ -78,7 +78,7 @@ export const MyIncomesPageContent = () => {
               </div>
 
               <CardContent className="flex items-center gap-4 flex-wrap">
-                <Avatar className="w-12 h-12">
+                <Avatar className="w-12 h-12 border border-my-dark-green">
                   <AvatarFallback>
                     {income.payer_name
                       ? income.payer_name[0].toUpperCase()
