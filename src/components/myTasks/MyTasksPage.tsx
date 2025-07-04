@@ -198,7 +198,7 @@ export const MyTasksPageContent = () => {
         isOpen={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
         title="Удалить задачу?"
-        description={selectedTask ? `Задача: ${selectedTask.task_name}` : undefined}
+        description={selectedTask ? `${selectedTask.task_name}` : undefined}
         onConfirm={handleConfirmDelete}
         onCancel={() => setConfirmDialogOpen(false)}
         confirmLabel="Да"
