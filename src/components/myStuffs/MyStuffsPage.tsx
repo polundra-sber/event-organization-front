@@ -109,7 +109,11 @@ export const MyStuffsPageContent = () => {
   return (
     <div className="p-4 min-h-screen bg-gray-50">
       <ButtonToMain />
-      <h1 className="text-2xl text-center font-bold mb-6">Мои вещи</h1>
+      <div className="flex items-center justify-center  bg-my-yellow-green  px-6 py-3 rounded-xl mb-4">
+        <label className="text-lg font-bold text-my-black text-lg">
+          Мои вещи
+        </label>
+      </div>
       <div className="mb-4">
         <FilterButton onClick={() => setIsFilterOpen(true)} label="Фильтры" />
       </div>
@@ -169,7 +173,7 @@ export const MyStuffsPageContent = () => {
                   </div>
 
                   <Button
-                    variant="destructive"
+                    variant="light_green"
                     size="sm"
                     onClick={() =>
                       openConfirmDialog({
