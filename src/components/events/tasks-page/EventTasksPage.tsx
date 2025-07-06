@@ -62,11 +62,11 @@ export const EventTasksPageContent = ({
         event_id,
         taskData: {
           task_name: data.task_name,
-          task_description: data.task_description,
+          task_description: data.task_description || null,
           task_status_name: "Новая",
-          responsible_user: data.responsible_user || null,
+          responsible_login: data.responsible_login || null,
           deadline_date: data.deadline_date,
-          deadline_time: data.deadline_time,
+          deadline_time: data.deadline_time || null,
         },
       }).unwrap();
       toast.success("Задача успешно создана");
@@ -172,7 +172,7 @@ export const EventTasksPageContent = ({
               isLoading={false}
               submitButtonText="Создать"
               eventDate={tasksResponse?.event_date}
-              eventTime={tasksResponse?.event_time}
+              eventTime={tasksResponse?.event_time || null}
               eventId={event_id}
             />
           </div>

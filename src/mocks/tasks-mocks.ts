@@ -5,6 +5,38 @@ import {
   TaskListItemEditor,
   TaskListItemResponsible,
 } from "@/lib/api/types/tasks-types";
+import { User } from "@/lib/api/types/participants-types";
+
+// Моковые данные пользователей
+const mockUsers: Record<string, User> = {
+  user1: {
+    login: "user1",
+    email: "user1@example.com",
+    name: "Иван",
+    surname: "Иванов",
+    role_name: "участник",
+    password: null,
+    comment_money_transfer: null,
+  },
+  user2: {
+    login: "user2",
+    email: "user2@example.com",
+    name: "Мария",
+    surname: "Петрова",
+    role_name: "организатор",
+    password: null,
+    comment_money_transfer: "На сбер: 89996362576",
+  },
+  current_user: {
+    login: "current_user",
+    email: "current@example.com",
+    name: "Текущий",
+    surname: "Пользователь",
+    role_name: "участник",
+    password: null,
+    comment_money_transfer: null,
+  },
+};
 
 // Моковые данные задач
 const mockTasks: Record<
@@ -12,7 +44,7 @@ const mockTasks: Record<
   { event_date: string; event_time: string | null; tasks: TaskListItem[] }
 > = {
   1: {
-    event_date: "15.06.2025",
+    event_date: "2025-07-15",
     event_time: "18:00",
     tasks: [
       {
@@ -23,7 +55,7 @@ const mockTasks: Record<
         responsible_login: "user1",
         responsible_name: "Иван",
         responsible_surname: "Иванов",
-        deadline_date: "12.06.2025",
+        deadline_date: "2025-07-15",
         deadline_time: "16:00",
       },
       {
@@ -34,13 +66,13 @@ const mockTasks: Record<
         responsible_login: null,
         responsible_name: null,
         responsible_surname: null,
-        deadline_date: "10.06.2025",
+        deadline_date: "2025-06-10",
         deadline_time: null,
       },
     ],
   },
   2: {
-    event_date: "20.07.2025",
+    event_date: "2025-07-20",
     event_time: null,
     tasks: [
       {
@@ -50,7 +82,7 @@ const mockTasks: Record<
         responsible_login: "user2",
         responsible_name: "Мария",
         responsible_surname: "Петрова",
-        deadline_date: "01.05.2025",
+        deadline_date: "2025-05-01",
         deadline_time: null,
       },
     ],
@@ -95,16 +127,26 @@ export const taskHandlers = [
         );
       }
 
+      // Находим данные пользователя, если указан responsible_login
+      let responsibleName = null;
+      let responsibleSurname = null;
+
+      if (taskData.responsible_login && mockUsers[taskData.responsible_login]) {
+        const user = mockUsers[taskData.responsible_login];
+        responsibleName = user.name;
+        responsibleSurname = user.surname;
+      }
+
       const newTask: TaskListItem = {
         task_id: Math.max(0, ...eventTasks.tasks.map((t) => t.task_id)) + 1,
         task_name: taskData.task_name,
         task_description: taskData.task_description || null,
         task_status_name: taskData.task_status_name || "Новая",
         responsible_login: taskData.responsible_login || null,
-        responsible_name: null,
-        responsible_surname: null,
+        responsible_name: responsibleName,
+        responsible_surname: responsibleSurname,
         deadline_date:
-          taskData.deadline_date || new Date().toLocaleDateString("ru-RU"),
+          taskData.deadline_date || new Date().toISOString().split("T")[0],
         deadline_time: taskData.deadline_time || null,
       };
 
@@ -140,9 +182,29 @@ export const taskHandlers = [
         );
       }
 
+      // Находим данные пользователя, если указан responsible_login
+      let responsibleName = eventTasks.tasks[taskIndex].responsible_name;
+      let responsibleSurname = eventTasks.tasks[taskIndex].responsible_surname;
+
+      if (taskData.responsible_login !== undefined) {
+        if (
+          taskData.responsible_login &&
+          mockUsers[taskData.responsible_login]
+        ) {
+          const user = mockUsers[taskData.responsible_login];
+          responsibleName = user.name;
+          responsibleSurname = user.surname;
+        } else {
+          responsibleName = null;
+          responsibleSurname = null;
+        }
+      }
+
       const updatedTask = {
         ...eventTasks.tasks[taskIndex],
         ...taskData,
+        responsible_name: responsibleName,
+        responsible_surname: responsibleSurname,
       };
 
       eventTasks.tasks[taskIndex] = updatedTask;
@@ -186,11 +248,7 @@ export const taskHandlers = [
     "/api/events/:event_id/tasks-list/:task_id/take-task",
     async ({ params }) => {
       const { event_id, task_id } = params;
-      const currentUser = {
-        login: "current_user",
-        name: "Текущий",
-        surname: "Пользователь",
-      };
+      const currentUser = mockUsers["current_user"];
 
       const eventTasks = mockTasks[event_id as unknown as number];
       if (!eventTasks) {

@@ -51,8 +51,7 @@ export const TaskCard = ({
   const canEditDelete =
     (userRole === "создатель" || userRole === "организатор") && isEventActive;
   const isCompleted = task.task_status_name.toLowerCase() === "выполнена";
-  const isTaskAvailable =
-    !task.responsible_user || task.responsible_user === "Не назначен";
+  const isTaskAvailable = !task.responsible_login;
 
   // Состояния для диалогов и загрузки
   const [isTakeDialogOpen, setIsTakeDialogOpen] = useState(false);
@@ -60,6 +59,21 @@ export const TaskCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isTaking, setIsTaking] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Форматирование даты для отображения
+  const formatDisplayDate = (dateString: string | null) => {
+    if (!dateString) return "";
+
+    try {
+      const [year, month, day] = dateString.split("-");
+      return `${day}.${month}.${year}`;
+    } catch {
+      return dateString;
+    }
+  };
+
+  const displayDate = formatDisplayDate(task.deadline_date);
+  const displayTime = task.deadline_time || "";
 
   const handleTakeTask = async () => {
     setIsTaking(true);
@@ -100,7 +114,7 @@ export const TaskCard = ({
         task_id: task.task_id,
         taskData: {
           ...data,
-          responsible_user: data.responsible_user || null,
+          responsible_login: data.responsible_login || null,
         },
       }).unwrap();
       toast.success("Задача успешно обновлена");
@@ -128,7 +142,7 @@ export const TaskCard = ({
             )}
           </div>
           <CardDescription className="text-black">
-            Срок: {task.deadline_date} {task.deadline_time || ""}
+            Срок: {displayDate} {displayTime}
           </CardDescription>
           <p className="text-sm mt-1">
             Статус:{" "}
@@ -137,7 +151,12 @@ export const TaskCard = ({
             </span>
           </p>
           <p className="text-sm mt-1">
-            Ответственный: {task.responsible_user || "Не назначен"}
+            Ответственный:{" "}
+            {task.responsible_login
+              ? `${task.responsible_name || ""} ${
+                  task.responsible_surname || ""
+                }`.trim()
+              : "Не назначен"}
           </p>
         </CardHeader>
 
@@ -229,10 +248,10 @@ export const TaskCard = ({
             <TaskForm
               defaultValues={{
                 task_name: task.task_name,
-                task_description: task.task_description,
+                task_description: task.task_description || null,
                 deadline_date: task.deadline_date,
-                deadline_time: task.deadline_time,
-                responsible_user: task.responsible_user || null,
+                deadline_time: task.deadline_time || null,
+                responsible_login: task.responsible_login || null,
               }}
               onSubmit={handleEditTask}
               onCancel={() => setIsEditing(false)}

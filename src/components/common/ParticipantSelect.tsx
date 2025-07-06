@@ -45,14 +45,26 @@ export function ParticipantSelect({
 
     const searchLower = searchValue.toLowerCase();
     return (
+      participant.login.toLowerCase().includes(searchLower) ||
       participant.email.toLowerCase().includes(searchLower) ||
-      participant.name.toLowerCase().includes(searchLower) ||
-      participant.surname.toLowerCase().includes(searchLower) ||
-      `${participant.surname} ${participant.name}`
+      participant.name?.toLowerCase().includes(searchLower) ||
+      participant.surname?.toLowerCase().includes(searchLower) ||
+      `${participant.surname || ""} ${participant.name || ""}`
         .toLowerCase()
+        .trim()
         .includes(searchLower)
     );
   });
+
+  const getDisplayName = (participant: User) => {
+    const nameParts = [];
+    if (participant.surname) nameParts.push(participant.surname);
+    if (participant.name) nameParts.push(participant.name);
+
+    const nameStr =
+      nameParts.length > 0 ? nameParts.join(" ") : participant.login;
+    return `${nameStr} (${participant.email})`;
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -64,7 +76,7 @@ export function ParticipantSelect({
           className={cn("w-full justify-between", className)}
         >
           {selectedParticipant
-            ? `${selectedParticipant.surname} ${selectedParticipant.name} (${selectedParticipant.email})`
+            ? getDisplayName(selectedParticipant)
             : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -72,13 +84,30 @@ export function ParticipantSelect({
       <PopoverContent className="w-full p-0">
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Поиск по email, имени или фамилии..."
+            placeholder="Поиск по логину, email, имени или фамилии..."
             className="h-9"
             value={searchValue}
             onValueChange={setSearchValue}
           />
           <CommandEmpty>Участник не найден</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-y-auto">
+            <CommandItem
+              key="none"
+              value=""
+              onSelect={() => {
+                onChange(null);
+                setOpen(false);
+                setSearchValue("");
+              }}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  value === null ? "opacity-100" : "opacity-0"
+                )}
+              />
+              Не назначен
+            </CommandItem>
             {filteredParticipants.map((participant) => (
               <CommandItem
                 key={participant.login}
@@ -97,7 +126,7 @@ export function ParticipantSelect({
                     value === participant.login ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {`${participant.surname} ${participant.name} (${participant.email})`}
+                {getDisplayName(participant)}
               </CommandItem>
             ))}
           </CommandGroup>

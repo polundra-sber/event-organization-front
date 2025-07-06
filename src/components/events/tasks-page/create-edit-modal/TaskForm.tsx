@@ -18,8 +18,8 @@ interface TaskFormProps {
   onCancel: () => void;
   isLoading: boolean;
   submitButtonText: string;
-  eventDate?: string;
-  eventTime?: string;
+  eventDate?: string | null;
+  eventTime?: string | null;
   eventId?: number;
 }
 
@@ -46,27 +46,27 @@ export const TaskForm = ({
     formState: { errors },
   } = useForm<TaskListItemCreator>({
     defaultValues: {
-      deadline_date: eventDate,
-      deadline_time: eventTime,
-      responsible_user: null,
+      deadline_date: eventDate || null,
+      deadline_time: eventTime || null,
+      responsible_login: null,
       ...defaultValues,
     },
   });
 
   const deadline_date = watch("deadline_date");
   const deadline_time = watch("deadline_time");
-  const responsible_user = watch("responsible_user");
+  const responsible_login = watch("responsible_login");
 
-  const handleDateChange = (date: string) => {
+  const handleDateChange = (date: string | null) => {
     setValue("deadline_date", date, { shouldValidate: true });
   };
 
-  const handleTimeChange = (time: string) => {
+  const handleTimeChange = (time: string | null) => {
     setValue("deadline_time", time, { shouldValidate: true });
   };
 
   const handleResponsibleChange = (login: string | null) => {
-    setValue("responsible_user", login, { shouldValidate: true });
+    setValue("responsible_login", login, { shouldValidate: true });
   };
 
   return (
@@ -86,14 +86,18 @@ export const TaskForm = ({
 
       <div>
         <Label htmlFor="task_description">Описание</Label>
-        <Textarea id="task_description" {...register("task_description")} />
+        <Textarea
+          id="task_description"
+          {...register("task_description")}
+          placeholder="Описание не добавлено"
+        />
       </div>
 
       <div>
         <Label>Ответственный</Label>
         <ParticipantSelect
           participants={participants}
-          value={responsible_user}
+          value={responsible_login}
           onChange={handleResponsibleChange}
           placeholder="Не назначен"
         />
