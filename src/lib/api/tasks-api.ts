@@ -18,7 +18,7 @@ export const {
     getTasksList: builder.query<
       {
         event_date: string;
-        event_time: string;
+        event_time: string | null;
         tasks: TaskListItem[];
       },
       number

@@ -9,14 +9,18 @@ const mockParticipants: Record<number, User[]> = {
       email: "user1@example.com",
       name: "Иван",
       surname: "Иванов",
-      role: "Организатор",
+      role_name: "Организатор",
+      password: null,
+      comment_money_transfer: null,
     },
     {
       login: "user2",
       email: "user2@example.com",
       name: "Мария",
       surname: "Петрова",
-      role: "Участник",
+      role_name: "Участник",
+      password: null,
+      comment_money_transfer: "На сбер: 89996362576",
     },
   ],
   2: [
@@ -25,7 +29,9 @@ const mockParticipants: Record<number, User[]> = {
       email: "user3@example.com",
       name: "Алексей",
       surname: "Сидоров",
-      role: "Гость",
+      role_name: "участник",
+      password: null,
+      comment_money_transfer: null,
     },
   ],
 };
@@ -160,7 +166,9 @@ export const participantsHandlers = [
         .filter((user) => logins.includes(user.login))
         .map((user) => ({
           ...user,
-          role: "Участник", // Устанавливаем роль по умолчанию
+          role_name: "Участник", // Устанавливаем роль по умолчанию
+          password: null,
+          comment_money_transfer: null,
         }));
 
       mockParticipants[event_id as unknown as number].push(...newParticipants);
@@ -172,6 +180,38 @@ export const participantsHandlers = [
         },
         { status: 200 }
       );
+    }
+  ),
+
+  // Удалить участника
+  http.delete(
+    "/api/events/:event_id/participants-list/:participant_login/delete-participant",
+    ({ params }) => {
+      const { event_id, participant_login } = params;
+
+      if (!mockParticipants[event_id as unknown as number]) {
+        return HttpResponse.json(
+          { error: "Мероприятие с данным идентификатором не найдено" },
+          { status: 404 }
+        );
+      }
+
+      const initialLength =
+        mockParticipants[event_id as unknown as number].length;
+      mockParticipants[event_id as unknown as number] = mockParticipants[
+        event_id as unknown as number
+      ].filter((user) => user.login !== participant_login);
+
+      if (
+        mockParticipants[event_id as unknown as number].length === initialLength
+      ) {
+        return HttpResponse.json(
+          { error: "Участник с данным логином не найден" },
+          { status: 404 }
+        );
+      }
+
+      return new HttpResponse(null, { status: 200 });
     }
   ),
 ];

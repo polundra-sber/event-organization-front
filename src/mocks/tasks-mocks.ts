@@ -6,10 +6,10 @@ import {
   TaskListItemResponsible,
 } from "@/lib/api/types/tasks-types";
 
-// Моковые данные
+// Моковые данные задач
 const mockTasks: Record<
   number,
-  { event_date: string; event_time: string; tasks: TaskListItem[] }
+  { event_date: string; event_time: string | null; tasks: TaskListItem[] }
 > = {
   1: {
     event_date: "15.06.2025",
@@ -20,7 +20,9 @@ const mockTasks: Record<
         task_name: "Заказать торт",
         task_description: "Торт без орехов и без апельсина",
         task_status_name: "В работе",
-        responsible_user: "user1",
+        responsible_login: "user1",
+        responsible_name: "Иван",
+        responsible_surname: "Иванов",
         deadline_date: "12.06.2025",
         deadline_time: "16:00",
       },
@@ -29,21 +31,27 @@ const mockTasks: Record<
         task_name: "Купить шарики",
         task_description: "Разноцветные, 20 штук",
         task_status_name: "Новая",
-        responsible_user: "Не назначен",
+        responsible_login: null,
+        responsible_name: null,
+        responsible_surname: null,
         deadline_date: "10.06.2025",
+        deadline_time: null,
       },
     ],
   },
   2: {
     event_date: "20.07.2025",
-    event_time: "20:00",
+    event_time: null,
     tasks: [
       {
         task_id: 3,
         task_name: "Забронировать ресторан",
         task_status_name: "Завершена",
-        responsible_user: "user2",
+        responsible_login: "user2",
+        responsible_name: "Мария",
+        responsible_surname: "Петрова",
         deadline_date: "01.05.2025",
+        deadline_time: null,
       },
     ],
   },
@@ -62,14 +70,7 @@ export const taskHandlers = [
       );
     }
 
-    return HttpResponse.json(
-      {
-        event_date: eventTasks.event_date,
-        event_time: eventTasks.event_time, // Добавлено в ответ
-        tasks: eventTasks.tasks,
-      },
-      { status: 200 }
-    );
+    return HttpResponse.json(eventTasks, { status: 200 });
   }),
 
   // Добавить новую задачу
@@ -87,7 +88,6 @@ export const taskHandlers = [
         );
       }
 
-      // Валидация обязательных полей
       if (!taskData.task_name) {
         return HttpResponse.json(
           { error: "Название задачи обязательно" },
@@ -98,12 +98,14 @@ export const taskHandlers = [
       const newTask: TaskListItem = {
         task_id: Math.max(0, ...eventTasks.tasks.map((t) => t.task_id)) + 1,
         task_name: taskData.task_name,
-        task_description: taskData.task_description || "Описание не добавлено",
+        task_description: taskData.task_description || null,
         task_status_name: taskData.task_status_name || "Новая",
-        responsible_user: taskData.responsible_user || "Не назначен",
+        responsible_login: taskData.responsible_login || null,
+        responsible_name: null,
+        responsible_surname: null,
         deadline_date:
           taskData.deadline_date || new Date().toLocaleDateString("ru-RU"),
-        deadline_time: taskData.deadline_time,
+        deadline_time: taskData.deadline_time || null,
       };
 
       eventTasks.tasks.push(newTask);
@@ -184,7 +186,11 @@ export const taskHandlers = [
     "/api/events/:event_id/tasks-list/:task_id/take-task",
     async ({ params }) => {
       const { event_id, task_id } = params;
-      const currentUser = "current_user";
+      const currentUser = {
+        login: "current_user",
+        name: "Текущий",
+        surname: "Пользователь",
+      };
 
       const eventTasks = mockTasks[event_id as unknown as number];
       if (!eventTasks) {
@@ -207,7 +213,9 @@ export const taskHandlers = [
 
       const updatedTask = {
         ...eventTasks.tasks[taskIndex],
-        responsible_user: currentUser,
+        responsible_login: currentUser.login,
+        responsible_name: currentUser.name,
+        responsible_surname: currentUser.surname,
         task_status_name: "В работе",
       };
 
@@ -216,7 +224,9 @@ export const taskHandlers = [
       const response: TaskListItemResponsible = {
         task_id: updatedTask.task_id,
         task_name: updatedTask.task_name,
-        responsible_user: updatedTask.responsible_user,
+        responsible_login: updatedTask.responsible_login,
+        responsible_name: updatedTask.responsible_name,
+        responsible_surname: updatedTask.responsible_surname,
         task_description: updatedTask.task_description,
       };
 
