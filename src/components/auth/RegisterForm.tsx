@@ -163,7 +163,7 @@ export const RegisterForm = () => {
         )}
 
         <Button
-          variant="pink"
+          variant="default"
           type="submit"
           className="w-full h-11"
           disabled={isLoading}
