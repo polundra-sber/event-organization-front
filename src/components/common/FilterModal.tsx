@@ -259,7 +259,7 @@ export function FilterModal<T extends Record<string, boolean>>({
         <DialogFooter className="mt-4">
           {activeCategory === null ? (
             <>
-              <Button variant="light_green" onClick={handleCancel}>
+              <Button variant="yellow_green" onClick={handleCancel}>
                 Отмена
               </Button>
               <Button variant="dark_green" onClick={handleApply}>Применить</Button>
