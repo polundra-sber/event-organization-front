@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react"; // Или любые другие иконки
+import { Check, X } from "lucide-react";
 
 import {
   AlertDialog,
@@ -10,6 +9,7 @@ import {
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogAction,
   AlertDialogCancel,
@@ -87,8 +87,14 @@ export const ConfirmationDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+          {description ? (
+            <AlertDialogDescription className="text-sm text-muted-foreground">
+              {description}
+            </AlertDialogDescription>
+          ) : (
+            <AlertDialogDescription className="sr-only">
+              Диалог подтверждения действия
+            </AlertDialogDescription>
           )}
         </AlertDialogHeader>
 
