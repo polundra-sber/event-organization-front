@@ -16,7 +16,7 @@ import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { useState } from "react";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 import { toast } from "sonner";
-import { TaskForm } from "./create-edit-modal/TaskForm";
+import { ItemModalForm } from "@/components/common/ItemModalForm";
 import { useEditTaskInTasksListMutation } from "@/lib/api/tasks-api";
 
 interface TaskCardProps {
@@ -244,8 +244,7 @@ export const TaskCard = ({
       {isEditing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
-            <h3 className="text-lg font-bold mb-4">Редактировать задачу</h3>
-            <TaskForm
+            <ItemModalForm
               defaultValues={{
                 task_name: task.task_name,
                 task_description: task.task_description || null,
@@ -258,6 +257,8 @@ export const TaskCard = ({
               isLoading={false}
               submitButtonText="Сохранить"
               eventId={event_id}
+              showDateTimeFields={true} // Показываем поля даты/времени для задач
+              formTitle="Редактировать задачу" // Перенес заголовок в пропсы формы
             />
           </div>
         </div>

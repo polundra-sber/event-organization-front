@@ -14,7 +14,7 @@ import { FilterModal } from "@/components/common/FilterModal";
 import { FilterButton } from "@/components/common/FilterButton";
 import { useGetUserMetadataQuery } from "@/lib/api/events-api";
 import { EventRole, EventStatus } from "@/lib/api/types/event-types";
-import { TaskForm } from "./create-edit-modal/TaskForm";
+import { ItemModalForm } from "@/components/common/ItemModalForm";
 import { toast } from "sonner";
 import { TaskListItemCreator } from "@/lib/api/types/tasks-types";
 
@@ -165,8 +165,7 @@ export const EventTasksPageContent = ({
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
-            <h3 className="text-lg font-bold mb-4">Создать новую задачу</h3>
-            <TaskForm
+            <ItemModalForm
               onSubmit={handleCreateTask}
               onCancel={() => setIsCreateModalOpen(false)}
               isLoading={false}
@@ -174,6 +173,8 @@ export const EventTasksPageContent = ({
               eventDate={tasksResponse?.event_date}
               eventTime={tasksResponse?.event_time || null}
               eventId={event_id}
+              showDateTimeFields={true}
+              formTitle="Создать новую задачу"
             />
           </div>
         </div>
