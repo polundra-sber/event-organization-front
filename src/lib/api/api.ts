@@ -21,6 +21,7 @@ export const api = createApi({
     "MyIncomes",
     "TaskList",
     "ParticipantsList",
+    "StuffList",
     "PurchaseList",
   ],
   endpoints: () => ({}),

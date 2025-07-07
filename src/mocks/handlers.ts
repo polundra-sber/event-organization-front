@@ -7,6 +7,8 @@ import { myDebtHandlers } from "./my-debts-mocks";
 import { myIncomesHandlers } from "./my-incomes-mocks";
 import { taskHandlers } from "./tasks-mocks";
 import { participantsHandlers } from "./participants-mocks";
+import { stuffHandlers } from "./stuffs-mocks";
+
 import { purchaseHandlers } from "./purchases-mocks";
 
 export const handlers = [
@@ -18,6 +20,7 @@ export const handlers = [
   ...authHandlers,
   ...profileHandlers,
   ...taskHandlers,
+  ...stuffHandlers,
   ...participantsHandlers,
   ...purchaseHandlers,
 ];
