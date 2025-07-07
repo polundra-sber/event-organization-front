@@ -5,70 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { TaskListItemCreator } from "@/lib/api/types/tasks-types";
 import { RequiredFieldLabel } from "@/components/common/FormInput";
 import { useGetEventParticipantsListQuery } from "@/lib/api/participants-api";
 import { ParticipantSelect } from "@/components/common/ParticipantSelect";
 import { DateSelect } from "@/components/common/DateSelect";
 import { TimeSelect } from "@/components/common/TimeSelect";
 
-/**
- * Универсальная форма для создания/редактирования элементов мероприятия
- *
- * @description
- * Компонент `ItemModalForm` предоставляет универсальную форму для работы с:
- * - Задачами мероприятия (с полями даты и времени)
- * - Вещами мероприятия (без полей даты и времени)
- *
- * Основные возможности:
- * - Поддержка создания и редактирования элементов
- * - Валидация обязательных полей
- * - Интеграция с участниками мероприятия
- * - Гибкое управление отображением полей даты/времени
- * - Кастомизация текста кнопки отправки
- * - Поддержка состояния загрузки
- *
- * @param props - Свойства формы
- * @param props.defaultValues - Начальные значения формы
- * @param props.onSubmit - Callback при отправке формы
- * @param props.onCancel - Callback при отмене
- * @param props.isLoading - Флаг состояния загрузки
- * @param props.submitButtonText - Текст кнопки отправки
- * @param props.eventDate - Дата мероприятия (по умолчанию для даты выполнения)
- * @param props.eventTime - Время мероприятия (по умолчанию для времени выполнения)
- * @param props.eventId - ID мероприятия для загрузки участников
- * @param props.showDateTimeFields - Флаг отображения полей даты/времени (по умолчанию true)
- * @param props.formTitle - Заголовок формы (опционально)
- *
- * @example
- * // Форма для задачи (с датой/временем)
- * <ItemModalForm
- *   onSubmit={handleTaskSubmit}
- *   onCancel={closeModal}
- *   isLoading={isSubmitting}
- *   submitButtonText="Сохранить"
- *   eventDate={eventDate}
- *   eventTime={eventTime}
- *   eventId={eventId}
- *   formTitle="Редактировать задачу"
- * />
- *
- * @example
- * // Форма для вещи (без даты/времени)
- * <ItemModalForm
- *   onSubmit={handleItemSubmit}
- *   onCancel={closeModal}
- *   isLoading={isSubmitting}
- *   submitButtonText="Создать"
- *   eventId={eventId}
- *   showDateTimeFields={false}
- *   formTitle="Добавить вещь"
- * />
- */
+const processFormData = (data: BaseItemFormValues) => {
+  return {
+    ...data,
+    description: data.description === "" ? null : data.description,
+  };
+};
 
-interface ItemFormProps {
-  defaultValues?: Partial<TaskListItemCreator>;
-  onSubmit: (data: TaskListItemCreator) => Promise<void>;
+type BaseItemFormValues = {
+  name: string;
+  description?: string | null;
+  responsible_login?: string | null;
+  deadline_date?: string | null;
+  deadline_time?: string | null;
+};
+
+interface ItemModalFormProps {
+  defaultValues?: Partial<BaseItemFormValues>;
+  onSubmit: (data: BaseItemFormValues) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
   submitButtonText: string;
@@ -77,6 +37,8 @@ interface ItemFormProps {
   eventId?: number;
   showDateTimeFields?: boolean;
   formTitle?: string;
+  nameLabel?: string;
+  descriptionLabel?: string;
 }
 
 export const ItemModalForm = ({
@@ -90,7 +52,9 @@ export const ItemModalForm = ({
   eventId,
   showDateTimeFields = true,
   formTitle,
-}: ItemFormProps) => {
+  nameLabel = "Название",
+  descriptionLabel = "Описание",
+}: ItemModalFormProps) => {
   const { data: participants = [] } = useGetEventParticipantsListQuery(
     eventId || 0,
     { skip: !eventId }
@@ -102,7 +66,7 @@ export const ItemModalForm = ({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<TaskListItemCreator>({
+  } = useForm<BaseItemFormValues>({
     defaultValues: {
       deadline_date: showDateTimeFields ? eventDate || null : null,
       deadline_time: showDateTimeFields ? eventTime || null : null,
@@ -128,28 +92,31 @@ export const ItemModalForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form
+      onSubmit={handleSubmit((data) => onSubmit(processFormData(data)))}
+      className="space-y-4"
+    >
       {formTitle && <h3 className="text-lg font-bold mb-4">{formTitle}</h3>}
 
       <div>
-        <Label htmlFor="task_name">
-          <RequiredFieldLabel text="Название" />
+        <Label htmlFor="name">
+          <RequiredFieldLabel text={nameLabel} />
         </Label>
         <Input
-          id="task_name"
-          {...register("task_name", { required: "Обязательное поле" })}
+          id="name"
+          {...register("name", { required: "Обязательное поле" })}
         />
-        {errors.task_name && (
-          <p className="text-sm text-red-500">{errors.task_name.message}</p>
+        {errors.name && (
+          <p className="text-sm text-red-500">{errors.name.message}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="task_description">Описание</Label>
+        <Label htmlFor="description">{descriptionLabel}</Label>
         <Textarea
-          id="task_description"
-          {...register("task_description")}
-          placeholder="Описание не добавлено"
+          id="description"
+          {...register("description")}
+          placeholder={`${descriptionLabel} не добавлено`}
         />
       </div>
 

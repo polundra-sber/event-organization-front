@@ -240,25 +240,35 @@ export const TaskCard = ({
         </CardContent>
       </Card>
 
-      {/* Модалка редактирования */}
+      {/* Модалка редактирования задачи */}
       {isEditing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
             <ItemModalForm
               defaultValues={{
-                task_name: task.task_name,
-                task_description: task.task_description || null,
+                name: task.task_name,
+                description: task.task_description || null,
                 deadline_date: task.deadline_date,
                 deadline_time: task.deadline_time || null,
                 responsible_login: task.responsible_login || null,
               }}
-              onSubmit={handleEditTask}
+              onSubmit={(data) =>
+                handleEditTask({
+                  task_name: data.name,
+                  task_description: data.description,
+                  responsible_login: data.responsible_login,
+                  deadline_date: data.deadline_date,
+                  deadline_time: data.deadline_time,
+                })
+              }
               onCancel={() => setIsEditing(false)}
               isLoading={false}
               submitButtonText="Сохранить"
               eventId={event_id}
-              showDateTimeFields={true} // Показываем поля даты/времени для задач
-              formTitle="Редактировать задачу" // Перенес заголовок в пропсы формы
+              showDateTimeFields={true}
+              formTitle="Редактировать задачу"
+              nameLabel="Название задачи"
+              descriptionLabel="Описание задачи"
             />
           </div>
         </div>

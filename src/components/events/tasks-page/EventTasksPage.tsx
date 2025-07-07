@@ -166,7 +166,15 @@ export const EventTasksPageContent = ({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
             <ItemModalForm
-              onSubmit={handleCreateTask}
+              onSubmit={(data) =>
+                handleCreateTask({
+                  task_name: data.name,
+                  task_description: data.description,
+                  responsible_login: data.responsible_login,
+                  deadline_date: data.deadline_date,
+                  deadline_time: data.deadline_time,
+                })
+              }
               onCancel={() => setIsCreateModalOpen(false)}
               isLoading={false}
               submitButtonText="Создать"
@@ -175,6 +183,8 @@ export const EventTasksPageContent = ({
               eventId={event_id}
               showDateTimeFields={true}
               formTitle="Создать новую задачу"
+              nameLabel="Название задачи"
+              descriptionLabel="Описание задачи"
             />
           </div>
         </div>
