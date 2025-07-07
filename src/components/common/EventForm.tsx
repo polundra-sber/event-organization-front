@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { FormInput, RequiredFieldLabel } from "./FormInput";
 import {
@@ -39,7 +38,6 @@ interface EventFormProps {
 
 export function EventForm({
   initialData,
-  eventId,
   isEditing = false,
   onSubmit,
   onCancel,
@@ -150,13 +148,17 @@ export function EventForm({
     if (!validateForm()) return;
 
     try {
+      // Функция для преобразования пустых строк в null
+      const transformEmptyToNull = (value: string) =>
+        value.trim() === "" ? null : value;
+
       await onSubmit({
         event_name: formData.event_name,
-        event_description: formData.event_description,
+        event_description: transformEmptyToNull(formData.event_description),
         event_date: formData.event_date.split("/").reverse().join("-"),
-        event_time: formData.event_time,
-        location: formData.location,
-        chat_link: formData.chat_link,
+        event_time: transformEmptyToNull(formData.event_time),
+        location: transformEmptyToNull(formData.location),
+        chat_link: transformEmptyToNull(formData.chat_link),
       });
     } catch (error: any) {
       const errorMessage =
