@@ -81,6 +81,144 @@ const mockAllUsers: UserDemo[] = [
     name: "Ольга",
     surname: "Смирнова",
   },
+
+  {
+    login: "ivanov1",
+    email: "ivanov1@example.com",
+    name: "Иван",
+    surname: "Иванов",
+  },
+  {
+    login: "ivanov2",
+    email: "ivanov2@example.com",
+    name: "Иван",
+    surname: "Ивановский",
+  },
+  {
+    login: "ivanova1",
+    email: "ivanova1@example.com",
+    name: "Ирина",
+    surname: "Иванова",
+  },
+  {
+    login: "ivanova2",
+    email: "ivanova2@example.com",
+    name: "Инна",
+    surname: "Иванова",
+  },
+
+  {
+    login: "petrov1",
+    email: "petrov1@example.com",
+    name: "Петр",
+    surname: "Петров",
+  },
+  {
+    login: "petrova1",
+    email: "petrova1@example.com",
+    name: "Полина",
+    surname: "Петрова",
+  },
+  {
+    login: "petrova2",
+    email: "petrova2@example.com",
+    name: "Мария",
+    surname: "Петрова",
+  },
+
+  {
+    login: "sidorov1",
+    email: "sidorov1@example.com",
+    name: "Семен",
+    surname: "Сидоров",
+  },
+  {
+    login: "sidorova1",
+    email: "sidorova1@example.com",
+    name: "Светлана",
+    surname: "Сидорова",
+  },
+
+  {
+    login: "kuznetsov1",
+    email: "kuznetsov1@example.com",
+    name: "Константин",
+    surname: "Кузнецов",
+  },
+  {
+    login: "kuznetsova1",
+    email: "kuznetsova1@example.com",
+    name: "Ксения",
+    surname: "Кузнецова",
+  },
+
+  {
+    login: "smirnov1",
+    email: "smirnov1@example.com",
+    name: "Сергей",
+    surname: "Смирнов",
+  },
+  {
+    login: "smirnova1",
+    email: "smirnova1@example.com",
+    name: "Ольга",
+    surname: "Смирнова",
+  },
+  {
+    login: "smirnova2",
+    email: "smirnova2@example.com",
+    name: "Анна",
+    surname: "Смирнова",
+  },
+
+  {
+    login: "popov1",
+    email: "popov1@example.com",
+    name: "Павел",
+    surname: "Попов",
+  },
+  {
+    login: "fedorova1",
+    email: "fedorova1@example.com",
+    name: "Фаина",
+    surname: "Федорова",
+  },
+  {
+    login: "alexeev1",
+    email: "alexeev1@example.com",
+    name: "Алексей",
+    surname: "Алексеев",
+  },
+  {
+    login: "alexeeva1",
+    email: "alexeeva1@example.com",
+    name: "Алина",
+    surname: "Алексеева",
+  },
+  {
+    login: "mikhailov1",
+    email: "mikhailov1@example.com",
+    name: "Михаил",
+    surname: "Михайлов",
+  },
+  {
+    login: "mikhailova1",
+    email: "mikhailova1@example.com",
+    name: "Марина",
+    surname: "Михайлова",
+  },
+  {
+    login: "admin1",
+    email: "admin1@example.com",
+    name: "Админ",
+    surname: "Админов",
+  },
+  {
+    login: "testuser",
+    email: "testuser@example.com",
+    name: "Тест",
+    surname: "Тестов",
+  },
 ];
 
 export const participantsHandlers = [
@@ -116,19 +254,18 @@ export const participantsHandlers = [
       }
 
       if (!text) {
-        return HttpResponse.json(
-          { error: "Текст поиска обязателен" },
-          { status: 400 }
-        );
+        return HttpResponse.json([], { status: 200 }); // Пустой массив вместо ошибки
       }
 
-      // Фильтрация пользователей по тексту поиска
+      // Фильтрация пользователей по тексту поиска (регистронезависимая)
+      const searchTextLower = text.toLowerCase();
       const filteredUsers = mockAllUsers
         .filter(
           (user) =>
-            user.login.includes(text) ||
-            user.name.includes(text) ||
-            user.surname.includes(text)
+            user.login.toLowerCase().includes(searchTextLower) ||
+            user.name.toLowerCase().includes(searchTextLower) ||
+            user.surname.toLowerCase().includes(searchTextLower) ||
+            user.email.toLowerCase().includes(searchTextLower)
         )
         // Исключаем уже добавленных участников
         .filter(
