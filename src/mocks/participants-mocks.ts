@@ -9,7 +9,7 @@ const mockParticipants: Record<number, User[]> = {
       email: "user1@example.com",
       name: "Иван",
       surname: "Иванов",
-      role_name: "Организатор",
+      role_name: "организатор",
       password: null,
       comment_money_transfer: null,
     },
@@ -18,9 +18,28 @@ const mockParticipants: Record<number, User[]> = {
       email: "user2@example.com",
       name: "Мария",
       surname: "Петрова",
-      role_name: "Участник",
+      role_name: "участник",
       password: null,
       comment_money_transfer: "На сбер: 89996362576",
+    },
+
+    {
+      login: "user55",
+      email: "user55@example.com",
+      name: "Мария",
+      surname: "заявка",
+      role_name: "не допущен",
+      password: null,
+      comment_money_transfer: "На сбер: 89996362576",
+    },
+    {
+      login: "user",
+      email: "user@example.com",
+      name: "boss",
+      surname: "Иванов",
+      role_name: "создатель",
+      password: null,
+      comment_money_transfer: null,
     },
   ],
   2: [
@@ -166,7 +185,7 @@ export const participantsHandlers = [
         .filter((user) => logins.includes(user.login))
         .map((user) => ({
           ...user,
-          role_name: "Участник", // Устанавливаем роль по умолчанию
+          role_name: "участник",
           password: null,
           comment_money_transfer: null,
         }));
@@ -212,6 +231,45 @@ export const participantsHandlers = [
       }
 
       return new HttpResponse(null, { status: 200 });
+    }
+  ),
+
+  http.patch(
+    "/api/events/:event_id/participants-list/:participant_login/change-participant-role",
+    ({ params }) => {
+      const { event_id, participant_login } = params;
+
+      if (!mockParticipants[event_id as unknown as number]) {
+        return HttpResponse.json(
+          { error: "Мероприятие не найдено" },
+          { status: 404 }
+        );
+      }
+
+      const participant = mockParticipants[event_id as unknown as number].find(
+        (p) => p.login === participant_login
+      );
+
+      if (!participant) {
+        return HttpResponse.json(
+          { error: "Участник не найден" },
+          { status: 404 }
+        );
+      }
+
+      if (participant.role_name === "создатель") {
+        return HttpResponse.json(
+          { error: "Нельзя изменить роль создателя" },
+          { status: 403 }
+        );
+      }
+
+      const newRole =
+        participant.role_name === "организатор" ? "участник" : "организатор";
+
+      participant.role_name = newRole;
+
+      return HttpResponse.json({ role: newRole }, { status: 200 });
     }
   ),
 ];
