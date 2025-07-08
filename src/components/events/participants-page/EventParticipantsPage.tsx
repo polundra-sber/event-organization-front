@@ -13,7 +13,8 @@ import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { ParticipantCard } from "./ParticipantCard";
 import { toast } from "sonner";
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { AddParticipantsModal } from "./AddParticipantsModal";
 
 interface EventParticipantsPageContentProps {
   event_id: number;
@@ -32,8 +33,8 @@ export const EventParticipantsPageContent = ({
   const [updateParticipantRole] = useUpdateParticipantRoleMutation();
   const [addParticipants] = useAddParticipantsMutation();
 
-  // Состояния для сворачивания секций
-  const [showNotAllowed, setShowNotAllowed] = useState(true);
+  // Состояния для сворачивания секцим и модалки добавления
+  const [showNotAllowed, setShowNotAllowed] = useState(false);
 
   const userRole: EventRole = (metadata?.role_name as EventRole) || "участник";
   const eventStatus: EventStatus =
@@ -169,11 +170,15 @@ export const EventParticipantsPageContent = ({
       </div>
 
       {canManage && (
-        <div className="mt-6 flex justify-center">
-          <Button variant="bright_green" className="gap-2">
-            <Plus size={16} />
-            Добавить участника
-          </Button>
+        <div className="mt-8 flex justify-center">
+          <AddParticipantsModal
+            event_id={event_id}
+            onAddParticipants={async (logins) => {
+              await addParticipants({ event_id, logins });
+              toast.success("Участники успешно добавлены");
+            }}
+            existingParticipants={participants?.map((p) => p.login) || []}
+          />
         </div>
       )}
     </div>
