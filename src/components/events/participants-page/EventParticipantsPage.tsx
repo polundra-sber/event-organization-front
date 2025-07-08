@@ -12,6 +12,8 @@ import { useGetUserMetadataQuery } from "@/lib/api/events-api";
 import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { ParticipantCard } from "./ParticipantCard";
 import { toast } from "sonner";
+import { useState } from "react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 
 interface EventParticipantsPageContentProps {
   event_id: number;
@@ -30,6 +32,9 @@ export const EventParticipantsPageContent = ({
   const [updateParticipantRole] = useUpdateParticipantRoleMutation();
   const [addParticipants] = useAddParticipantsMutation();
 
+  // Состояния для сворачивания секций
+  const [showNotAllowed, setShowNotAllowed] = useState(true);
+
   const userRole: EventRole = (metadata?.role_name as EventRole) || "участник";
   const eventStatus: EventStatus =
     (metadata?.event_status_name as EventStatus) || "активно";
@@ -41,8 +46,6 @@ export const EventParticipantsPageContent = ({
   // Разделяем участников на категории
   const notAllowed =
     participants?.filter((p) => p.role_name === "не допущен") || [];
-  const applications =
-    participants?.filter((p) => p.role_name === "заявка") || [];
   const confirmedParticipants =
     participants?.filter(
       (p) => !["не допущен", "заявка"].includes(p.role_name)
@@ -105,55 +108,46 @@ export const EventParticipantsPageContent = ({
         </Button>
       </div>
 
-      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <h1 className="text-lg font-bold text-my-black">Список участников</h1>
-      </div>
-
       {/* Секция не допущенных участников */}
       {notAllowed.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3 text-my-black">Заявки</h2>
-          <div className="space-y-3">
-            {notAllowed.map((participant) => (
-              <ParticipantCard
-                key={participant.login}
-                participant={participant}
-                canManage={canManage}
-                isCreator={isCreator}
-                onDelete={handleDelete}
-                onToggleOrganizer={handleToggleOrganizer}
-                onApprove={handleApprove}
-                event_id={event_id}
-              />
-            ))}
+          <div
+            className="flex items-center justify-between bg-my-yellow-green px-6 py-3 rounded-xl mb-4 cursor-pointer hover:bg-my-yellow-green/90 transition-colors"
+            onClick={() => setShowNotAllowed(!showNotAllowed)}
+          >
+            <h2 className="text-lg font-semibold text-my-black">Заявки</h2>
+            {showNotAllowed ? (
+              <ChevronUp size={20} />
+            ) : (
+              <ChevronDown size={20} />
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Секция заявок */}
-      {applications.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3 text-my-black">Заявки</h2>
-          <div className="space-y-3">
-            {applications.map((participant) => (
-              <ParticipantCard
-                key={participant.login}
-                participant={participant}
-                canManage={canManage}
-                isCreator={isCreator}
-                onDelete={handleDelete}
-                onToggleOrganizer={handleToggleOrganizer}
-                onApprove={handleApprove}
-                event_id={event_id}
-              />
-            ))}
-          </div>
+          {showNotAllowed && (
+            <div className="space-y-3">
+              {notAllowed.map((participant) => (
+                <ParticipantCard
+                  key={participant.login}
+                  participant={participant}
+                  canManage={canManage}
+                  isCreator={isCreator}
+                  onDelete={handleDelete}
+                  onToggleOrganizer={handleToggleOrganizer}
+                  onApprove={handleApprove}
+                  event_id={event_id}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Секция участников */}
       <div>
-        <h2 className="text-lg font-semibold mb-3 text-my-black">Участники</h2>
+        <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
+          <h2 className="text-lg font-semibold text-my-black">Участники</h2>
+        </div>
+
         <div className="space-y-3">
           {confirmedParticipants.length === 0 ? (
             <p className="text-gray-500">Нет участников</p>
@@ -175,8 +169,11 @@ export const EventParticipantsPageContent = ({
       </div>
 
       {canManage && (
-        <div className="mt-6">
-          <Button variant="bright_green">Добавить участника</Button>
+        <div className="mt-6 flex justify-center">
+          <Button variant="bright_green" className="gap-2">
+            <Plus size={16} />
+            Добавить участника
+          </Button>
         </div>
       )}
     </div>
