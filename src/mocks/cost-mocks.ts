@@ -3,12 +3,10 @@ import {
   CostAllocationListItem,
   CostListResponse,
   UserDemo,
-  ReceiptList,
-  EventNotExistResponse,
 } from "@/lib/api/types/cost-types";
 
 // Существующие мероприятия
-const existingEventIds = [1, 888, 999];
+const existingEventIds = [1, 888, 15];
 
 // Моковые расходы
 const mockCostAllocationList: CostAllocationListItem[] = [
@@ -60,17 +58,18 @@ const mockParticipants: UserDemo[] = [
 export const costHandlers = [
   // Получить список расходов
   http.get("/api/events/:event_id/cost-list", ({ params }) => {
-    const eventId = Number(params.event_id);
+    const { event_id } = params;
+    const eventId = Number(event_id);
 
     if (!existingEventIds.includes(eventId)) {
-      return HttpResponse.json<EventNotExistResponse>(
+      return HttpResponse.json(
         { error: "Мероприятие с данным идентификатором не найдено" },
         { status: 404 }
       );
     }
 
-    if (eventId === 999) {
-      return HttpResponse.json<CostListResponse>(
+    if (eventId === 15) {
+      return HttpResponse.json(
         {
           cost_allocation_list: [],
           expenses_existence: false,
@@ -80,7 +79,7 @@ export const costHandlers = [
     }
 
     if (eventId === 888) {
-      return HttpResponse.json<CostListResponse>(
+      return HttpResponse.json(
         {
           cost_allocation_list: [],
           expenses_existence: true,
@@ -89,7 +88,7 @@ export const costHandlers = [
       );
     }
 
-    return HttpResponse.json<CostListResponse>(
+    return HttpResponse.json(
       {
         cost_allocation_list: mockCostAllocationList,
         expenses_existence: true,
@@ -100,10 +99,11 @@ export const costHandlers = [
 
   // Получить персональный список расходов
   http.get("/api/events/:event_id/cost-list-personal", ({ params }) => {
-    const eventId = Number(params.event_id);
+    const { event_id } = params;
+    const eventId = Number(event_id);
 
     if (!existingEventIds.includes(eventId)) {
-      return HttpResponse.json<EventNotExistResponse>(
+      return HttpResponse.json(
         { error: "Мероприятие с данным идентификатором не найдено" },
         { status: 404 }
       );
@@ -114,24 +114,26 @@ export const costHandlers = [
 
   // Получить участников для покупки
   http.get("/api/events/:event_id/cost-list/:purchase_id/participants", ({ params }) => {
-    const eventId = Number(params.event_id);
+    const { event_id } = params;
+    const eventId = Number(event_id);
 
     if (!existingEventIds.includes(eventId)) {
-      return HttpResponse.json<EventNotExistResponse>(
+      return HttpResponse.json(
         { error: "Мероприятие с данным идентификатором не найдено" },
         { status: 404 }
       );
     }
 
-    return HttpResponse.json<UserDemo[]>(mockParticipants, { status: 200 });
+    return HttpResponse.json(mockParticipants, { status: 200 });
   }),
 
   // Получить чек покупки
   http.get("/api/events/:event_id/purchases-list/:purchase_id/get-receipt", async ({ params }) => {
-    const eventId = Number(params.event_id);
+    const { event_id } = params;
+    const eventId = Number(event_id);
 
     if (!existingEventIds.includes(eventId)) {
-      return HttpResponse.json<EventNotExistResponse>(
+      return HttpResponse.json(
         { error: "Мероприятие с данным идентификатором не найдено" },
         { status: 404 }
       );
