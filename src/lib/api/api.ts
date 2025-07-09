@@ -25,7 +25,8 @@ export const api = createApi({
     "StuffList",
     "PurchaseList",
     "CostAllocationList",
-    "Participants"
+    "Participants",
+    "CostList"
   ],
   endpoints: () => ({}),
 });
