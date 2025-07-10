@@ -38,7 +38,7 @@ export const myTaskHandlers = [
 
   // Отказаться от задачи
   http.delete(
-    "/api/events/:event_id/my-tasks-list/:task_id/deny-task",
+    "/api/events/my-tasks-list/:task_id/deny-task",
     ({ params }) => {
       const { task_id } = params;
       const taskIdNum = Number(task_id);
@@ -55,7 +55,7 @@ export const myTaskHandlers = [
 
   // Отметить задачу выполненной
   http.patch(
-    "/api/events/:event_id/my-tasks-list/:task_id/mark-task-completed",
+    "/api/events/my-tasks-list/:task_id/mark-task-completed",
     ({ params }) => {
       const { task_id } = params;
       const taskIdNum = Number(task_id);

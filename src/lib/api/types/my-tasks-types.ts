@@ -9,6 +9,6 @@ export interface MyTaskListItem {
   task_status_name: string;
 }
 
-export interface EventNotExistResponse {
-  detail: string;
+export interface TaskNotExistResponse {
+  error: string;
 }

@@ -18,8 +18,8 @@ export const myTasksApi = api.injectEndpoints({
     }),
 
     denyTaskInMyTasksList: builder.mutation<void, { event_id: number; task_id: number }>({
-      query: ({ event_id, task_id }) => ({
-        url: `/events/${event_id}/my-tasks-list/${task_id}/deny-task`,
+      query: ({  task_id }) => ({
+        url: `/events/my-tasks-list/${task_id}/deny-task`,
         method: "DELETE",
       }),
       invalidatesTags: (_, __, { task_id }) => [
@@ -29,8 +29,8 @@ export const myTasksApi = api.injectEndpoints({
     }),
 
     markTaskCompletedInMyTasksList: builder.mutation<void, { event_id: number; task_id: number }>({
-      query: ({ event_id, task_id }) => ({
-        url: `/events/${event_id}/my-tasks-list/${task_id}/mark-task-completed`,
+      query: ({ task_id }) => ({
+        url: `/events/my-tasks-list/${task_id}/mark-task-completed`,
         method: "PATCH",
       }),
       invalidatesTags: (_, __, { task_id }) => [
