@@ -1,14 +1,18 @@
 export type UserProfile = {
-  firstName: string;
-  lastName: string;
+  name: string;
+  surname: string;
   login: string;
   email: string;
-  requisites: string;
+  comment_money_transfer?: string | null;
 };
 
 export type UserEditor = {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  requisites?: string;
+  name?: string | null;
+  surname?: string | null;
+  email?: string | null;
+  comment_money_transfer?: string | null;
 };
+
+export type UserAlreadyExistResponse = {
+  error: string;
+}

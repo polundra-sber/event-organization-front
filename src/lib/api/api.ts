@@ -18,7 +18,7 @@ export const api = createApi({
     "MyStuff",
     "MyTask",
     "MyDebt",
-    "MyIncomes",
+    "MyIncome",
     "MyPurchases",
     "TaskList",
     "ParticipantsList",

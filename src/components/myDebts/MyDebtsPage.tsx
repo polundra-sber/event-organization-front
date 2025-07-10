@@ -129,7 +129,6 @@ export const MyDebtsPageContent = () => {
                   onClick={async () => {
                     try {
                       await markDebtPaid({
-                        event_id: debt.event_id,
                         debt_id: debt.debt_id,
                       }).unwrap();
                       toast.success("Долг отмечен как оплаченный");

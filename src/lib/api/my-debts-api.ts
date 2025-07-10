@@ -4,7 +4,7 @@ import { MyDebtListItem } from "@/lib/api/types/my-debts-types";
 export const myDebtsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getMyDebtsList: builder.query<MyDebtListItem[], void>({
-      query: () => `/events/my-debts-list`,
+      query: () => `/my-debts-list`,
       providesTags: (result) =>
         result
           ? [
@@ -17,9 +17,9 @@ export const myDebtsApi = api.injectEndpoints({
           : [{ type: "MyDebt", id: "LIST" }],
     }),
 
-    markDebtPaidInMyDebtsList: builder.mutation<void, { event_id: number; debt_id: number }>({
-      query: ({ event_id, debt_id }) => ({
-        url: `/events/${event_id}/my-debts-list/${debt_id}/mark-debt-paid`,
+    markDebtPaidInMyDebtsList: builder.mutation<void, { debt_id: number }>({
+      query: ({ debt_id }) => ({
+        url: `/my-debts-list/${debt_id}/mark-debt-paid`,
         method: "PATCH",
       }),
       invalidatesTags: (_, __, { debt_id }) => [

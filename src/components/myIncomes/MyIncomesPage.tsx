@@ -110,7 +110,6 @@ export const MyIncomesPageContent = () => {
 
                     try {
                       await markIncomeReceived({
-                        event_id: income.event_id,
                         debt_id: income.debt_id,
                       }).unwrap();
                       toast.success("Долг отмечен как полученный");

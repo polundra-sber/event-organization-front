@@ -8,14 +8,14 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
   profileApi,
-} from "@/lib/api/profile-api"; // Измененный импорт API профиля
+} from "@/lib/api/profile-api";
 import { useDispatch } from "react-redux";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
 import { UserEditor, UserProfile } from "@/lib/api/types/profile-types";
 
-function getInitials(firstName: string, lastName: string) {
-  const firstInitial = firstName?.charAt(0).toUpperCase() || "?";
-  const lastInitial = lastName?.charAt(0).toUpperCase() || "?";
+function getInitials(name?: string | null, surname?: string | null) {
+  const firstInitial = name?.charAt(0).toUpperCase() || "?";
+  const lastInitial = surname?.charAt(0).toUpperCase() || "?";
   return `${firstInitial}.${lastInitial}`;
 }
 
@@ -39,14 +39,18 @@ export const ProfilePageContent = () => {
   const [nameError, setNameError] = useState<string | null>(null);
   const [editedProfile, setEditedProfile] = useState<UserEditor>({});
 
-  // Используем хуки из profileApi
   const { data: profile, isLoading, isError } = useGetProfileQuery();
   const [updateProfile] = useUpdateProfileMutation();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (profile) {
-      setEditedProfile(profile);
+      setEditedProfile({
+        name: profile.name,
+        surname: profile.surname,
+        email: profile.email,
+        comment_money_transfer: profile.comment_money_transfer,
+      });
     }
   }, [profile]);
 
@@ -65,7 +69,7 @@ export const ProfilePageContent = () => {
   };
 
   const validateNames = () => {
-    if (!editedProfile.firstName?.trim() || !editedProfile.lastName?.trim()) {
+    if (!editedProfile.name?.trim() || !editedProfile.surname?.trim()) {
       setNameError("Имя и фамилия не могут быть пустыми");
       return false;
     }
@@ -81,7 +85,6 @@ export const ProfilePageContent = () => {
 
   const toggleEdit = async () => {
     if (isEditing) {
-      // Валидация перед сохранением
       if (!validateNames() || !validateEmail(editedProfile.email || "")) {
         return;
       }
@@ -117,128 +120,119 @@ export const ProfilePageContent = () => {
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain isEditing={isEditing} className="mb-10"/>
+      <ButtonToMain isEditing={isEditing} className="mb-10" />
 
-      
-        {errorMessage && (
-          <p className="text-red-600 font-medium text-sm bg-red-50 border border-red-200 p-2 rounded">
-            {errorMessage}
-          </p>
-        )}
+      {errorMessage && (
+        <p className="text-red-600 font-medium text-sm bg-red-50 border border-red-200 p-2 rounded">
+          {errorMessage}
+        </p>
+      )}
 
-        <div className="flex items-center justify-center  bg-my-yellow-green  px-6 py-3 rounded-xl mb-4">
-          <label className="text-lg font-bold text-my-black text-lg">
-            Мой профиль
-          </label>
-        </div>
+      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
+        <label className="text-lg font-bold text-my-black">
+          Мой профиль
+        </label>
+      </div>
 
-        <div className="flex items-start gap-4 bg-my-light-green p-4 rounded-xl mb-4">
-          <Avatar className="w-16 h-16 flex-shrink-0">
-            <AvatarFallback>
-              {getInitials(profile.firstName, profile.lastName)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col gap-2 w-full min-w-0">
-            {isEditing ? (
-              <div className="space-y-2 w-full">
-                <div>
-                  <Input
-                    value={editedProfile.firstName || ""}
-                    onChange={(e) => {
-                      setEditedProfile({
-                        ...editedProfile,
-                        firstName: e.target.value,
-                      });
-                      if (e.target.value.trim()) setNameError(null);
-                    }}
-                    placeholder="Имя"
-                    className="w-full bg-white"
-                    maxLength={32}
-                  />
-                </div>
-                <div>
-                  <Input
-                    value={editedProfile.lastName || ""}
-                    onChange={(e) => {
-                      setEditedProfile({
-                        ...editedProfile,
-                        lastName: e.target.value,
-                      });
-                      if (e.target.value.trim()) setNameError(null);
-                    }}
-                    placeholder="Фамилия"
-                    className="w-full bg-white"
-                    maxLength={32}
-                  />
-                </div>
-                {nameError && (
-                  <p className="text-red-600 text-xs">{nameError}</p>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-1 min-w-0">
-                <p className="text-lg truncate overflow-hidden">
-                  {profile.firstName}
-                </p>
-                <p className="text-lg truncate overflow-hidden">
-                  {profile.lastName}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
-          <label className="text-sm text-gray-500">Логин</label>
-          <p className="text-gray-900 truncate">{profile.login}</p>
-        </div>
-
-        <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
-          <label className="text-sm text-gray-500">Email</label>
+      <div className="flex items-start gap-4 bg-my-light-green p-4 rounded-xl mb-4">
+        <Avatar className="w-16 h-16 flex-shrink-0">
+          <AvatarFallback>
+            {getInitials(profile.name, profile.surname)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col gap-2 w-full min-w-0">
           {isEditing ? (
-            <>
+            <div className="space-y-2 w-full">
               <Input
-                value={editedProfile.email || ""}
-                onChange={handleEmailChange}
-                placeholder="example@example.com"
-                className="bg-white"
+                value={editedProfile.name || ""}
+                onChange={(e) =>
+                  setEditedProfile({
+                    ...editedProfile,
+                    name: e.target.value,
+                  })
+                }
+                placeholder="Имя"
+                className="w-full bg-white"
+                maxLength={32}
               />
-              {emailError && (
-                <p className="text-red-600 text-xs mt-1">{emailError}</p>
+              <Input
+                value={editedProfile.surname || ""}
+                onChange={(e) =>
+                  setEditedProfile({
+                    ...editedProfile,
+                    surname: e.target.value,
+                  })
+                }
+                placeholder="Фамилия"
+                className="w-full bg-white"
+                maxLength={32}
+              />
+              {nameError && (
+                <p className="text-red-600 text-xs">{nameError}</p>
               )}
-            </>
+            </div>
           ) : (
-            <p className="text-gray-900 truncate">{profile.email}</p>
+            <div className="space-y-1 min-w-0">
+              <p className="text-lg truncate overflow-hidden">{profile.name}</p>
+              <p className="text-lg truncate overflow-hidden">
+                {profile.surname}
+              </p>
+            </div>
           )}
         </div>
+      </div>
 
-        <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
-          <label className="text-sm text-gray-500">Реквизиты</label>
-          {isEditing ? (
+      <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
+        <label className="text-sm text-gray-500">Логин</label>
+        <p className="text-gray-900 truncate">{profile.login}</p>
+      </div>
+
+      <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
+        <label className="text-sm text-gray-500">Email</label>
+        {isEditing ? (
+          <>
             <Input
-              value={editedProfile.requisites || ""}
-              onChange={(e) =>
-                setEditedProfile({
-                  ...editedProfile,
-                  requisites: e.target.value,
-                })
-              }
-              placeholder="Реквизиты"
-              maxLength={128}
+              value={editedProfile.email || ""}
+              onChange={handleEmailChange}
+              placeholder="example@example.com"
               className="bg-white"
             />
-          ) : (
-            <p className="text-gray-900 line-clamp-4 break-words ">
-              {profile.requisites}
-            </p>
-          )}
-        </div>
+            {emailError && (
+              <p className="text-red-600 text-xs mt-1">{emailError}</p>
+            )}
+          </>
+        ) : (
+          <p className="text-gray-900 truncate">{profile.email}</p>
+        )}
+      </div>
 
-        <div className="mt-4">
-          <Button onClick={toggleEdit} variant="dark_green" className="w-full">
-            {isEditing ? "Сохранить" : "Редактировать"}
-          </Button>
-        </div>
+      <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
+        <label className="text-sm text-gray-500">Комментарий для перевода</label>
+        {isEditing ? (
+          <Input
+            value={editedProfile.comment_money_transfer || ""}
+            onChange={(e) =>
+              setEditedProfile({
+                ...editedProfile,
+                comment_money_transfer: e.target.value,
+              })
+            }
+            placeholder="Комментарий"
+            maxLength={128}
+            className="bg-white"
+          />
+        ) : (
+          <p className="text-gray-900 line-clamp-4 break-words">
+            {profile.comment_money_transfer || "-"}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <Button onClick={toggleEdit} variant="dark_green" className="w-full">
+          {isEditing ? "Сохранить" : "Редактировать"}
+        </Button>
+      </div>
     </div>
   );
 };

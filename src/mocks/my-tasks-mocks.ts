@@ -32,13 +32,13 @@ let myMockTasks: MyTaskListItem[] = [
 
 export const myTaskHandlers = [
   // Получить список всех задач пользователя
-  http.get("/api/events/my-tasks-list", () => {
+  http.get("/api/my-tasks-list", () => {
     return HttpResponse.json(myMockTasks, { status: 200 });
   }),
 
   // Отказаться от задачи
   http.delete(
-    "/api/events/:event_id/my-tasks-list/:task_id/deny-task",
+    "/api/my-tasks-list/:task_id/deny-task",
     ({ params }) => {
       const { task_id } = params;
       const taskIdNum = Number(task_id);
@@ -55,7 +55,7 @@ export const myTaskHandlers = [
 
   // Отметить задачу выполненной
   http.patch(
-    "/api/events/:event_id/my-tasks-list/:task_id/mark-task-completed",
+    "/api/my-tasks-list/:task_id/mark-task-completed",
     ({ params }) => {
       const { task_id } = params;
       const taskIdNum = Number(task_id);

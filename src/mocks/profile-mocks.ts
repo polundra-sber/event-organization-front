@@ -4,22 +4,22 @@ import { http, HttpResponse } from "msw";
 
 // Моковые данные профиля
 let mockProfile = {
-  firstName: "Анна",
-  lastName: "Иванова",
+  name: "Анна",
+  surname: "Иванова",
   login: "anna_ivanova",
   email: "anna@example.com",
-  requisites: "Банковская карта: 1234 5678 9012 3456",
+  comment_money_transfer: "Банковская карта: 1234 5678 9012 3456",
 };
 
 export const profileHandlers = [
   // Получение профиля текущего пользователя
   http.get("/api/profile", () => {
     return HttpResponse.json({
-      firstName: mockProfile.firstName,
-      lastName: mockProfile.lastName,
+      name: mockProfile.name,
+      surname: mockProfile.surname,
       login: mockProfile.login,
       email: mockProfile.email,
-      requisites: mockProfile.requisites,
+      comment_money_transfer: mockProfile.comment_money_transfer,
     });
   }),
 

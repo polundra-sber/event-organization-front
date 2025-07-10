@@ -3,12 +3,12 @@ export interface MyTaskListItem {
   event_id: number;
   event_name: string;
   task_name: string;
-  task_description?: string;
+  task_description?: string | null;
   deadline_date: string;
-  deadline_time?: string;
+  deadline_time?: string | null;
   task_status_name: string;
 }
 
-export interface EventNotExistResponse {
-  detail: string;
+export interface TaskNotExistResponse {
+  error: string;
 }
