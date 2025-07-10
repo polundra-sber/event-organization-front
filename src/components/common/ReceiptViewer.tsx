@@ -17,12 +17,17 @@ const ReceiptViewer: React.FC<ReceiptViewerProps> = ({
     purchase_id: purchaseId,
   });
 
+  // Функция для создания URL из Blob
+  const createObjectURL = (file: Blob) => {
+    return URL.createObjectURL(file);
+  };
+
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-hidden">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-600 hover:text-black"
+          className="absolute top-4 right-4 text-gray-600 hover:text-black text-2xl"
         >
           ✕
         </button>
@@ -35,14 +40,18 @@ const ReceiptViewer: React.FC<ReceiptViewerProps> = ({
         ) : !data?.files?.length ? (
           <p>Нет прикреплённых чеков</p>
         ) : (
-          <div className="space-y-4 overflow-y-auto max-h-[70vh]">
+          <div className="space-y-4 overflow-y-auto max-h-[calc(90vh-100px)] pr-2">
             {data.files.map((file, index) => (
-              <img
-                key={index}
-                src={URL.createObjectURL(file)}
-                alt={`Чек ${index + 1}`}
-                className="w-full rounded border"
-              />
+              <div key={index} className="border rounded p-2">
+                <img
+                  src={createObjectURL(file)}
+                  alt={`Чек ${index + 1}`}
+                  className="w-full rounded"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {file.name || `Чек ${index + 1}`}
+                </p>
+              </div>
             ))}
           </div>
         )}
