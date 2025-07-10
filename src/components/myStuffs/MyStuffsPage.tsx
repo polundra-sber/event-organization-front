@@ -56,7 +56,6 @@ export const MyStuffsPageContent = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedStuff, setSelectedStuff] = useState<{
     stuff_id: number;
-    event_id: number;
     stuff_name: string;
   } | null>(null);
 
@@ -72,7 +71,6 @@ export const MyStuffsPageContent = () => {
   // Открыть диалог
   const openConfirmDialog = (stuff: {
     stuff_id: number;
-    event_id: number;
     stuff_name: string;
   }) => {
     setSelectedStuff(stuff);
@@ -180,7 +178,6 @@ export const MyStuffsPageContent = () => {
                     onClick={() =>
                       openConfirmDialog({
                         stuff_id: stuff.stuff_id,
-                        event_id: stuff.event_id,
                         stuff_name: stuff.stuff_name,
                       })
                     }
