@@ -177,7 +177,7 @@ export const MyPurchasesPageContent = () => {
   if (isError) return <p>Ошибка загрузки</p>;
 
   const purchases = data?.purchases || [];
-  const userLogin = data?.userLogin;
+  const user_login = data?.user_login;
 
   const filteredPurchases = purchases.filter((purchase) => {
     const responsibleFiltersActive = Object.keys(filters).some(
@@ -351,7 +351,7 @@ export const MyPurchasesPageContent = () => {
                     </div>
 
                     <div className="flex justify-end">
-                      {purchase.responsible_login === userLogin &&
+                      {purchase.responsible_login === user_login &&
                         (currentCost === 0 || currentCost === undefined) && (
                           <Button
                             variant="dark_green"

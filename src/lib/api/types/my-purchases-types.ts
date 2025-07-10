@@ -12,7 +12,7 @@ export interface MyPurchaseListItem {
 }
 
 export interface MyPurchasesListResponse {
-  userLogin: string;
+  user_login: string;
   purchases: MyPurchaseListItem[];
 }
 
