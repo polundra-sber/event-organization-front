@@ -1,9 +1,7 @@
-// src/mocks/profile-mocks.ts
-import { UserProfile, UserEditor } from "@/lib/api/types/profile-types";
+import { UserProfile } from "@/lib/api/types/profile-types";
 import { http, HttpResponse } from "msw";
 
-// Моковые данные профиля
-let mockProfile = {
+let mockProfile: UserProfile = {
   name: "Анна",
   surname: "Иванова",
   login: "anna_ivanova",
@@ -12,32 +10,22 @@ let mockProfile = {
 };
 
 export const profileHandlers = [
-  // Получение профиля текущего пользователя
   http.get("/api/profile", () => {
-    return HttpResponse.json({
-      name: mockProfile.name,
-      surname: mockProfile.surname,
-      login: mockProfile.login,
-      email: mockProfile.email,
-      comment_money_transfer: mockProfile.comment_money_transfer,
-    });
+    return HttpResponse.json(mockProfile);
   }),
 
   http.patch("/api/profile", async ({ request }) => {
-    const updatedData = await request.json();
+    const updatedProfile = await request.json() as UserProfile;
 
-    if (updatedData.email && updatedData.email === "existing@example.com") {
+    if (updatedProfile.email === "existing@example.com") {
       return HttpResponse.json(
         { error: "Пользователь с такой почтой уже существует" },
         { status: 409 }
       );
     }
 
-    mockProfile = {
-      ...mockProfile,
-      ...updatedData,
-    };
+    mockProfile = { ...updatedProfile };
 
-    return HttpResponse.json(updatedData, { status: 201 });
+    return HttpResponse.json(mockProfile, { status: 200 });
   }),
 ];
