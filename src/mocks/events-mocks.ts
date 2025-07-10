@@ -225,8 +225,8 @@ export const eventHandlers = [
     // Успешный ответ
     return HttpResponse.json<EventUserMetadata>(
       {
-        role_name: "создатель",
-        event_status_name: "активно",
+        role_name: "создатель", // участник организатор
+        event_status_name: "активно", // активно
       },
       { status: 200 }
     );
