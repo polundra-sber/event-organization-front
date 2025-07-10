@@ -1,24 +1,37 @@
 import { api } from "./api";
-import { MyIncomeListItem, EventNotExistResponse } from "@/lib/api/types/my-incomes-types";
+import { MyIncomeListItem, DebtNotExistResponse } from "@/lib/api/types/my-incomes-types";
 
 export const myIncomesApi = api.injectEndpoints({
   endpoints: (build) => ({
     getMyIncomesList: build.query<MyIncomeListItem[], void>({
-      query: () => "/events/my-incomes-list",
-      providesTags: ["MyIncomes"],
+      query: () => "/my-incomes-list",
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ debt_id }) => ({
+                type: "MyIncome" as const,
+                id: debt_id,
+              })),
+              { type: "MyIncome", id: "LIST" },
+            ]
+          : [{ type: "MyIncome", id: "LIST" }],
     }),
     markIncomeReceivedInMyIncomesList: build.mutation<
-      void | EventNotExistResponse,
-      { event_id: number; debt_id: number }
+      void,
+      { debt_id: number }
     >({
-      query: ({ event_id, debt_id }) => ({
-        url: `/events/${event_id}/my-incomes-list/${debt_id}/mark-income-received`,
+      query: ({ debt_id }) => ({
+        url: `/my-incomes-list/${debt_id}/mark-income-received`,
         method: "PATCH",
       }),
-      invalidatesTags: ["MyIncomes"],
+      invalidatesTags: (_, __, { debt_id }) => [
+        { type: "MyIncome", id: debt_id },
+        { type: "MyIncome", id: "LIST" },
+      ],
     }),
   }),
 });
+
 
 export const {
   useGetMyIncomesListQuery,
