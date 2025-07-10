@@ -8,7 +8,7 @@ import {
 export const myPurchasesApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getMyPurchasesList: builder.query<MyPurchasesListResponse, void>({
-      query: () => "/events/my-purchases-list",
+      query: () => "/my-purchases-list",
       providesTags: ["MyPurchases"],
     }),
 
@@ -20,8 +20,8 @@ export const myPurchasesApi = api.injectEndpoints({
         data: EditPurchaseCostRequest;
       }
     >({
-      query: ({ event_id, purchase_id, data }) => ({
-        url: `/events/${event_id}/my-purchases-list/${purchase_id}/edit-purchase-cost`,
+      query: ({ purchase_id, data }) => ({
+        url: `/my-purchases-list/${purchase_id}/edit-purchase-cost`,
         method: "PATCH",
         body: data, // Отправляем только data (который содержит cost)
         headers: {
@@ -35,8 +35,8 @@ export const myPurchasesApi = api.injectEndpoints({
       void,
       { event_id: number; purchase_id: number }
     >({
-      query: ({ event_id, purchase_id }) => ({
-        url: `/events/${event_id}/my-purchases-list/${purchase_id}/deny-purchase`,
+      query: ({ purchase_id }) => ({
+        url: `/my-purchases-list/${purchase_id}/deny-purchase`,
         method: "DELETE",
       }),
       invalidatesTags: ["MyPurchases"],
@@ -46,11 +46,11 @@ export const myPurchasesApi = api.injectEndpoints({
       void,
       { event_id: number; purchase_id: number; files: File[] }
     >({
-      query: ({ event_id, purchase_id, files }) => {
+      query: ({ purchase_id, files }) => {
         const formData = new FormData();
         files.forEach((file) => formData.append("file", file));
         return {
-          url: `/events/${event_id}/my-purchases-list/${purchase_id}/add-receipt`,
+          url: `/my-purchases-list/${purchase_id}/add-receipt`,
           method: "POST",
           body: formData,
         };
@@ -62,8 +62,8 @@ export const myPurchasesApi = api.injectEndpoints({
       ReceiptList,
       { event_id: number; purchase_id: number }
     >({
-      query: ({ event_id, purchase_id }) => ({
-        url: `/events/${event_id}/purchases-list/${purchase_id}/get-receipt`,
+      query: ({ purchase_id }) => ({
+        url: `/purchases-list/${purchase_id}/get-receipt`,
         responseHandler: (response) => response.formData(), // получить formData
       }),
       transformResponse: async (formData: FormData) => {

@@ -5,19 +5,19 @@ export interface MyPurchaseListItem {
   purchase_name: string;
   responsible_name: string;
   responsible_surname: string;
-  responsible_id: number;
+  responsible_login: string;
   cost: number;
   purchase_description?: string;
   has_receipt: boolean;
 }
 
 export interface MyPurchasesListResponse {
-  myId: number;
+  userLogin: string;
   purchases: MyPurchaseListItem[];
 }
 
 export interface ReceiptList {
-  files: File[];  // массив бинарных файлов
+  files: File[]; // массив бинарных файлов
 }
 
 export interface EventNotExistResponse {

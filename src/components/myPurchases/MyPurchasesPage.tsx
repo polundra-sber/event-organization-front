@@ -177,7 +177,7 @@ export const MyPurchasesPageContent = () => {
   if (isError) return <p>Ошибка загрузки</p>;
 
   const purchases = data?.purchases || [];
-  const myId = data?.myId;
+  const userLogin = data?.userLogin;
 
   const filteredPurchases = purchases.filter((purchase) => {
     const responsibleFiltersActive = Object.keys(filters).some(
@@ -190,7 +190,7 @@ export const MyPurchasesPageContent = () => {
         (key) =>
           key.startsWith("responsible_") &&
           filters[key] &&
-          key === `responsible_${purchase.responsible_id}`
+          key === `responsible_${purchase.responsible_login}`
       );
 
     const eventFiltersActive = Object.keys(filters).some(
@@ -351,7 +351,7 @@ export const MyPurchasesPageContent = () => {
                     </div>
 
                     <div className="flex justify-end">
-                      {purchase.responsible_id === myId &&
+                      {purchase.responsible_login === userLogin &&
                         (currentCost === 0 || currentCost === undefined) && (
                           <Button
                             variant="dark_green"
@@ -455,9 +455,9 @@ export const MyPurchasesPageContent = () => {
             options: Array.from(
               new Map(
                 purchases.map((p) => [
-                  `responsible_${p.responsible_id}`,
+                  `responsible_${p.responsible_login}`,
                   {
-                    id: `responsible_${p.responsible_id}`,
+                    id: `responsible_${p.responsible_login}`,
                     label: `${p.responsible_name} ${p.responsible_surname}`,
                   },
                 ])
