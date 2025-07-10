@@ -5,7 +5,7 @@ export interface MyTaskListItem {
   task_name: string;
   task_description?: string | null;
   deadline_date: string;
-  deadline_time?: string;
+  deadline_time?: string | null;
   task_status_name: string;
 }
 
