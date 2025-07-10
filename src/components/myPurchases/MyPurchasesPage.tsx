@@ -16,7 +16,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, UploadIcon } from "lucide-react";
 import { FilterModal } from "@/components/common/FilterModal";
 import { FilterButton } from "@/components/common/FilterButton";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
@@ -81,29 +81,29 @@ export const MyPurchasesPageContent = () => {
     setConfirmDialogOpen(true);
   };
 
-    const handleEditCost = async (
+  const handleEditCost = async (
     event_id: number,
     purchase_id: number,
     newCostStr: string
-    ) => {
+  ) => {
     const newCost = newCostStr === "" ? 0 : Number(newCostStr);
     if (isNaN(newCost) || newCost < 0) {
-        toast.error("Введите корректную стоимость");
-        return;
+      toast.error("Введите корректную стоимость");
+      return;
     }
     try {
-        await editCost({ 
-        event_id, 
-        purchase_id, 
-        data: { cost: newCost } // Правильная структура данных
-        }).unwrap();
-        toast.success("Стоимость обновлена");
-        setOpenedCostId(null);
-        setCosts((prev) => ({ ...prev, [purchase_id]: newCostStr }));
+      await editCost({
+        event_id,
+        purchase_id,
+        data: { cost: newCost }, // Правильная структура данных
+      }).unwrap();
+      toast.success("Стоимость обновлена");
+      setOpenedCostId(null);
+      setCosts((prev) => ({ ...prev, [purchase_id]: newCostStr }));
     } catch {
-        toast.error("Не удалось изменить стоимость");
+      toast.error("Не удалось изменить стоимость");
     }
-    };
+  };
 
   const handleConfirmDeny = async () => {
     if (selectedPurchase) {
@@ -124,6 +124,36 @@ export const MyPurchasesPageContent = () => {
 
   const handleUploadReceipt = async (files: FileList) => {
     try {
+      // Проверка каждого файла перед загрузкой
+      const filesArray = Array.from(files);
+
+      for (const file of filesArray) {
+        // Проверка формата файла
+        if (!file.type.match("image/jpeg") && !file.type.match("image/jpg")) {
+          toast.error(`Файл ${file.name} не является JPG изображением`);
+          return;
+        }
+
+        // Проверка размера файла (20 МБ = 20 * 1024 * 1024 байт)
+        if (file.size > 20 * 1024 * 1024) {
+          toast.error(`Файл ${file.name} превышает максимальный размер 20 МБ`);
+          return;
+        }
+
+        // Не меньше 1 КБ
+        if (file.size < 1024) {
+          toast.error(`Файл ${file.name} слишком мал`);
+          return;
+        }
+      }
+
+      // Не больше 5 файлов
+      if (filesArray.length > 5) {
+        toast.error("Можно загрузить не более 5 файлов за раз");
+        return;
+      }
+
+      // Если все проверки пройдены, загружаем файлы
       for (const purchase_id of selectedPurchases) {
         const event_id =
           data?.purchases.find((p) => p.purchase_id === purchase_id)
@@ -131,9 +161,10 @@ export const MyPurchasesPageContent = () => {
         await addReceipt({
           event_id,
           purchase_id,
-          files: Array.from(files),
+          files: filesArray,
         }).unwrap();
       }
+
       toast.success("Чеки прикреплены");
       setSelectedPurchases([]);
       setShowUpload(false);
@@ -149,8 +180,8 @@ export const MyPurchasesPageContent = () => {
   const myId = data?.myId;
 
   const filteredPurchases = purchases.filter((purchase) => {
-    const responsibleFiltersActive = Object.keys(filters).some((key) =>
-      key.startsWith("responsible_") && filters[key]
+    const responsibleFiltersActive = Object.keys(filters).some(
+      (key) => key.startsWith("responsible_") && filters[key]
     );
 
     const responsibleMatch =
@@ -162,8 +193,8 @@ export const MyPurchasesPageContent = () => {
           key === `responsible_${purchase.responsible_id}`
       );
 
-    const eventFiltersActive = Object.keys(filters).some((key) =>
-      key.startsWith("event_") && filters[key]
+    const eventFiltersActive = Object.keys(filters).some(
+      (key) => key.startsWith("event_") && filters[key]
     );
 
     const eventMatch =
@@ -190,7 +221,9 @@ export const MyPurchasesPageContent = () => {
         <FilterButton onClick={() => setIsFilterOpen(true)} />
 
         {selectedPurchases.length > 0 && (
-          <Button variant = "bright_green" onClick={() => setShowUpload(true)}>Прикрепить чек</Button>
+          <Button variant="bright_green" onClick={() => setShowUpload(true)}>
+            Прикрепить чек
+          </Button>
         )}
       </div>
 
@@ -250,10 +283,16 @@ export const MyPurchasesPageContent = () => {
                     {purchase.purchase_description && (
                       <div className="relative">
                         <button
-                          onClick={() => toggleDescription(purchase.purchase_id)}
+                          onClick={() =>
+                            toggleDescription(purchase.purchase_id)
+                          }
                           className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
                         >
-                          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                          {isOpen ? (
+                            <ChevronUp size={16} />
+                          ) : (
+                            <ChevronDown size={16} />
+                          )}
                           Описание
                         </button>
 
@@ -339,23 +378,41 @@ export const MyPurchasesPageContent = () => {
 
       {/* Модальное окно загрузки чеков */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] max-w-[90vw] rounded-lg">
           <DialogHeader>
-            <DialogTitle>Загрузить чек</DialogTitle>
+            <DialogTitle className="text-lg font-semibold text-gray-800">
+              Загрузить чек
+            </DialogTitle>
           </DialogHeader>
 
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={(e) =>
-              e.target.files && handleUploadReceipt(e.target.files)
-            }
-            className="mt-2"
-          />
+          <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-gray-50">
+            <UploadIcon className="w-10 h-10 text-gray-400 mb-4" />
+            <p className="text-sm text-gray-600 text-center mb-4">
+              Прикрепите фото чека в формате JPG
+              <br />
+              (не более 20MB на файл)
+            </p>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowUpload(false)}>
+            <label className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm font-medium transition-colors">
+              Выбрать файлы
+              <input
+                type="file"
+                multiple
+                accept="image/jpeg, image/jpg"
+                onChange={(e) =>
+                  e.target.files && handleUploadReceipt(e.target.files)
+                }
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          <DialogFooter className="mt-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowUpload(false)}
+              className="border-gray-300 text-gray-700"
+            >
               Отмена
             </Button>
           </DialogFooter>

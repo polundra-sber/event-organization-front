@@ -48,7 +48,7 @@ export const myPurchasesApi = api.injectEndpoints({
     >({
       query: ({ event_id, purchase_id, files }) => {
         const formData = new FormData();
-        files.forEach((file) => formData.append("files", file));
+        files.forEach((file) => formData.append("file", file));
         return {
           url: `/events/${event_id}/my-purchases-list/${purchase_id}/add-receipt`,
           method: "POST",
