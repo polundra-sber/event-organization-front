@@ -10,6 +10,9 @@ import { participantsHandlers } from "./participants-mocks";
 import { stuffHandlers } from "./stuffs-mocks";
 
 import { purchaseHandlers } from "./purchases-mocks";
+import { costAllocationHandlers } from "./cost-allocation-mocks";
+
+import { costHandlers } from "./cost-mocks";
 
 export const handlers = [
   ...myStuffHandlers,
@@ -23,4 +26,6 @@ export const handlers = [
   ...stuffHandlers,
   ...participantsHandlers,
   ...purchaseHandlers,
+  ...costAllocationHandlers,
+  ...costHandlers
 ];
