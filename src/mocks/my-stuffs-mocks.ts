@@ -57,7 +57,7 @@ let mockStuffs: MyStuffListItem[] = [
 ];
 
 export const myStuffHandlers = [
-  http.get(`/api/events/my-stuffs-list`, ({ request }) => {
+  http.get(`/api/my-stuffs-list`, ({ request }) => {
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return HttpResponse.json({ error: "Не авторизован" }, { status: 401 });
@@ -67,9 +67,9 @@ export const myStuffHandlers = [
   }),
 
   http.delete(
-    `/api/events/:event_id/my-stuffs-list/:stuff_id/deny-stuff`,
+    `/api/my-stuffs-list/:stuff_id/deny-stuff`,
     ({ params }) => {
-      const { event_id, stuff_id } = params;
+      const { stuff_id } = params;
       //в будущем надо убрать и исправить
       if (stuff_id === 999) {
         return HttpResponse.json(
