@@ -12,12 +12,8 @@ import {
 import { useDispatch } from "react-redux";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
 import { UserEditor, UserProfile } from "@/lib/api/types/profile-types";
+import { getInitials } from "@/components/common/UserAvatar";
 
-function getInitials(name?: string | null, surname?: string | null) {
-  const firstInitial = name?.charAt(0).toUpperCase() || "?";
-  const lastInitial = surname?.charAt(0).toUpperCase() || "?";
-  return `${firstInitial}.${lastInitial}`;
-}
 
 function getChangedFields(
   original: Partial<UserEditor>,

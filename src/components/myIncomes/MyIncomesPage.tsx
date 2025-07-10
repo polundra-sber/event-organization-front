@@ -12,6 +12,7 @@ import { FilterModal } from "@/components/common/FilterModal";
 import { FilterButton } from "@/components/common/FilterButton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ButtonToMain } from "../common/ButtonToMain";
+import { getInitials } from "@/components/common/UserAvatar";
 
 export const MyIncomesPageContent = () => {
   const { data, isLoading, isError } = useGetMyIncomesListQuery();
@@ -80,19 +81,17 @@ export const MyIncomesPageContent = () => {
               <CardContent className="flex items-center gap-4 flex-wrap">
                 <Avatar className="w-12 h-12 border border-my-dark-green">
                   <AvatarFallback>
-                    {income.payer_name
-                      ? income.payer_name[0].toUpperCase()
-                      : "U"}
+                    {getInitials(income.payer_name, income.payer_surname)}
                   </AvatarFallback>
                 </Avatar>
 
-                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap  ml-auto">
+                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap ml-auto">
                   {income.debt_amount ? `${income.debt_amount} ₽` : "0 ₽"}
                 </div>
 
                 <div className="flex-1 min-w-[200px]">
                   <div className="font-semibold">
-                    {income.payer_name || "Имя отсутствует"}
+                    {income.payer_name || "Имя отсутствует"} {income.payer_surname || ""}
                   </div>
                   <div className="text-sm mt-1 font-medium">
                     Статус: {income.debt_status_name}
