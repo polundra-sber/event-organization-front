@@ -20,6 +20,8 @@ import { FilterModal } from "@/components/common/FilterModal";
 import { FilterButton } from "@/components/common/FilterButton";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 import { ButtonToMain } from "../common/ButtonToMain";
+import { format, isValid } from "date-fns";
+import { ru } from "date-fns/locale";
 
 export const MyTasksPageContent = () => {
   const { data, isLoading, isError } = useGetMyTasksListQuery();
@@ -70,19 +72,17 @@ export const MyTasksPageContent = () => {
   const tasks = data || [];
   
   const filteredTasks = tasks.filter((task) => {
-    // Проверяем фильтры по статусу
     const statusFiltersActive = filters.done || filters.in_progress;
     const statusMatch =
-      !statusFiltersActive || // если ни один статус не выбран - показываем все
+      !statusFiltersActive ||
       (filters.done && task.task_status_name === "выполнена") ||
       (filters.in_progress && task.task_status_name !== "выполнена");
 
-    // Проверяем фильтры по мероприятиям
     const eventFiltersActive = Object.keys(filters).some(key => 
       key.startsWith('event_') && filters[key]
     );
     const eventMatch =
-      !eventFiltersActive || // если ни одно мероприятие не выбрано - показываем все
+      !eventFiltersActive ||
       Object.keys(filters).some(
         key => key.startsWith('event_') && 
         filters[key] && 
@@ -92,13 +92,30 @@ export const MyTasksPageContent = () => {
     return statusMatch && eventMatch;
   });
 
+  const formatTaskDeadline = (task: MyTaskListItem) => {
+    try {
+      const date = new Date(task.deadline_date);
+      
+      if (!isValid(date)) {
+        return "Срок не указан";
+      }
+
+      const formattedDate = format(date, "d MMMM yyyy", { locale: ru });
+      const timeString = task.deadline_time ? `, ${task.deadline_time}` : "";
+
+      return `${formattedDate}${timeString}`;
+    } catch {
+      return "Срок не указан";
+    }
+  };
+
   if (isLoading) return <p>Загрузка...</p>;
   if (isError) return <p>Ошибка загрузки</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
       <ButtonToMain className="mb-10"/>
-      <div className="flex items-center justify-center  bg-my-yellow-green   px-6 py-3 rounded-xl mb-4">
+      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
         <label className="text-lg font-bold text-my-black text-lg">
           Мои задачи
         </label>
@@ -114,6 +131,7 @@ export const MyTasksPageContent = () => {
         <div className="space-y-4">
           {filteredTasks.map((task) => {
             const isOpen = openedDescriptionId === task.task_id;
+            const deadlineString = formatTaskDeadline(task);
 
             return (
               <Card key={task.task_id}>
@@ -123,7 +141,7 @@ export const MyTasksPageContent = () => {
                     {task.task_name}
                   </CardDescription>
                   <CardDescription className="text-black">
-                    Срок завершения задачи: {task.deadline_date} {task.deadline_time || ""}
+                    Срок завершения задачи: {deadlineString}
                   </CardDescription>
                   <p className="text-sm mt-1">
                     Статус: {task.task_status_name}
@@ -154,7 +172,6 @@ export const MyTasksPageContent = () => {
                   </div>
 
                   <div className="flex gap-2 ml-auto">
-
                     {task.task_status_name !== "выполнена" && (
                       <Button 
                         variant="light_green"
@@ -164,7 +181,7 @@ export const MyTasksPageContent = () => {
                         Отказаться
                       </Button>
                     )}
-                                        {task.task_status_name !== "выполнена" && (
+                    {task.task_status_name !== "выполнена" && (
                       <Button
                         variant="dark_green"
                         size="sm"
