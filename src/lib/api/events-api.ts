@@ -25,7 +25,7 @@ export const eventsApi = api.injectEndpoints({
     // Создание мероприятия
     createEvent: builder.mutation<Event, Partial<EventEditor>>({
       query: (eventData) => ({
-        url: "/create_event",
+        url: "/create-event",
         method: "POST",
         body: eventData,
       }),
@@ -34,7 +34,7 @@ export const eventsApi = api.injectEndpoints({
 
     // Поиск мероприятия по ID
     findEvent: builder.query<Event, number>({
-      query: (eventId) => `/find_event/${eventId}`,
+      query: (eventId) => `/find-event/${eventId}`,
       providesTags: (result, error, eventId) => [
         { type: "Event", id: eventId },
       ],
@@ -43,7 +43,7 @@ export const eventsApi = api.injectEndpoints({
     // Запрос на присоединение к мероприятию
     joinEvent: builder.mutation<string, number>({
       query: (eventId) => ({
-        url: `/join_event_request/${eventId}`,
+        url: `/join-event-request/${eventId}`,
         method: "POST",
       }),
     }),
@@ -51,7 +51,7 @@ export const eventsApi = api.injectEndpoints({
     // Покинуть мероприятие
     leaveEvent: builder.mutation<string, number>({
       query: (eventId) => ({
-        url: `/leave_event/${eventId}`,
+        url: `/leave-event/${eventId}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error, eventId) => [
@@ -62,7 +62,7 @@ export const eventsApi = api.injectEndpoints({
     // Удаление мероприятия (для создателя)
     deleteEvent: builder.mutation<string, number>({
       query: (eventId) => ({
-        url: `/delete_event/${eventId}`,
+        url: `/delete-event/${eventId}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error, eventId) => [
@@ -73,7 +73,7 @@ export const eventsApi = api.injectEndpoints({
     // Завершение мероприятия
     completeEvent: builder.mutation<string, number>({
       query: (eventId) => ({
-        url: `/complete_event/${eventId}`,
+        url: `/complete-event/${eventId}`,
         method: "PATCH",
       }),
       invalidatesTags: (result, error, eventId) => [
