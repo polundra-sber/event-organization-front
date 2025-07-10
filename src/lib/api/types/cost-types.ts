@@ -1,8 +1,8 @@
 export interface CostAllocationListItem {
   purchase_id: number;
   purchase_name: string;
-  responsible_name?: string;
-  responsible_surname?: string;
+  responsible_name?: string | null;
+  responsible_surname?: string | null;
   cost: number;
   hasReceipt: boolean;
   countParticipants: number;

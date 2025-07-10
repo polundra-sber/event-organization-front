@@ -27,3 +27,7 @@ export type StuffListItemResponsible = {
   responsible_surname?: string | null;
   stuff_description?: string | null;
 };
+
+export type EventNotExistResponse = {
+  error: string;
+}

@@ -18,3 +18,8 @@ export type UserDemo = {
 export type ReceiptList = {
   files: Blob[];
 };
+
+
+export type EventNotExistResponse = {
+  error: string;
+}
