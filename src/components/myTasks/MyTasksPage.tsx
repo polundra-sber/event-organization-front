@@ -36,7 +36,6 @@ export const MyTasksPageContent = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<{
     task_id: number;
-    event_id: number;
     task_name: string;
   } | null>(null);
 
@@ -46,7 +45,6 @@ export const MyTasksPageContent = () => {
 
   const openConfirmDialog = (task: {
     task_id: number;
-    event_id: number;
     task_name: string;
   }) => {
     setSelectedTask(task);
@@ -57,7 +55,6 @@ export const MyTasksPageContent = () => {
     if (selectedTask) {
       try {
         await denyTask({
-          event_id: selectedTask.event_id,
           task_id: selectedTask.task_id,
         }).unwrap();
         toast.success("Задача удалена");
@@ -174,7 +171,6 @@ export const MyTasksPageContent = () => {
                         onClick={async () => {
                           try {
                             await markTaskCompleted({
-                              event_id: task.event_id,
                               task_id: task.task_id,
                             }).unwrap();
                             toast.success("Задача отмечена как выполненная");
