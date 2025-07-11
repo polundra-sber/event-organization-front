@@ -7,7 +7,7 @@ let myMockPurchases: MyPurchaseListItem[] = [
     event_name: "Шашлыки",
     purchase_id: 1,
     purchase_name: "Огурцы",
-    responsible_id: 123,
+    responsible_login: "hello",
     responsible_name: "Вася",
     responsible_surname: "Пупкин",
     cost: 100,
@@ -19,19 +19,19 @@ let myMockPurchases: MyPurchaseListItem[] = [
     event_name: "Шашлыки",
     purchase_id: 2,
     purchase_name: "Мясо",
-    responsible_id: 124,
+    responsible_login: "hello2",
     responsible_name: "Петя",
     responsible_surname: "Иванов",
     cost: 0,
-    has_receipt: true,
+    has_receipt: false,
   },
 ];
 
 export const myPurchasesHandlers = [
-  http.get("/api/events/my-purchases-list", () => {
+  http.get("/api/my-purchases-list", () => {
     return HttpResponse.json(
       {
-        myId: 124,
+        user_login: "hello",
         purchases: myMockPurchases,
       },
       { status: 200 }
@@ -39,7 +39,7 @@ export const myPurchasesHandlers = [
   }),
 
   http.patch(
-    "/api/events/:event_id/my-purchases-list/:purchase_id/edit-purchase-cost",
+    "/api/my-purchases-list/:purchase_id/edit-purchase-cost",
     async ({ params, request }) => {
       const { purchase_id } = params;
       const { cost } = await request.json(); // Получаем только cost из тела запроса
@@ -59,7 +59,7 @@ export const myPurchasesHandlers = [
   ),
 
   http.delete(
-    "/api/events/:event_id/my-purchases-list/:purchase_id/deny-purchase",
+    "/api/my-purchases-list/:purchase_id/deny-purchase",
     ({ params }) => {
       const { purchase_id } = params;
       myMockPurchases = myMockPurchases.filter(
@@ -70,7 +70,7 @@ export const myPurchasesHandlers = [
   ),
 
   http.post(
-    "/api/events/:event_id/my-purchases-list/:purchase_id/add-receipt",
+    "/api/my-purchases-list/:purchase_id/add-receipt",
     async ({ params }) => {
       const { purchase_id } = params;
       const purchase = myMockPurchases.find(
