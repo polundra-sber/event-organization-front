@@ -346,7 +346,7 @@ export function EventForm({
           value={formData.location}
           onChange={handleChange}
           error={errors.location}
-          maxLength={50}
+          maxLength={100}
         />
 
         <FormInput
