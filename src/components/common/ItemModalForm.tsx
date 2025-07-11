@@ -99,16 +99,25 @@ export const ItemModalForm = ({
       {formTitle && <h3 className="text-lg font-bold mb-4">{formTitle}</h3>}
 
       <div>
-        <Label htmlFor="name">
-          <RequiredFieldLabel text={nameLabel} />
-        </Label>
-        <Input
-          id="name"
-          {...register("name", { required: "Обязательное поле" })}
-        />
-        {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
-        )}
+<Label htmlFor="name">
+  <RequiredFieldLabel text={nameLabel} />
+</Label>
+<Input
+  id="name"
+  {...register("name", {
+    required: "Обязательное поле",
+    maxLength: {
+      value: 50,
+      message: "Название не должно превышать 50 символов",
+    },
+  })}
+  placeholder={"Не более 50 символов"}
+  maxLength={50}
+/>
+{errors.name && (
+  <p className="text-sm text-red-500">{errors.name.message}</p>
+)}
+
       </div>
 
       <div>
@@ -117,6 +126,7 @@ export const ItemModalForm = ({
           id="description"
           {...register("description")}
           placeholder={`${descriptionLabel} не добавлено`}
+          className="h-24 resize-none"
         />
       </div>
 
