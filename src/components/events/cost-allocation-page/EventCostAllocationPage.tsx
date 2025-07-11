@@ -92,11 +92,11 @@ export const EventCostAllocationPageContent = ({
     );
   }, [allocations, participantsMap]);
 
-  if (isLoading) return <p>Загрузка...</p>;
-  if (isError) return <p>Ошибка загрузки</p>;
+  if (isLoading) return <p className="text-center p-4">Загрузка...</p>;
+  if (isError) return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50">
+    <div className="p-4 min-h-screen bg-gray-50 max-w-full overflow-x-hidden">
       <div className="mb-5">
         <Button variant="dark_green" size="sm" asChild>
           <Link href={`/events/${event_id}`}>← Назад</Link>
@@ -104,31 +104,33 @@ export const EventCostAllocationPageContent = ({
       </div>
 
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <h1 className="text-lg font-bold text-my-black">Распределение расходов</h1>
+        <h1 className="text-lg font-bold text-my-black break-words min-w-0">
+          Распределение расходов
+        </h1>
       </div>
 
       {isCreator && allocations.length > 0 && (
-        <div className="mb-4">
+        <div className="mb-4 space-y-2">
           <Button
             variant="dark_green"
             disabled={!allHaveParticipants}
             onClick={() => setIsSendConfirmationOpen(true)}
-            className="w-full py-3 mb-4 mt-4"
+            className="w-full py-3"
           >
             Отправить расчет
           </Button>
 
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 min-w-0"
               onClick={() => setSelectedIds(allocations.map(a => a.purchase_id))}
             >
               Выбрать всех
             </Button>
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 min-w-0"
               onClick={() => setSelectedIds([])}
             >
               Очистить
@@ -138,7 +140,7 @@ export const EventCostAllocationPageContent = ({
       )}
 
       {allocations.length === 0 ? (
-        <p className="text-gray-500 text-center">Нет покупок</p>
+        <p className="text-gray-500 text-center py-8">Нет покупок</p>
       ) : (
         <div className="space-y-4">
           {allocations.map((item) => (
@@ -160,7 +162,7 @@ export const EventCostAllocationPageContent = ({
       )}
 
       {isCreator && (
-        <div className="sticky bottom-4 bg-white p-2 rounded-lg shadow-lg mt-4">
+        <div className="sticky bottom-4 bg-white p-4 rounded-lg shadow-lg mt-4 border border-gray-200">
           <Button
             variant="bright_green"
             disabled={selectedIds.length === 0}
