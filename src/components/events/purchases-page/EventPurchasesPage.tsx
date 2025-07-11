@@ -84,9 +84,9 @@ export const EventPurchasesPageContent = ({
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <Button variant="outline" disabled className="bg-gray-200">
-          Расходы
-        </Button>
+        <Link href={`/events/${event_id}/cost-allocation-list`}>
+          <Button variant="bright_green">Расходы</Button>
+        </Link>
         {canEditDelete && (
           <Button
             variant="bright_green"
