@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/my-purchases-api";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Receipt } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -253,29 +254,28 @@ export const MyPurchasesPageContent = () => {
                 />
 
                 <Card className="flex-1">
-                  <CardHeader>
-                    <CardTitle>{purchase.event_name}</CardTitle>
-                    <CardDescription className="text-black">
-                      {purchase.purchase_name}
-                    </CardDescription>
-                    <CardDescription className="text-black">
-                      Ответственный: {purchase.responsible_name}{" "}
-                      {purchase.responsible_surname}
-                    </CardDescription>
+                  <CardHeader className="flex flex-row justify-between items-start">
+                    <div>
+                      <CardTitle>{purchase.event_name}</CardTitle>
+                      <CardDescription className="text-black">
+                        {purchase.purchase_name}
+                      </CardDescription>
+                      <CardDescription className="text-black">
+                        Ответственный: {purchase.responsible_name}{" "}
+                        {purchase.responsible_surname}
+                      </CardDescription>
+                    </div>
                     {purchase.has_receipt && (
-                      <button
+                      <Button
+                        variant="ghost"
+                        className="text-green-600 hover:text-green-800 p-0 h-auto"
                         onClick={() =>
                           setOpenedReceiptsPurchaseId(purchase.purchase_id)
                         }
-                        className="text-sm text-blue-600 hover:underline"
                       >
-                        Посмотреть чек
-                      </button>
-                    )}
-                    {currentCost > 0 && (
-                      <p className="text-sm text-gray-800 mt-2">
-                        Стоимость: {currentCost} ₽
-                      </p>
+                        <Receipt className="h-4 w-4 mr-1" />
+                        Чеки
+                      </Button>
                     )}
                   </CardHeader>
 
