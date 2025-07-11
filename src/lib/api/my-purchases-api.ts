@@ -62,8 +62,8 @@ export const myPurchasesApi = api.injectEndpoints({
       ReceiptList,
       { event_id: number; purchase_id: number }
     >({
-      query: ({ purchase_id }) => ({
-        url: `/purchases-list/${purchase_id}/get-receipt`,
+      query: ({ event_id, purchase_id }) => ({
+        url: `/events/${event_id}/purchases-list/${purchase_id}/get-receipt`,
         responseHandler: (response) => response.formData(), // получить formData
       }),
       transformResponse: async (formData: FormData) => {
