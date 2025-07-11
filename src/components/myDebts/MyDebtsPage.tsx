@@ -15,6 +15,7 @@ import { FilterModal } from "@/components/common/FilterModal";
 import { FilterButton } from "@/components/common/FilterButton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ButtonToMain } from "../common/ButtonToMain";
+import { getInitials } from "@/components/common/UserAvatar";
 
 export const MyDebtsPageContent = () => {
   const { data, isLoading, isError } = useGetMyDebtsListQuery();
@@ -86,21 +87,19 @@ export const MyDebtsPageContent = () => {
                 {/* Аватар */}
                 <Avatar className="w-12 h-12 border border-my-dark-green">
                   <AvatarFallback>
-                    {debt.recipient_name
-                      ? debt.recipient_name[0].toUpperCase()
-                      : "U"}
+                    {getInitials(debt.recipient_name, debt.recipient_surname)}
                   </AvatarFallback>
                 </Avatar>
 
                 {/* Сумма */}
-                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap  ml-auto">
+                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap ml-auto">
                   {debt.debt_amount ? `${debt.debt_amount} ₽` : "0 ₽"}
                 </div>
 
                 {/* Центр */}
                 <div className="flex-1 min-w-[200px]">
                   <div className="font-semibold">
-                    {debt.recipient_name || "Имя отсутствует"}
+                    {debt.recipient_name || "Имя отсутствует"} {debt.recipient_surname || ""}
                   </div>
                   <div className="text-sm break-words">
                     {debt.comment_money_transfer || "Комментарий отсутствует"}
@@ -116,10 +115,10 @@ export const MyDebtsPageContent = () => {
                 <Button
                   variant="dark_green"
                   size="sm"
-                    disabled={
-                        debt.debt_status_name !== "не оплачен" ||
-                        paidDebts.has(debt.debt_id)
-                    }
+                  disabled={
+                    debt.debt_status_name !== "не оплачен" ||
+                    paidDebts.has(debt.debt_id)
+                  }
                   className={`w-full ${
                     debt.debt_status_name === "оплачен" ||
                     paidDebts.has(debt.debt_id)

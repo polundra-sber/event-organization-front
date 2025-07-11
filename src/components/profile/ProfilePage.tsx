@@ -1,3 +1,4 @@
+// src/app/profile/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,33 +12,15 @@ import {
 } from "@/lib/api/profile-api";
 import { useDispatch } from "react-redux";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
-import { UserEditor, UserProfile } from "@/lib/api/types/profile-types";
-
-function getInitials(name?: string | null, surname?: string | null) {
-  const firstInitial = name?.charAt(0).toUpperCase() || "?";
-  const lastInitial = surname?.charAt(0).toUpperCase() || "?";
-  return `${firstInitial}.${lastInitial}`;
-}
-
-function getChangedFields(
-  original: Partial<UserEditor>,
-  edited: Partial<UserEditor>
-) {
-  const changed: Partial<UserEditor> = {};
-  for (const key in edited) {
-    if (edited[key as keyof UserEditor] !== original[key as keyof UserEditor]) {
-      changed[key as keyof UserEditor] = edited[key as keyof UserEditor];
-    }
-  }
-  return changed;
-}
+import { UserProfile } from "@/lib/api/types/profile-types";
+import { getInitials } from "@/components/common/UserAvatar";
 
 export const ProfilePageContent = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
-  const [editedProfile, setEditedProfile] = useState<UserEditor>({});
+  const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
 
   const { data: profile, isLoading, isError } = useGetProfileQuery();
   const [updateProfile] = useUpdateProfileMutation();
@@ -45,12 +28,7 @@ export const ProfilePageContent = () => {
 
   useEffect(() => {
     if (profile) {
-      setEditedProfile({
-        name: profile.name,
-        surname: profile.surname,
-        email: profile.email,
-        comment_money_transfer: profile.comment_money_transfer,
-      });
+      setEditedProfile(profile);
     }
   }, [profile]);
 
@@ -69,7 +47,7 @@ export const ProfilePageContent = () => {
   };
 
   const validateNames = () => {
-    if (!editedProfile.name?.trim() || !editedProfile.surname?.trim()) {
+    if (!editedProfile?.name.trim() || !editedProfile?.surname.trim()) {
       setNameError("Имя и фамилия не могут быть пустыми");
       return false;
     }
@@ -79,24 +57,21 @@ export const ProfilePageContent = () => {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    if (!editedProfile) return;
     setEditedProfile({ ...editedProfile, email: value });
     if (value) validateEmail(value);
   };
 
   const toggleEdit = async () => {
     if (isEditing) {
-      if (!validateNames() || !validateEmail(editedProfile.email || "")) {
+      if (!validateNames() || !validateEmail(editedProfile?.email || "")) {
         return;
       }
 
-      const changedFields = getChangedFields(profile, editedProfile);
-      if (Object.keys(changedFields).length === 0) {
-        setIsEditing(false);
-        return;
-      }
+      if (!editedProfile) return;
 
       try {
-        const result = await updateProfile(changedFields).unwrap();
+        const result = await updateProfile(editedProfile).unwrap();
         dispatch(
           profileApi.util.updateQueryData("getProfile", undefined, (draft) => {
             Object.assign(draft, result);
@@ -116,7 +91,7 @@ export const ProfilePageContent = () => {
 
   if (isLoading) return <p>Загрузка профиля...</p>;
   if (isError) return <p>Ошибка загрузки профиля</p>;
-  if (!profile) return <p>Профиль не найден</p>;
+  if (!profile || !editedProfile) return <p>Профиль не найден</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
@@ -129,9 +104,7 @@ export const ProfilePageContent = () => {
       )}
 
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black">
-          Мой профиль
-        </label>
+        <label className="text-lg font-bold text-my-black">Мой профиль</label>
       </div>
 
       <div className="flex items-start gap-4 bg-my-light-green p-4 rounded-xl mb-4">
@@ -144,7 +117,7 @@ export const ProfilePageContent = () => {
           {isEditing ? (
             <div className="space-y-2 w-full">
               <Input
-                value={editedProfile.name || ""}
+                value={editedProfile.name}
                 onChange={(e) =>
                   setEditedProfile({
                     ...editedProfile,
@@ -156,7 +129,7 @@ export const ProfilePageContent = () => {
                 maxLength={32}
               />
               <Input
-                value={editedProfile.surname || ""}
+                value={editedProfile.surname}
                 onChange={(e) =>
                   setEditedProfile({
                     ...editedProfile,
@@ -173,7 +146,9 @@ export const ProfilePageContent = () => {
             </div>
           ) : (
             <div className="space-y-1 min-w-0">
-              <p className="text-lg truncate overflow-hidden">{profile.name}</p>
+              <p className="text-lg truncate overflow-hidden">
+                {profile.name}
+              </p>
               <p className="text-lg truncate overflow-hidden">
                 {profile.surname}
               </p>
@@ -192,7 +167,7 @@ export const ProfilePageContent = () => {
         {isEditing ? (
           <>
             <Input
-              value={editedProfile.email || ""}
+              value={editedProfile.email}
               onChange={handleEmailChange}
               placeholder="example@example.com"
               className="bg-white"

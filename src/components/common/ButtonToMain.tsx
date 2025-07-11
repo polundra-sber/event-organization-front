@@ -51,7 +51,7 @@ export const ButtonToMain = ({ className, isEditing = false }: Props) => {
         <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
           <AlertDialogTrigger asChild>
             <Button
-              variant="light_green"
+              variant="dark_green"
               size="sm"
               onClick={(e) => {
                 e.preventDefault();
