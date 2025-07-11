@@ -130,8 +130,12 @@ export const MyPurchasesPageContent = () => {
 
       for (const file of filesArray) {
         // Проверка формата файла
-        if (!file.type.match("image/jpeg") && !file.type.match("image/jpg")) {
-          toast.error(`Файл ${file.name} не является JPG изображением`);
+        if (
+          !file.type.match("image/jpeg") &&
+          !file.type.match("image/jpg") &&
+          !file.type.match("image/png")
+        ) {
+          toast.error(`Файл ${file.name} должен быть JPG или PNG изображением`);
           return;
         }
 
@@ -388,7 +392,7 @@ export const MyPurchasesPageContent = () => {
           <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-gray-50">
             <UploadIcon className="w-10 h-10 text-gray-400 mb-4" />
             <p className="text-sm text-gray-600 text-center mb-4">
-              Прикрепите фото чека в формате JPG
+              Прикрепите фото чека в формате JPG или PNG
               <br />
               (не более 20MB на файл)
             </p>
@@ -398,7 +402,7 @@ export const MyPurchasesPageContent = () => {
               <input
                 type="file"
                 multiple
-                accept="image/jpeg, image/jpg"
+                accept="image/jpeg, image/jpg, image/png"
                 onChange={(e) =>
                   e.target.files && handleUploadReceipt(e.target.files)
                 }
