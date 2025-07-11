@@ -61,7 +61,7 @@ export const eventHandlers = [
   }),
 
   // Создание мероприятия
-  http.post("/api/create_event", async ({ request }) => {
+  http.post("/api/create-event", async ({ request }) => {
     //return HttpResponse.json({ error: "Специальная ошибка" }, { status: 409 });
 
     const authHeader = request.headers.get("Authorization");
@@ -87,7 +87,7 @@ export const eventHandlers = [
   }),
 
   // Поиск мероприятия по ID
-  http.get("/api/find_event/:event_id", ({ params, request }) => {
+  http.get("/api/find-event/:event_id", ({ params, request }) => {
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return HttpResponse.json({ error: "Не авторизован" }, { status: 401 });
@@ -107,7 +107,7 @@ export const eventHandlers = [
   }),
 
   // Запрос на присоединение к мероприятию
-  http.post("/api/join_event_request/:event_id", ({ params, request }) => {
+  http.post("/api/join-event-request/:event_id", ({ params, request }) => {
     const { event_id } = params;
     const event = mockEvents.find((e) => e.event_id === Number(event_id));
 
@@ -131,7 +131,7 @@ export const eventHandlers = [
   }),
 
   // Покинуть мероприятие
-  http.delete("/api/leave_event/:event_id", ({ params }) => {
+  http.delete("/api/leave-event/:event_id", ({ params }) => {
     const { event_id } = params;
     const index = mockEvents.findIndex((e) => e.event_id === Number(event_id));
 
@@ -148,7 +148,7 @@ export const eventHandlers = [
   }),
 
   // Удаление мероприятия
-  http.delete("/api/delete_event/:event_id", ({ params }) => {
+  http.delete("/api/delete-event/:event_id", ({ params }) => {
     const { event_id } = params;
     const index = mockEvents.findIndex((e) => e.event_id === Number(event_id));
 
@@ -164,7 +164,7 @@ export const eventHandlers = [
   }),
 
   // Завершение мероприятия
-  http.patch("/api/complete_event/:event_id", ({ params }) => {
+  http.patch("/api/complete-event/:event_id", ({ params }) => {
     const { event_id } = params;
     const event = mockEvents.find((e) => e.event_id === Number(event_id));
 

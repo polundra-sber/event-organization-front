@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Receipt, Users } from "lucide-react";
 import { CostAllocationListItem } from "@/lib/api/types/cost-types";
 import { ParticipantsModal } from "./ParticipantsModal";
-import { ReceiptsModal } from "./ReceiptsModal";
 import { useState } from "react";
+import ReceiptViewer from "@/components/common/ReceiptViewer";
 
 export const CostCard = ({
   purchase,
@@ -28,10 +28,11 @@ export const CostCard = ({
         </CardHeader>
         <CardContent className="space-y-2">
           <p className="text-lg font-semibold">{purchase.cost} ₽</p>
-          
+
           {purchase.responsible_name && (
             <p className="text-sm">
-              Ответственный: {purchase.responsible_name} {purchase.responsible_surname}
+              Ответственный: {purchase.responsible_name}{" "}
+              {purchase.responsible_surname}
             </p>
           )}
 
@@ -69,9 +70,9 @@ export const CostCard = ({
       )}
 
       {showReceipts && (
-        <ReceiptsModal
-          event_id={event_id}
-          purchase_id={purchase.purchase_id}
+        <ReceiptViewer
+          eventId={event_id}
+          purchaseId={purchase.purchase_id}
           onClose={() => setShowReceipts(false)}
         />
       )}

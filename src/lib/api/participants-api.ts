@@ -48,6 +48,18 @@ export const participantsApi = api.injectEndpoints({
       }),
       invalidatesTags: ["ParticipantsList"],
     }),
+
+    // Изменить роль участника
+    updateParticipantRole: builder.mutation<
+      { role: string },
+      { event_id: number; participant_login: string }
+    >({
+      query: ({ event_id, participant_login }) => ({
+        url: `/events/${event_id}/participants-list/${participant_login}/change-participant-role`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["ParticipantsList"],
+    }),
   }),
 });
 
@@ -56,4 +68,5 @@ export const {
   useSearchUsersQuery,
   useAddParticipantsMutation,
   useDeleteParticipantMutation,
+  useUpdateParticipantRoleMutation,
 } = participantsApi;

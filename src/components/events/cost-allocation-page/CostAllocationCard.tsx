@@ -9,10 +9,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
-import { useLazyGetParticipantsForPurchaseQuery, useDeleteParticipantsForPurchaseMutation } from "@/lib/api/cost-allocation-api";
+import { X, Receipt } from "lucide-react";
+import {
+  useLazyGetParticipantsForPurchaseQuery,
+  useDeleteParticipantsForPurchaseMutation,
+} from "@/lib/api/cost-allocation-api";
 import { CostAllocationListItem } from "@/lib/api/types/cost-allocation-types";
 import { toast } from "sonner";
+import ReceiptViewer from "@/components/common/ReceiptViewer";
 
 interface CostAllocationCardProps {
   purchase: CostAllocationListItem;
@@ -29,13 +33,14 @@ export const CostAllocationCard = ({
   event_id,
   onParticipantsLoaded,
 }: CostAllocationCardProps) => {
-  const [showModal, setShowModal] = useState(false);
+  const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+  const [showReceiptsModal, setShowReceiptsModal] = useState(false);
   const [fetchParticipants, { data: participants = [], isFetching }] =
     useLazyGetParticipantsForPurchaseQuery();
   const [deleteParticipant] = useDeleteParticipantsForPurchaseMutation();
 
-  const handleOpenModal = async () => {
-    setShowModal(true);
+  const handleOpenParticipantsModal = async () => {
+    setShowParticipantsModal(true);
     const result = await fetchParticipants({
       event_id,
       purchase_id: purchase.purchase_id,
@@ -53,14 +58,14 @@ export const CostAllocationCard = ({
         purchase_id: purchase.purchase_id,
         logins: [login],
       }).unwrap();
-      
+
       toast.success("Участник удален");
-      
+
       const result = await fetchParticipants({
         event_id,
         purchase_id: purchase.purchase_id,
       }).unwrap();
-      
+
       if (onParticipantsLoaded && Array.isArray(result)) {
         onParticipantsLoaded(result.map((p) => p.login));
       }
@@ -92,19 +97,34 @@ export const CostAllocationCard = ({
                 ? `${purchase.responsible_name} ${purchase.responsible_surname}`
                 : "Не назначен"}
             </p>
-            <div className="text-sm">
-              <button
-                onClick={handleOpenModal}
-                className="text-blue-600 underline hover:text-blue-800"
+            <div className="flex gap-4">
+              <Button
+                variant="ghost"
+                className="text-blue-600 hover:text-blue-800"
+                onClick={handleOpenParticipantsModal}
               >
-                Участников ({purchase.countParticipants}):
-              </button>
+                Участники ({purchase.countParticipants})
+              </Button>
+
+              {purchase.hasReceipt && (
+                <Button
+                  variant="ghost"
+                  className="text-green-600 hover:text-green-800"
+                  onClick={() => setShowReceiptsModal(true)}
+                >
+                  <Receipt className="h-4 w-4 mr-1" />
+                  Чеки
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Dialog open={showModal} onOpenChange={setShowModal}>
+      <Dialog
+        open={showParticipantsModal}
+        onOpenChange={setShowParticipantsModal}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Участники покупки</DialogTitle>
@@ -115,7 +135,10 @@ export const CostAllocationCard = ({
           ) : (
             <ul className="space-y-2 mt-2">
               {participants.map((p) => (
-                <li key={p.login} className="text-sm flex items-center justify-between">
+                <li
+                  key={p.login}
+                  className="text-sm flex items-center justify-between"
+                >
                   <div>
                     {p.name} {p.surname} ({p.login})
                   </div>
@@ -133,6 +156,14 @@ export const CostAllocationCard = ({
           )}
         </DialogContent>
       </Dialog>
+
+      {showReceiptsModal && (
+        <ReceiptViewer
+          eventId={event_id}
+          purchaseId={purchase.purchase_id}
+          onClose={() => setShowReceiptsModal(false)}
+        />
+      )}
     </>
   );
 };
