@@ -15,6 +15,10 @@ import { ButtonToMain } from "@/components/common/ButtonToMain";
 import { UserProfile } from "@/lib/api/types/profile-types";
 import { getInitials } from "@/components/common/UserAvatar";
 import { Loader } from "../common/Loader";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { ConfirmationDialog } from "../common/ConfirmationDialog";
+import { LogOut } from "lucide-react";
 
 export const ProfilePageContent = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -26,6 +30,15 @@ export const ProfilePageContent = () => {
   const { data: profile, isLoading, isError } = useGetProfileQuery();
   const [updateProfile] = useUpdateProfileMutation();
   const dispatch = useDispatch();
+
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Вы успешно вышли из профиля");
+    router.push("/"); // Перенаправляем на главную
+  };
 
   useEffect(() => {
     if (profile) {
@@ -96,7 +109,13 @@ export const ProfilePageContent = () => {
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain isEditing={isEditing} className="mb-10" />
+      <div className="flex justify-between items-start mb-4">
+        <ButtonToMain isEditing={isEditing} />
+        <Button variant="dark_green" onClick={() => setLogoutDialogOpen(true)}>
+          <LogOut className="h-4 w-4" />
+          Выйти
+        </Button>
+      </div>
 
       {errorMessage && (
         <p className="text-red-600 font-medium text-sm bg-red-50 border border-red-200 p-2 rounded">
@@ -207,6 +226,16 @@ export const ProfilePageContent = () => {
           {isEditing ? "Сохранить" : "Редактировать"}
         </Button>
       </div>
+
+      <ConfirmationDialog
+        isOpen={logoutDialogOpen}
+        onOpenChange={setLogoutDialogOpen}
+        title="Вы действительно хотите выйти?"
+        description="Для доступа к профилю потребуется снова войти в систему."
+        onConfirm={handleLogout}
+        confirmLabel="Выйти"
+        cancelLabel="Отмена"
+      />
     </div>
   );
 };
