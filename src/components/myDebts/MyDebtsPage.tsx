@@ -7,15 +7,13 @@ import {
 } from "@/lib/api/my-debts-api";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { FilterModal } from "@/components/common/FilterModal";
 import { FilterButton } from "@/components/common/FilterButton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ButtonToMain } from "../common/ButtonToMain";
 import { getInitials } from "@/components/common/UserAvatar";
+import { Loader } from "../common/Loader";
 
 export const MyDebtsPageContent = () => {
   const { data, isLoading, isError } = useGetMyDebtsListQuery();
@@ -42,8 +40,8 @@ export const MyDebtsPageContent = () => {
       (filters.paid && debt.debt_status_name === "оплачен") ||
       (filters.received && debt.debt_status_name === "получен");
 
-    const eventFiltersActive = Object.keys(filters).some((key) =>
-      key.startsWith("event_") && filters[key]
+    const eventFiltersActive = Object.keys(filters).some(
+      (key) => key.startsWith("event_") && filters[key]
     );
 
     const eventMatch =
@@ -58,7 +56,7 @@ export const MyDebtsPageContent = () => {
     return statusMatch && eventMatch;
   });
 
-  if (isLoading) return <p>Загрузка...</p>;
+  if (isLoading) return <Loader />;
   if (isError) return <p>Ошибка загрузки</p>;
 
   return (
@@ -66,9 +64,7 @@ export const MyDebtsPageContent = () => {
       <ButtonToMain className="mb-10" />
 
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black">
-          Мои долги
-        </label>
+        <label className="text-lg font-bold text-my-black">Мои долги</label>
       </div>
 
       <div className="flex justify-start mb-4">
@@ -99,7 +95,8 @@ export const MyDebtsPageContent = () => {
                 {/* Центр */}
                 <div className="flex-1 min-w-[200px]">
                   <div className="font-semibold">
-                    {debt.recipient_name || "Имя отсутствует"} {debt.recipient_surname || ""}
+                    {debt.recipient_name || "Имя отсутствует"}{" "}
+                    {debt.recipient_surname || ""}
                   </div>
                   <div className="text-sm break-words">
                     {debt.comment_money_transfer || "Комментарий отсутствует"}

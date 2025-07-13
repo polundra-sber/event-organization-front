@@ -16,6 +16,7 @@ import {
   HandCoins,
 } from "lucide-react";
 import { MyListsMenu } from "@/components/common/MyListsMenu";
+import { Loader } from "../common/Loader";
 
 interface EventPageProps {
   eventId: number;
@@ -26,7 +27,7 @@ export function EventPage({ eventId }: EventPageProps) {
 
   const { data: event, isLoading, error } = useGetEventByIdQuery(eventId);
 
-  if (isLoading) return <div className="text-center py-8">Загрузка...</div>;
+  if (isLoading) return <Loader />;
   if (error)
     return (
       <div className="text-center py-8 text-red-500">

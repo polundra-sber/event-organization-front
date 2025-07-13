@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { MyListsMenu } from "../common/MyListsMenu";
+import { Loader } from "../common/Loader";
 
 interface EventFilters extends Record<string, boolean> {
   active: boolean;
@@ -152,6 +153,10 @@ export const HomePageContent = () => {
       return true;
     return false;
   });
+
+  if (isEventsLoading) {
+    return <Loader />;
+  }
 
   if (isError)
     return (

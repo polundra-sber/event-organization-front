@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
 import { UserProfile } from "@/lib/api/types/profile-types";
 import { getInitials } from "@/components/common/UserAvatar";
+import { Loader } from "../common/Loader";
 
 export const ProfilePageContent = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -89,7 +90,7 @@ export const ProfilePageContent = () => {
     }
   };
 
-  if (isLoading) return <p>Загрузка профиля...</p>;
+  if (isLoading) return <Loader />;
   if (isError) return <p>Ошибка загрузки профиля</p>;
   if (!profile || !editedProfile) return <p>Профиль не найден</p>;
 
@@ -140,15 +141,11 @@ export const ProfilePageContent = () => {
                 className="w-full bg-white"
                 maxLength={32}
               />
-              {nameError && (
-                <p className="text-red-600 text-xs">{nameError}</p>
-              )}
+              {nameError && <p className="text-red-600 text-xs">{nameError}</p>}
             </div>
           ) : (
             <div className="space-y-1 min-w-0">
-              <p className="text-lg truncate overflow-hidden">
-                {profile.name}
-              </p>
+              <p className="text-lg truncate overflow-hidden">{profile.name}</p>
               <p className="text-lg truncate overflow-hidden">
                 {profile.surname}
               </p>
@@ -182,7 +179,9 @@ export const ProfilePageContent = () => {
       </div>
 
       <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
-        <label className="text-sm text-gray-500">Комментарий для перевода</label>
+        <label className="text-sm text-gray-500">
+          Комментарий для перевода
+        </label>
         {isEditing ? (
           <Input
             value={editedProfile.comment_money_transfer || ""}

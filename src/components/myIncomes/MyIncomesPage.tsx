@@ -13,6 +13,7 @@ import { FilterButton } from "@/components/common/FilterButton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ButtonToMain } from "../common/ButtonToMain";
 import { getInitials } from "@/components/common/UserAvatar";
+import { Loader } from "../common/Loader";
 
 export const MyIncomesPageContent = () => {
   const { data, isLoading, isError } = useGetMyIncomesListQuery();
@@ -37,8 +38,8 @@ export const MyIncomesPageContent = () => {
       (filters.paid && income.debt_status_name === "оплачен") ||
       (filters.received && income.debt_status_name === "получен");
 
-    const eventFiltersActive = Object.keys(filters).some((key) =>
-      key.startsWith("event_") && filters[key]
+    const eventFiltersActive = Object.keys(filters).some(
+      (key) => key.startsWith("event_") && filters[key]
     );
 
     const eventMatch =
@@ -53,7 +54,7 @@ export const MyIncomesPageContent = () => {
     return statusMatch && eventMatch;
   });
 
-  if (isLoading) return <p>Загрузка...</p>;
+  if (isLoading) return <Loader />;
   if (isError) return <p>Ошибка загрузки</p>;
 
   return (
@@ -74,9 +75,7 @@ export const MyIncomesPageContent = () => {
         <div className="space-y-4">
           {filteredIncomes.map((income) => (
             <Card key={income.debt_id} className="p-4">
-              <div className="mb-2 font-bold text-lg">
-                {income.event_name}
-              </div>
+              <div className="mb-2 font-bold text-lg">{income.event_name}</div>
 
               <CardContent className="flex items-center gap-4 flex-wrap">
                 <Avatar className="w-12 h-12 border border-my-dark-green">
@@ -91,7 +90,8 @@ export const MyIncomesPageContent = () => {
 
                 <div className="flex-1 min-w-[200px]">
                   <div className="font-semibold">
-                    {income.payer_name || "Имя отсутствует"} {income.payer_surname || ""}
+                    {income.payer_name || "Имя отсутствует"}{" "}
+                    {income.payer_surname || ""}
                   </div>
                   <div className="text-sm mt-1 font-medium">
                     Статус: {income.debt_status_name}

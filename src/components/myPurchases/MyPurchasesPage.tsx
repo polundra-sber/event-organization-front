@@ -30,6 +30,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"; // Импорт компонента модалки
+import { Loader } from "../common/Loader";
 
 export const MyPurchasesPageContent = () => {
   const { data, isLoading, isError } = useGetMyPurchasesListQuery();
@@ -178,7 +179,7 @@ export const MyPurchasesPageContent = () => {
     }
   };
 
-  if (isLoading) return <p>Загрузка...</p>;
+  if (isLoading) return <Loader />;
   if (isError) return <p>Ошибка загрузки</p>;
 
   const purchases = data?.purchases || [];

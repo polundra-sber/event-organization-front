@@ -22,13 +22,16 @@ import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 import { ButtonToMain } from "../common/ButtonToMain";
 import { format, isValid } from "date-fns";
 import { ru } from "date-fns/locale";
+import { Loader } from "../common/Loader";
 
 export const MyTasksPageContent = () => {
   const { data, isLoading, isError } = useGetMyTasksListQuery();
   const [denyTask] = useDenyTaskInMyTasksListMutation();
   const [markTaskCompleted] = useMarkTaskCompletedInMyTasksListMutation();
 
-  const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(null);
+  const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(
+    null
+  );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState<Record<string, boolean>>({
     done: false,
@@ -45,10 +48,7 @@ export const MyTasksPageContent = () => {
     setOpenedDescriptionId((prev) => (prev === id ? null : id));
   };
 
-  const openConfirmDialog = (task: {
-    task_id: number;
-    task_name: string;
-  }) => {
+  const openConfirmDialog = (task: { task_id: number; task_name: string }) => {
     setSelectedTask(task);
     setConfirmDialogOpen(true);
   };
@@ -70,7 +70,7 @@ export const MyTasksPageContent = () => {
   };
 
   const tasks = data || [];
-  
+
   const filteredTasks = tasks.filter((task) => {
     const statusFiltersActive = filters.done || filters.in_progress;
     const statusMatch =
@@ -78,15 +78,16 @@ export const MyTasksPageContent = () => {
       (filters.done && task.task_status_name === "выполнена") ||
       (filters.in_progress && task.task_status_name !== "выполнена");
 
-    const eventFiltersActive = Object.keys(filters).some(key => 
-      key.startsWith('event_') && filters[key]
+    const eventFiltersActive = Object.keys(filters).some(
+      (key) => key.startsWith("event_") && filters[key]
     );
     const eventMatch =
       !eventFiltersActive ||
       Object.keys(filters).some(
-        key => key.startsWith('event_') && 
-        filters[key] && 
-        key === `event_${task.event_id}`
+        (key) =>
+          key.startsWith("event_") &&
+          filters[key] &&
+          key === `event_${task.event_id}`
       );
 
     return statusMatch && eventMatch;
@@ -95,7 +96,7 @@ export const MyTasksPageContent = () => {
   const formatTaskDeadline = (task: MyTaskListItem) => {
     try {
       const date = new Date(task.deadline_date);
-      
+
       if (!isValid(date)) {
         return "Срок не указан";
       }
@@ -109,12 +110,12 @@ export const MyTasksPageContent = () => {
     }
   };
 
-  if (isLoading) return <p>Загрузка...</p>;
+  if (isLoading) return <Loader />;
   if (isError) return <p>Ошибка загрузки</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain className="mb-10"/>
+      <ButtonToMain className="mb-10" />
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
         <label className="text-lg font-bold text-my-black text-lg">
           Мои задачи
@@ -156,7 +157,11 @@ export const MyTasksPageContent = () => {
                         className="flex items-center text-sm text-gray-700 hover:text-gray-900"
                       >
                         <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
-                          {isOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          {isOpen ? (
+                            <ChevronUp className="w-3 h-3" />
+                          ) : (
+                            <ChevronDown className="w-3 h-3" />
+                          )}
                         </span>
                         Описание
                       </button>
@@ -173,7 +178,7 @@ export const MyTasksPageContent = () => {
 
                   <div className="flex gap-2 ml-auto">
                     {task.task_status_name !== "выполнена" && (
-                      <Button 
+                      <Button
                         variant="light_green"
                         size="sm"
                         onClick={() => openConfirmDialog(task)}
@@ -239,10 +244,13 @@ export const MyTasksPageContent = () => {
             withSearch: true,
             options: Array.from(
               new Map(
-                tasks.map(task => [`event_${task.event_id}`, {
-                  id: `event_${task.event_id}`,
-                  label: task.event_name,
-                }])
+                tasks.map((task) => [
+                  `event_${task.event_id}`,
+                  {
+                    id: `event_${task.event_id}`,
+                    label: task.event_name,
+                  },
+                ])
               ).values()
             ),
           },
