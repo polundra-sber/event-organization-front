@@ -28,6 +28,7 @@ export const api = createApi({
     "Participants",
     "CostList",
   ],
+  refetchOnMountOrArgChange: true, // отключение кэширования при переходе между вкладками
   endpoints: () => ({}),
 });
 
