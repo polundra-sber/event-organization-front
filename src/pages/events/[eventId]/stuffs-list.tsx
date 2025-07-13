@@ -11,38 +11,58 @@ import { useEffect, useState } from "react";
 export default function EventStuffsPage() {
   const router = useRouter();
   const params = useParams();
-  const eventId = Number(params?.eventId);
   const [isLoading, setIsLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
   const [deniedReason, setDeniedReason] = useState("");
+  const [validEventId, setValidEventId] = useState<number | null>(null);
 
-  // Получаем метаданные пользователя для мероприятия
+  // Проверяем и устанавливаем eventId
+  useEffect(() => {
+    if (params?.eventId) {
+      const id = Number(params.eventId);
+      if (!isNaN(id)) {
+        setValidEventId(id);
+      } else {
+        setAccessDenied(true);
+        setDeniedReason("Некорректный ID мероприятия");
+        setIsLoading(false);
+      }
+    }
+  }, [params?.eventId]);
+
+  // Получаем метаданные пользователя (только при наличии validEventId)
   const {
     data: metadata,
     isLoading: metadataLoading,
     error,
-  } = useGetUserMetadataQuery(eventId);
+  } = useGetUserMetadataQuery(validEventId!, {
+    skip: !validEventId,
+  });
 
+  // Проверка авторизации
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/");
-    } else {
+    } else if (validEventId !== null) {
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, validEventId]);
 
+  // Обработка ошибок
   useEffect(() => {
     if (error) {
       setDeniedReason("Мероприятие не найдено или произошла ошибка");
       setAccessDenied(true);
     }
-  }, [metadata, metadataLoading, error]);
+  }, [error]);
 
-  if (isLoading || metadataLoading) {
+  // Состояния загрузки
+  if (isLoading || metadataLoading || validEventId === null) {
     return <Loader />;
   }
 
+  // Состояния ошибок
   if (accessDenied) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -63,5 +83,5 @@ export default function EventStuffsPage() {
     );
   }
 
-  return <EventStuffsPageContent event_id={eventId} />;
+  return <EventStuffsPageContent event_id={validEventId} />;
 }

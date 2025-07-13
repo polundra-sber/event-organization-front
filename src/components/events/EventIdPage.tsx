@@ -17,15 +17,14 @@ import {
 } from "lucide-react";
 import { MyListsMenu } from "@/components/common/MyListsMenu";
 
-export function EventPage() {
-  const router = useRouter();
-  const eventId = router.query.eventId as string;
+interface EventPageProps {
+  eventId: number;
+}
 
-  const {
-    data: event,
-    isLoading,
-    error,
-  } = useGetEventByIdQuery(Number(eventId));
+export function EventPage({ eventId }: EventPageProps) {
+  const router = useRouter();
+
+  const { data: event, isLoading, error } = useGetEventByIdQuery(eventId);
 
   if (isLoading) return <div className="text-center py-8">Загрузка...</div>;
   if (error)

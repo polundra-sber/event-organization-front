@@ -8,20 +8,20 @@ import { AlertCircle } from "lucide-react";
 import { Loader } from "@/components/common/Loader";
 import { useEffect, useState } from "react";
 
-export default function EventTasksPage() {
+export default function EventPurchasesPage() {
   const router = useRouter();
   const params = useParams();
-  const eventId = Number(params?.eventId);
   const [isLoading, setIsLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
   const [deniedReason, setDeniedReason] = useState("");
+  const [eventId, setEventId] = useState<number | null>(null); // Храним eventId в состоянии
 
   // Получаем метаданные пользователя для мероприятия
   const {
     data: metadata,
     isLoading: metadataLoading,
     error,
-  } = useGetUserMetadataQuery(eventId);
+  } = useGetUserMetadataQuery(eventId!, { skip: !eventId }); // Запрос выполнится только если eventId есть
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,14 +32,27 @@ export default function EventTasksPage() {
     }
   }, [router]);
 
+  // Следим за params.eventId и обновляем состояние
+  useEffect(() => {
+    if (params?.eventId) {
+      const id = Number(params.eventId);
+      if (!isNaN(id)) {
+        setEventId(id);
+      } else {
+        setAccessDenied(true);
+        setDeniedReason("Некорректный ID мероприятия");
+      }
+    }
+  }, [params?.eventId]);
+
   useEffect(() => {
     if (error) {
       setDeniedReason("Мероприятие не найдено или произошла ошибка");
       setAccessDenied(true);
     }
-  }, [metadata, metadataLoading, error]);
+  }, [error]);
 
-  if (isLoading || metadataLoading) {
+  if (isLoading || metadataLoading || !eventId) {
     return <Loader />;
   }
 

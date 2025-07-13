@@ -11,44 +11,64 @@ import { useEffect, useState } from "react";
 export default function EventTasksPage() {
   const router = useRouter();
   const params = useParams();
-  const eventId = Number(params?.eventId);
   const [isLoading, setIsLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
   const [deniedReason, setDeniedReason] = useState("");
+  const [validEventId, setValidEventId] = useState<number | null>(null);
 
-  // Получаем метаданные пользователя для мероприятия
+  // Безопасное извлечение и проверка eventId
+  useEffect(() => {
+    if (params?.eventId) {
+      const id = Number(params.eventId);
+      if (!isNaN(id)) {
+        setValidEventId(id);
+      } else {
+        setAccessDenied(true);
+        setDeniedReason("Некорректный идентификатор мероприятия");
+        setIsLoading(false);
+      }
+    }
+  }, [params?.eventId]);
+
+  // Запрос метаданных только при наличии валидного ID
   const {
     data: metadata,
     isLoading: metadataLoading,
     error,
-  } = useGetUserMetadataQuery(eventId);
+  } = useGetUserMetadataQuery(validEventId!, {
+    skip: !validEventId,
+  });
 
+  // Проверка аутентификации
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/");
-    } else {
+    } else if (validEventId !== null) {
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, validEventId]);
 
+  // Обработка ошибок запроса
   useEffect(() => {
     if (error) {
-      setDeniedReason("Мероприятие не найдено или произошла ошибка");
+      setDeniedReason("Ошибка при загрузке данных мероприятия");
       setAccessDenied(true);
     }
-  }, [metadata, metadataLoading, error]);
+  }, [error]);
 
-  if (isLoading || metadataLoading) {
+  // Состояния загрузки
+  if (isLoading || metadataLoading || validEventId === null) {
     return <Loader />;
   }
 
+  // Состояния ошибок
   if (accessDenied) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Доступ запрещен</AlertTitle>
+          <AlertTitle>Ошибка доступа</AlertTitle>
           <AlertDescription>
             {deniedReason}
             <button
@@ -63,5 +83,5 @@ export default function EventTasksPage() {
     );
   }
 
-  return <EventTasksPageContent event_id={eventId} />;
+  return <EventTasksPageContent event_id={validEventId} />;
 }

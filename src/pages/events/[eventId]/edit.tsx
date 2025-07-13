@@ -4,42 +4,54 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import EditEventPage from "@/components/create-edit-event/EditEventPage";
 import { useGetUserMetadataQuery } from "@/lib/api/events-api";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Для отображения ошибок
-import { AlertCircle } from "lucide-react"; // Иконка для алерта
-
-const Loader = () => (
-  <div className="flex justify-center items-center h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-);
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { Loader } from "@/components/common/Loader";
 
 export default function EditEventWrapper() {
   const router = useRouter();
   const params = useParams();
-  const eventId = Number(params?.eventId);
   const [isLoading, setIsLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
   const [deniedReason, setDeniedReason] = useState("");
+  const [validEventId, setValidEventId] = useState<number | null>(null);
 
-  // Получаем метаданные пользователя для мероприятия
+  // Проверяем и устанавливаем eventId
+  useEffect(() => {
+    if (params?.eventId) {
+      const id = Number(params.eventId);
+      if (!isNaN(id)) {
+        setValidEventId(id);
+      } else {
+        setAccessDenied(true);
+        setDeniedReason("Некорректный ID мероприятия");
+        setIsLoading(false);
+      }
+    }
+  }, [params?.eventId]);
+
+  // Получаем метаданные пользователя (только при наличии validEventId)
   const {
     data: metadata,
     isLoading: metadataLoading,
     error,
-  } = useGetUserMetadataQuery(eventId);
+  } = useGetUserMetadataQuery(validEventId!, {
+    skip: !validEventId,
+  });
 
+  // Проверка авторизации
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/");
-    } else {
+    } else if (validEventId !== null) {
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, validEventId]);
 
+  // Проверка прав доступа и статуса мероприятия
   useEffect(() => {
-    if (!metadataLoading && metadata) {
-      // Проверяем, что пользователь - создатель и мероприятие активно
+    if (metadata && !metadataLoading) {
       const isCreator = metadata.role_name === "создатель";
       const isEventActive = metadata.event_status_name === "активно";
 
@@ -60,7 +72,7 @@ export default function EditEventWrapper() {
     }
   }, [metadata, metadataLoading, error]);
 
-  if (isLoading || metadataLoading) {
+  if (isLoading || metadataLoading || validEventId === null) {
     return <Loader />;
   }
 
@@ -84,5 +96,5 @@ export default function EditEventWrapper() {
     );
   }
 
-  return <EditEventPage eventId={eventId} />;
+  return <EditEventPage eventId={validEventId} />;
 }

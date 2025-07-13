@@ -1,28 +1,35 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { EventPage } from "@/components/events/EventIdPage";
+import { Loader } from "@/components/common/Loader";
 
 export default function EventsPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true); // Добавляем состояние загрузки
-  const Loader = () => (
-    <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [eventId, setEventId] = useState<number | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/");
     } else {
-      setIsLoading(false); // Останавливаем лоадер, если токен есть
+      setIsLoading(false);
     }
   }, []);
 
-  if (isLoading) {
+  // Отслеживаем появление eventId в query
+  useEffect(() => {
+    if (router.isReady && router.query.eventId) {
+      const id = Number(router.query.eventId);
+      if (!isNaN(id)) {
+        setEventId(id);
+      }
+    }
+  }, [router.isReady, router.query.eventId]);
+
+  if (isLoading || !eventId) {
     return <Loader />;
   }
 
-  return <EventPage />;
+  return <EventPage eventId={eventId} />;
 }
