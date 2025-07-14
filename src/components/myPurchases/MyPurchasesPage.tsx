@@ -274,14 +274,16 @@ export const MyPurchasesPageContent = () => {
                       </CardDescription>
 
                       {/* Отображение стоимости под названием */}
-                      {currentCostStr !== "" && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          Текущая стоимость:{" "}
-                          <span className="font-medium">
-                            {currentCostStr} ₽
-                          </span>
-                        </p>
-                      )}
+                      {currentCostStr &&
+                        currentCostStr !== "0" &&
+                        currentCostStr !== "null" && (
+                          <p className="text-sm text-gray-600 mt-1">
+                            Текущая стоимость:{" "}
+                            <span className="font-medium">
+                              {currentCostStr} ₽
+                            </span>
+                          </p>
+                        )}
 
                       <CardDescription className="text-black break-all mt-1">
                         Ответственный:{" "}
