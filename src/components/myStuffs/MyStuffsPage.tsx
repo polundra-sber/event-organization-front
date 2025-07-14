@@ -140,50 +140,47 @@ export const MyStuffsPageContent = () => {
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="flex justify-between items-center relative">
-                  <div className="relative">
-                    {stuff.stuff_description && (
-                      <button
-                        onClick={() => toggleDescription(stuff.stuff_id)}
-                        className="flex items-center text-sm text-gray-700 hover:text-gray-900"
-                      >
-                        <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
-                          {isOpen ? (
-                            <ChevronUp className="w-3 h-3" />
-                          ) : (
-                            <ChevronDown className="w-3 h-3" />
-                          )}
-                        </span>
-                        Описание
-                      </button>
-                    )}
+<CardContent className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 min-w-0">
+  <div className="relative w-full min-w-0">
+    {stuff.stuff_description && (
+      <button
+        onClick={() => toggleDescription(stuff.stuff_id)}
+        className="flex items-center text-sm text-gray-700 hover:text-gray-900 w-full min-w-0"
+      >
+        <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+          {isOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        </span>
+        <span className="text-left break-words overflow-hidden text-ellipsis min-w-0">
+          Описание
+        </span>
+      </button>
+    )}
 
-                    {isOpen && (
-                      <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-                        <h3 className="font-semibold mb-1">
-                          {stuff.stuff_name}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {stuff.stuff_description ||
-                            "Нет дополнительного описания"}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+    {isOpen && (
+      <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
+        <p className="text-sm text-gray-600 break-words whitespace-pre-line">
+          {stuff.stuff_description || "Описание не добавлено"}
+        </p>
+      </div>
+    )}
+  </div>
 
-                  <Button
-                    variant="light_green"
-                    size="sm"
-                    onClick={() =>
-                      openConfirmDialog({
-                        stuff_id: stuff.stuff_id,
-                        stuff_name: stuff.stuff_name,
-                      })
-                    }
-                  >
-                    Отказаться
-                  </Button>
-                </CardContent>
+  <div className="w-full sm:w-auto flex justify-end">
+    <Button
+      variant="light_green"
+      size="sm"
+      onClick={() =>
+        openConfirmDialog({
+          stuff_id: stuff.stuff_id,
+          stuff_name: stuff.stuff_name,
+        })
+      }
+      className="ml-auto"
+    >
+      Отказаться
+    </Button>
+  </div>
+</CardContent>
               </Card>
             );
           })}
