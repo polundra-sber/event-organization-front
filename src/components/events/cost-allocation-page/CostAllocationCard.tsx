@@ -123,43 +123,54 @@ export const CostAllocationCard = ({
         </Card>
       </div>
 
-      <Dialog
-        open={showParticipantsModal}
-        onOpenChange={setShowParticipantsModal}
-      >
-        <DialogContent className="max-w-[95vw] sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="break-words min-w-0">
-              Участники покупки
-            </DialogTitle>
-          </DialogHeader>
+<Dialog 
+  open={showParticipantsModal}
+  onOpenChange={setShowParticipantsModal}
+>
+  <DialogContent className="max-w-[95vw] sm:max-w-md">
+    <DialogHeader>
+      <DialogTitle className="text-left break-all whitespace-normal">
+        Участники покупки: {purchase.purchase_name}
+      </DialogTitle>
+    </DialogHeader>
 
-          {isFetching ? (
-            <p className="text-sm text-gray-500">Загрузка участников...</p>
-          ) : (
-            <ul className="space-y-2 mt-2">
-              {participants.map((p) => (
-                <li
-                  key={p.login}
-                  className="text-sm flex items-center justify-between break-words min-w-0"
-                >
-                  <div className="break-words overflow-hidden text-ellipsis min-w-0">
-                    {p.name} {p.surname} ({p.login})
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-500 hover:text-red-700 flex-shrink-0"
-                    onClick={() => handleDeleteParticipant(p.login)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </DialogContent>
-      </Dialog>
+    {isFetching ? (
+      <div className="flex justify-center py-4">
+        <p className="text-sm text-gray-500">Загрузка участников...</p>
+      </div>
+    ) : participants.length === 0 ? (
+      <p className="text-sm text-gray-500 py-4 text-center">Участников нет</p>
+    ) : (
+      <div className="space-y-3 max-h-[60vh] overflow-y-auto px-1">
+        {participants.map((p) => (
+          <div
+            key={p.login}
+            className="border rounded-lg p-3 w-full hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex justify-between items-start gap-3">
+              <div className="min-w-0">
+                <p className="font-medium break-words whitespace-normal">
+                  {p.name} {p.surname}
+                </p>
+                <p className="text-sm text-gray-500 break-all whitespace-normal mt-1">
+                  {p.login}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-red-500 hover:text-red-700 flex-shrink-0 mt-1"
+                onClick={() => handleDeleteParticipant(p.login)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </DialogContent>
+</Dialog>
 
       {showReceiptsModal && (
         <ReceiptViewer
