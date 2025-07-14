@@ -5,8 +5,8 @@ export interface ValidationResult {
 
 export const validateName = (name: string): ValidationResult => {
   if (!name.trim()) return { valid: false, message: "Имя обязательно" };
-  if (name.length > 20)
-    return { valid: false, message: "Максимум 20 символов" };
+  if (name.length > 50)
+    return { valid: false, message: "Максимум 50 символов" };
   return { valid: true };
 };
 
@@ -58,7 +58,7 @@ export const validatePassword = (password: string): ValidationResult => {
 };
 
 export const validateMoneyTransfer = (text: string): ValidationResult => {
-  if (text.length > 254)
-    return { valid: false, message: "Максимум 254 символа" };
+  if (text.length > 1000)
+    return { valid: false, message: "Максимум 1000 символа" };
   return { valid: true };
 };
