@@ -284,8 +284,12 @@ export const MyPurchasesPageContent = () => {
                       )}
 
                       <CardDescription className="text-black break-all mt-1">
-                        Ответственный: {purchase.responsible_name}{" "}
-                        {purchase.responsible_surname}
+                        Ответственный:{" "}
+                        {purchase.responsible_login
+                          ? `${purchase.responsible_name || ""} ${
+                              purchase.responsible_surname || ""
+                            }`.trim()
+                          : "не назначен"}
                       </CardDescription>
                     </div>
 
@@ -512,17 +516,26 @@ export const MyPurchasesPageContent = () => {
             id: "responsible",
             label: "Ответственный",
             withSearch: true,
-            options: Array.from(
-              new Map(
-                purchases.map((p) => [
-                  `responsible_${p.responsible_login}`,
-                  {
-                    id: `responsible_${p.responsible_login}`,
-                    label: `${p.responsible_name} ${p.responsible_surname}`,
-                  },
-                ])
-              ).values()
-            ),
+            options: [
+              // Добавляем вариант "Не назначен"
+              { id: "responsible_null", label: "Не назначен" },
+              // Фильтруем уникальных ответственных, исключая null
+              ...Array.from(
+                new Map(
+                  purchases
+                    .filter((p) => p.responsible_login) // Исключаем записи без ответственного
+                    .map((p) => [
+                      `responsible_${p.responsible_login}`,
+                      {
+                        id: `responsible_${p.responsible_login}`,
+                        label: `${p.responsible_name || ""} ${
+                          p.responsible_surname || ""
+                        }`.trim(),
+                      },
+                    ])
+                ).values()
+              ),
+            ],
           },
           {
             id: "event",
