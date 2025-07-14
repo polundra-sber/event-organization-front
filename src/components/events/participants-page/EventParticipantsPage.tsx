@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { AddParticipantsModal } from "./AddParticipantsModal";
+import { Loader } from "@/components/common/Loader";
 
 interface EventParticipantsPageContentProps {
   event_id: number;
@@ -88,12 +89,7 @@ export const EventParticipantsPageContent = ({
     }
   };
 
-  if (isLoading)
-    return (
-      <div className="flex justify-center p-8">
-        <p>Загрузка...</p>
-      </div>
-    );
+  if (isLoading) return <Loader />;
   if (isError)
     return (
       <div className="flex justify-center p-8">

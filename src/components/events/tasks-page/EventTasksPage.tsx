@@ -17,6 +17,7 @@ import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { ItemModalForm } from "@/components/common/ItemModalForm";
 import { toast } from "sonner";
 import { TaskListItemCreator } from "@/lib/api/types/tasks-types";
+import { Loader } from "@/components/common/Loader";
 
 interface EventTasksPageContentProps {
   event_id: number;
@@ -95,8 +96,9 @@ export const EventTasksPageContent = ({
     return false;
   });
 
-  if (isLoading) return <p className="text-center p-4">Загрузка...</p>;
-  if (isError) return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
+  if (isLoading) return <Loader />;
+  if (isError)
+    return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50 max-w-full overflow-x-hidden">
@@ -126,9 +128,7 @@ export const EventTasksPageContent = ({
       </div>
 
       {filteredTasks.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">
-          Нет задач
-        </p>
+        <p className="text-gray-500 text-center py-8">Нет задач</p>
       ) : (
         <div className="space-y-4">
           {filteredTasks.map((task) => (

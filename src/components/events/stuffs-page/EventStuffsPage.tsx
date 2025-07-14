@@ -15,6 +15,7 @@ import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { ItemModalForm } from "@/components/common/ItemModalForm";
 import { toast } from "sonner";
 import { StuffListItemCreator } from "@/lib/api/types/stuffs-types";
+import { Loader } from "@/components/common/Loader";
 
 interface EventStuffsPageContentProps {
   event_id: number;
@@ -68,8 +69,9 @@ export const EventStuffsPageContent = ({
     }
   };
 
-  if (isLoading) return <p className="text-center p-4">Загрузка...</p>;
-  if (isError) return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
+  if (isLoading) return <Loader />;
+  if (isError)
+    return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50 max-w-full overflow-x-hidden">
@@ -80,9 +82,7 @@ export const EventStuffsPageContent = ({
       </div>
 
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black">
-          Список вещей
-        </label>
+        <label className="text-lg font-bold text-my-black">Список вещей</label>
       </div>
 
       <div className="flex justify-end mb-4">

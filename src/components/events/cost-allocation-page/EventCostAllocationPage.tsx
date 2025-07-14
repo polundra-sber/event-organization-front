@@ -15,6 +15,7 @@ import { EventRole } from "@/lib/api/types/event-types";
 import { ParticipantsPickerModal } from "./ParticipantsPickerModal";
 import { CostAllocationCard } from "./CostAllocationCard";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
+import { Loader } from "@/components/common/Loader";
 
 interface EventCostAllocationPageContentProps {
   event_id: number;
@@ -86,7 +87,7 @@ export const EventCostAllocationPageContent = ({
     );
   }, [allocations]);
 
-  if (isLoading) return <p className="text-center p-4">Загрузка...</p>;
+  if (isLoading) return <Loader />;
   if (isError)
     return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
 
