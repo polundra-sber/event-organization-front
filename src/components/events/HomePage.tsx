@@ -237,38 +237,45 @@ export const HomePageContent = () => {
       />
       {/* Диалог поиска мероприятия */}
       <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Присоединиться к мероприятию</DialogTitle>
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto">
+          <DialogHeader className="px-4 sm:px-6">
+            <DialogTitle className="text-lg break-words text-center">
+              Присоединиться к мероприятию
+            </DialogTitle>
           </DialogHeader>
 
           {!searchedEventId ? (
-            <div className="space-y-4">
+            <div className="space-y-4 min-w-0 px-4 sm:px-6">
               <Input
                 placeholder="Введите ID мероприятия"
                 value={eventIdInput}
                 onChange={(e) => setEventIdInput(e.target.value)}
                 type="number"
+                className="w-full"
               />
               <Button onClick={handleFindEvent} className="w-full">
                 Найти мероприятие
               </Button>
             </div>
           ) : isFindingEvent ? (
-            <div className="text-center py-4">Поиск мероприятия...</div>
+            <div className="text-center py-4 break-words px-4 sm:px-6">
+              Поиск мероприятия...
+            </div>
           ) : isFindError ? (
-            <div className="text-center py-4 text-red-500">
-              Мероприятие не найдено
+            <div className="text-center py-4 px-4 sm:px-6">
+              <p className="text-red-500 break-words mb-4">
+                Мероприятие не найдено
+              </p>
               <Button
                 variant="outline"
-                className="mt-4 w-full"
+                className="w-full"
                 onClick={() => setSearchedEventId(null)}
               >
                 Попробовать снова
               </Button>
             </div>
           ) : foundEvent ? (
-            <div className="space-y-4">
+            <div className="space-y-4 min-w-0 px-4 sm:px-6">
               <EventPreviewCard
                 event_id={foundEvent.event_id}
                 event_name={foundEvent.event_name}

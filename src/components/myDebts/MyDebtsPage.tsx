@@ -60,55 +60,56 @@ export const MyDebtsPageContent = () => {
   if (isError) return <p>Ошибка загрузки</p>;
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain className="mb-10" />
+    <div className="p-4 min-h-screen bg-gray-50 w-full max-w-full overflow-hidden">
+      <ButtonToMain className="mb-5" />
 
-      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black">Мои долги</label>
+      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4 w-full max-w-full">
+        <label className="text-lg font-bold text-my-black break-all">
+          Мои долги
+        </label>
       </div>
 
-      <div className="flex justify-start mb-4">
+      <div className="flex justify-start mb-4 w-full max-w-full">
         <FilterButton onClick={() => setIsFilterOpen(true)} />
       </div>
 
       {filteredDebts.length === 0 ? (
         <p className="text-gray-500 text-center py-8">Нет задолженностей</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full max-w-full">
           {filteredDebts.map((debt) => (
-            <Card key={debt.debt_id} className="p-4">
-              <div className="mb-2 font-bold text-lg">{debt.event_name}</div>
+            <Card key={debt.debt_id} className="w-full max-w-full overflow-hidden p-4">
+              <div className="mb-2 font-bold text-lg break-all">
+                {debt.event_name}
+              </div>
 
-              <CardContent className="flex items-center gap-4 flex-wrap">
-                {/* Аватар */}
-                <Avatar className="w-12 h-12 border border-my-dark-green">
-                  <AvatarFallback>
-                    {getInitials(debt.recipient_name, debt.recipient_surname)}
-                  </AvatarFallback>
-                </Avatar>
+              <CardContent className="p-0 flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full max-w-full">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <Avatar className="w-12 h-12 border border-my-dark-green flex-shrink-0">
+                    <AvatarFallback>
+                      {getInitials(debt.recipient_name, debt.recipient_surname)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                {/* Сумма */}
-                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap ml-auto">
-                  {debt.debt_amount ? `${debt.debt_amount} ₽` : "0 ₽"}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold break-all">
+                      {debt.recipient_name || "Имя отсутствует"} {debt.recipient_surname || ""}
+                    </div>
+                    <div className="text-sm break-all whitespace-pre-wrap">
+                      {debt.comment_money_transfer || "Комментарий отсутствует"}
+                    </div>
+                    <div className="text-sm mt-1 font-medium break-all">
+                      Статус: {debt.debt_status_name}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Центр */}
-                <div className="flex-1 min-w-[200px]">
-                  <div className="font-semibold">
-                    {debt.recipient_name || "Имя отсутствует"}{" "}
-                    {debt.recipient_surname || ""}
-                  </div>
-                  <div className="text-sm break-words">
-                    {debt.comment_money_transfer || "Комментарий отсутствует"}
-                  </div>
-                  <div className="text-sm mt-1 font-medium">
-                    Статус: {debt.debt_status_name}
-                  </div>
+                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap ml-auto sm:ml-0 flex-shrink-0">
+                  {debt.debt_amount ? `${debt.debt_amount} ₽` : "0 ₽"}
                 </div>
               </CardContent>
 
-              {/* Кнопка снизу */}
-              <div className="mt-4">
+              <div className="mt-4 w-full">
                 <Button
                   variant="dark_green"
                   size="sm"
@@ -116,7 +117,7 @@ export const MyDebtsPageContent = () => {
                     debt.debt_status_name !== "не оплачен" ||
                     paidDebts.has(debt.debt_id)
                   }
-                  className={`w-full ${
+                  className={`w-full max-w-full ${
                     debt.debt_status_name === "оплачен" ||
                     paidDebts.has(debt.debt_id)
                       ? "opacity-50 cursor-not-allowed"

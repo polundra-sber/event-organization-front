@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   useGetMyPurchasesListQuery,
@@ -37,7 +36,6 @@ export const MyPurchasesPageContent = () => {
   const [editCost] = useEditPurchaseCostMutation();
   const [denyPurchase] = useDenyPurchaseMutation();
   const [addReceipt] = useAddReceiptMutation();
-
   const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(
     null
   );
@@ -48,10 +46,8 @@ export const MyPurchasesPageContent = () => {
   const [selectedPurchases, setSelectedPurchases] = useState<number[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [openedReceiptsPurchaseId, setOpenedReceiptsPurchaseId] = useState<
-    number | null
-  >(null);
-
+  const [openedReceiptsPurchaseId, setOpenedReceiptsPurchaseId] =
+    useState<number | null>(null);
   const [selectedPurchase, setSelectedPurchase] = useState<{
     purchase_id: number;
     event_id: number;
@@ -97,7 +93,7 @@ export const MyPurchasesPageContent = () => {
       await editCost({
         event_id,
         purchase_id,
-        data: { cost: newCost }, // Правильная структура данных
+        data: { cost: newCost },
       }).unwrap();
       toast.success("Стоимость обновлена");
       setOpenedCostId(null);
@@ -162,15 +158,14 @@ export const MyPurchasesPageContent = () => {
       // Если все проверки пройдены, загружаем файлы
       for (const purchase_id of selectedPurchases) {
         const event_id =
-          data?.purchases.find((p) => p.purchase_id === purchase_id)
-            ?.event_id || 0;
+          data?.purchases.find((p) => p.purchase_id === purchase_id)?.event_id ||
+          0;
         await addReceipt({
           event_id,
           purchase_id,
           files: filesArray,
         }).unwrap();
       }
-
       toast.success("Чеки прикреплены");
       setSelectedPurchases([]);
       setShowUpload(false);
@@ -189,7 +184,6 @@ export const MyPurchasesPageContent = () => {
     const responsibleFiltersActive = Object.keys(filters).some(
       (key) => key.startsWith("responsible_") && filters[key]
     );
-
     const responsibleMatch =
       !responsibleFiltersActive ||
       Object.keys(filters).some(
@@ -198,11 +192,9 @@ export const MyPurchasesPageContent = () => {
           filters[key] &&
           key === `responsible_${purchase.responsible_login}`
       );
-
     const eventFiltersActive = Object.keys(filters).some(
       (key) => key.startsWith("event_") && filters[key]
     );
-
     const eventMatch =
       !eventFiltersActive ||
       Object.keys(filters).some(
@@ -211,193 +203,189 @@ export const MyPurchasesPageContent = () => {
           filters[key] &&
           key === `event_${purchase.event_id}`
       );
-
     return responsibleMatch && eventMatch;
   });
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain className="mb-10" />
-
-      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <h1 className="text-lg font-bold text-my-black">Мои покупки</h1>
+    <div className="p-4 min-h-screen bg-gray-50 w-full max-w-full overflow-hidden">
+      <ButtonToMain className="mb-5" />
+      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4 w-full max-w-full">
+        <h1 className="text-lg font-bold text-my-black break-all">Мои покупки</h1>
       </div>
-
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 w-full max-w-full">
         <FilterButton onClick={() => setIsFilterOpen(true)} />
-
         {selectedPurchases.length > 0 && (
           <Button variant="bright_green" onClick={() => setShowUpload(true)}>
             Прикрепить чек
           </Button>
         )}
       </div>
-
       {filteredPurchases.length === 0 ? (
         <p className="text-gray-500 text-center py-8">Нет покупок</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full max-w-full">
           {filteredPurchases.map((purchase) => {
             const isOpen = openedDescriptionId === purchase.purchase_id;
             const isCostOpen = openedCostId === purchase.purchase_id;
             const isSelected = selectedPurchases.includes(purchase.purchase_id);
             const currentCostStr =
               costs[purchase.purchase_id] ?? purchase.cost.toString();
-            const currentCost =
-              currentCostStr === "" ? undefined : Number(currentCostStr);
 
             return (
               <div
                 key={purchase.purchase_id}
-                className="flex items-start gap-3 relative"
+                className="flex items-start gap-3 relative w-full max-w-full"
               >
                 <input
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleSelect(purchase.purchase_id)}
-                  className="mt-4"
+                  className="mt-4 flex-shrink-0"
                 />
 
-                <Card className="flex-1">
-                  <CardHeader className="flex flex-row justify-between items-start">
-                    <div>
-                      <CardTitle>{purchase.event_name}</CardTitle>
-                      <CardDescription className="text-black">
-                        {purchase.purchase_name}
-                      </CardDescription>
-                      <CardDescription className="text-black">
-                        Ответственный: {purchase.responsible_name}{" "}
-                        {purchase.responsible_surname}
-                      </CardDescription>
-                    </div>
-                    {purchase.has_receipt && (
-                      <Button
-                        variant="ghost"
-                        className="text-green-600 hover:text-green-800 p-0 h-auto"
-                        onClick={() =>
-                          setOpenedReceiptsPurchaseId(purchase.purchase_id)
-                        }
-                      >
-                        <Receipt className="h-4 w-4 mr-1" />
-                        Чеки
-                      </Button>
-                    )}
-                  </CardHeader>
+<Card className="flex-1 min-w-0 relative">
+  {/* Заголовок карточки: только event_name и чеки */}
+  <CardHeader className="flex flex-row justify-between items-start min-w-0 pb-2">
+    <CardTitle className="break-all">{purchase.event_name}</CardTitle>
+    {purchase.has_receipt && (
+      <Button
+        variant="ghost"
+        className="text-green-600 hover:text-green-800 p-0 h-auto flex-shrink-0"
+        onClick={() => setOpenedReceiptsPurchaseId(purchase.purchase_id)}
+      >
+        <Receipt className="h-4 w-4 mr-1" />
+        Чеки
+      </Button>
+    )}
+  </CardHeader>
 
-                  <CardContent className="flex flex-col gap-4 relative">
-                    {purchase.purchase_description && (
-                      <div className="relative">
-                        <button
-                          onClick={() =>
-                            toggleDescription(purchase.purchase_id)
-                          }
-                          className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
-                        >
-                          {isOpen ? (
-                            <ChevronUp size={16} />
-                          ) : (
-                            <ChevronDown size={16} />
-                          )}
-                          Описание
-                        </button>
+  {/* Блок с основной информацией о покупке */}
+  <CardContent className="flex flex-col gap-4 min-w-0 pt-0">
+    <div className="border-t pt-3">
+      <CardDescription className="text-black break-all">
+        {purchase.purchase_name}
+      </CardDescription>
 
-                        {isOpen && (
-                          <div className="absolute left-0 top-full mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-                            <p className="text-sm text-gray-600">
-                              {purchase.purchase_description}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
+      {/* Отображение стоимости под названием */}
+      {currentCostStr !== "" && (
+        <p className="text-sm text-gray-600 mt-1">
+          Текущая стоимость:{" "}
+          <span className="font-medium">{currentCostStr} ₽</span>
+        </p>
+      )}
 
-                    <div className="relative">
-                      <button
-                        onClick={() => toggleCost(purchase.purchase_id)}
-                        className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
-                      >
-                        <Plus size={16} />
-                        {isCostOpen ? "Скрыть стоимость" : "Добавить стоимость"}
-                      </button>
+      <CardDescription className="text-black break-all mt-1">
+        Ответственный: {purchase.responsible_name} {purchase.responsible_surname}
+      </CardDescription>
+    </div>
 
-                      {isCostOpen && (
-                        <div className="absolute left-0 top-full mt-1 flex items-center gap-2 w-max bg-white p-2 border border-gray-200 rounded-md shadow z-10">
-                          <input
-                            type="number"
-                            value={currentCostStr}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (val === "" || /^\d*$/.test(val)) {
-                                setCosts((prev) => ({
-                                  ...prev,
-                                  [purchase.purchase_id]: val,
-                                }));
-                              }
-                            }}
-                            className="border px-2 py-1 w-24"
-                            autoFocus
-                          />
+    {/* Блок "Описание" */}
+    {purchase.purchase_description && (
+      <div className="relative">
+        <button
+          onClick={() => toggleDescription(purchase.purchase_id)}
+          className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
+        >
+          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          <span>Описание</span>
+        </button>
+        {isOpen && (
+          <div className="absolute left-0 top-full mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+            <p className="text-sm text-gray-600 break-words whitespace-pre-line">
+              {purchase.purchase_description}
+            </p>
+          </div>
+        )}
+      </div>
+    )}
 
-                          <Button
-                            size="sm"
-                            onClick={() =>
-                              handleEditCost(
-                                purchase.event_id,
-                                purchase.purchase_id,
-                                costs[purchase.purchase_id] ??
-                                  purchase.cost.toString()
-                              )
-                            }
-                          >
-                            Сохранить
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+    {/* Блок "Добавить стоимость" */}
+    <div className="relative">
+      <button
+        onClick={() => toggleCost(purchase.purchase_id)}
+        className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
+      >
+        <Plus size={16} />
+        <span>{isCostOpen ? "Скрыть стоимость" : "Добавить стоимость"}</span>
+      </button>
+      {isCostOpen && (
+        <div className="absolute left-0 top-full mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={currentCostStr}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "" || /^\d*$/.test(val)) {
+                  setCosts((prev) => ({
+                    ...prev,
+                    [purchase.purchase_id]: val,
+                  }));
+                }
+              }}
+              className="border px-2 py-1 w-full"
+              autoFocus
+            />
+            <Button
+              size="sm"
+              onClick={() =>
+                handleEditCost(
+                  purchase.event_id,
+                  purchase.purchase_id,
+                  costs[purchase.purchase_id] ?? purchase.cost.toString()
+                )
+              }
+            >
+              Сохранить
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
 
-                    <div className="flex justify-end">
-                      {purchase.responsible_login === user_login &&
-                        (currentCost === 0 || currentCost === undefined) && (
-                          <Button
-                            variant="dark_green"
-                            size="sm"
-                            onClick={() =>
-                              openConfirmDialog({
-                                purchase_id: purchase.purchase_id,
-                                event_id: purchase.event_id,
-                                purchase_name: purchase.purchase_name,
-                              })
-                            }
-                          >
-                            Отказаться
-                          </Button>
-                        )}
-                    </div>
-                  </CardContent>
-                </Card>
+    {/* Кнопка "Отказаться" */}
+    <div className="flex justify-end">
+      {purchase.responsible_login === user_login &&
+        (Number(currentCostStr) === 0 || isNaN(Number(currentCostStr))) && (
+          <Button
+            variant="dark_green"
+            size="sm"
+            onClick={() =>
+              openConfirmDialog({
+                purchase_id: purchase.purchase_id,
+                event_id: purchase.event_id,
+                purchase_name: purchase.purchase_name,
+              })
+            }
+            className="w-full sm:w-auto"
+          >
+            Отказаться
+          </Button>
+        )}
+    </div>
+  </CardContent>
+</Card>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Модальное окно загрузки чеков */}
+      {/* Диалог загрузки чека */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
         <DialogContent className="sm:max-w-[425px] max-w-[90vw] rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-800">
+            <DialogTitle className="text-lg font-semibold text-gray-800 break-all">
               Загрузить чек
             </DialogTitle>
           </DialogHeader>
-
           <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-gray-50">
             <UploadIcon className="w-10 h-10 text-gray-400 mb-4" />
-            <p className="text-sm text-gray-600 text-center mb-4">
+            <p className="text-sm text-gray-600 text-center mb-4 break-all">
               Прикрепите фото чека в формате JPG или PNG
               <br />
               (не более 20MB на файл)
             </p>
-
             <label className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm font-medium transition-colors">
               Выбрать файлы
               <input
@@ -411,7 +399,6 @@ export const MyPurchasesPageContent = () => {
               />
             </label>
           </div>
-
           <DialogFooter className="mt-2">
             <Button
               variant="outline"
@@ -424,6 +411,7 @@ export const MyPurchasesPageContent = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Диалог подтверждения отказа */}
       <ConfirmationDialog
         isOpen={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
@@ -435,17 +423,20 @@ export const MyPurchasesPageContent = () => {
         cancelLabel="Нет"
       />
 
+      {/* Просмотр чеков */}
       {openedReceiptsPurchaseId !== null && (
         <ReceiptViewer
           purchaseId={openedReceiptsPurchaseId}
           eventId={
-            purchases.find((p) => p.purchase_id === openedReceiptsPurchaseId)
-              ?.event_id || 0
+            purchases.find(
+              (p) => p.purchase_id === openedReceiptsPurchaseId
+            )?.event_id || 0
           }
           onClose={() => setOpenedReceiptsPurchaseId(null)}
         />
       )}
 
+      {/* Фильтры */}
       <FilterModal
         mode="multi"
         isOpen={isFilterOpen}

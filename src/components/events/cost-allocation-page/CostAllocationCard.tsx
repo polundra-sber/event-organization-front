@@ -76,31 +76,33 @@ export const CostAllocationCard = ({
 
   return (
     <>
-      <div className="flex gap-4 items-start">
+      <div className="flex gap-4 items-start w-full max-w-full min-w-0">
         <input
           type="checkbox"
           checked={selected}
           onChange={() => toggleSelect(purchase.purchase_id)}
-          className="mt-4"
+          className="mt-4 flex-shrink-0"
         />
-        <Card className="flex-1">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">
-              {purchase.purchase_name}
-            </CardTitle>
+        <Card className="flex-1 w-full max-w-full min-w-0">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start gap-2 min-w-0">
+              <CardTitle className="text-lg font-semibold break-words overflow-hidden text-ellipsis min-w-0">
+                {purchase.purchase_name}
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p className="text-lg font-semibold">{purchase.cost} ₽</p>
-            <p className="text-sm">
+            <p className="text-lg font-semibold break-words min-w-0">{purchase.cost} ₽</p>
+            <p className="text-sm break-words min-w-0">
               Ответственный:{" "}
               {purchase.responsible_name
                 ? `${purchase.responsible_name} ${purchase.responsible_surname}`
                 : "Не назначен"}
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <Button
                 variant="ghost"
-                className="text-blue-600 hover:text-blue-800"
+                className="text-blue-600 hover:text-blue-800 min-w-0"
                 onClick={handleOpenParticipantsModal}
               >
                 Участники ({purchase.countParticipants})
@@ -109,10 +111,10 @@ export const CostAllocationCard = ({
               {purchase.hasReceipt && (
                 <Button
                   variant="ghost"
-                  className="text-green-600 hover:text-green-800"
+                  className="text-green-600 hover:text-green-800 min-w-0"
                   onClick={() => setShowReceiptsModal(true)}
                 >
-                  <Receipt className="h-4 w-4 mr-1" />
+                  <Receipt className="h-4 w-4 mr-1 flex-shrink-0" />
                   Чеки
                 </Button>
               )}
@@ -125,9 +127,11 @@ export const CostAllocationCard = ({
         open={showParticipantsModal}
         onOpenChange={setShowParticipantsModal}
       >
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Участники покупки</DialogTitle>
+            <DialogTitle className="break-words min-w-0">
+              Участники покупки
+            </DialogTitle>
           </DialogHeader>
 
           {isFetching ? (
@@ -137,15 +141,15 @@ export const CostAllocationCard = ({
               {participants.map((p) => (
                 <li
                   key={p.login}
-                  className="text-sm flex items-center justify-between"
+                  className="text-sm flex items-center justify-between break-words min-w-0"
                 >
-                  <div>
+                  <div className="break-words overflow-hidden text-ellipsis min-w-0">
                     {p.name} {p.surname} ({p.login})
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 flex-shrink-0"
                     onClick={() => handleDeleteParticipant(p.login)}
                   >
                     <X className="h-4 w-4" />

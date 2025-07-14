@@ -95,11 +95,11 @@ export const EventTasksPageContent = ({
     return false;
   });
 
-  if (isLoading) return <p>Загрузка...</p>;
-  if (isError) return <p>Ошибка загрузки</p>;
+  if (isLoading) return <p className="text-center p-4">Загрузка...</p>;
+  if (isError) return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50">
+    <div className="p-4 min-h-screen bg-gray-50 max-w-full overflow-x-hidden">
       <div className="mb-5">
         <Button variant="dark_green" size="sm" asChild>
           <Link href={`/events/${event_id}`}>← Назад</Link>
@@ -107,7 +107,7 @@ export const EventTasksPageContent = ({
       </div>
 
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black text-lg">
+        <label className="text-lg font-bold text-my-black">
           Задачи мероприятия
         </label>
       </div>
@@ -126,7 +126,9 @@ export const EventTasksPageContent = ({
       </div>
 
       {filteredTasks.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">Нет задач</p>
+        <p className="text-gray-500 text-center py-8">
+          Нет задач
+        </p>
       ) : (
         <div className="space-y-4">
           {filteredTasks.map((task) => (
@@ -161,10 +163,9 @@ export const EventTasksPageContent = ({
         </div>
       )}
 
-      {/* Модалка создания задачи */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <ItemModalForm
               onSubmit={(data) =>
                 handleCreateTask({

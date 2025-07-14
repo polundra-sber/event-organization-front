@@ -107,22 +107,23 @@ export const PurchaseCard = ({
 
   return (
     <>
-      <Card>
+      <Card className="w-full max-w-full min-w-0">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-lg font-semibold line-clamp-2">
+          <div className="flex justify-between items-start gap-2 min-w-0">
+            <CardTitle className="text-lg font-semibold break-words overflow-hidden text-ellipsis min-w-0">
               {purchase.purchase_name}
             </CardTitle>
             {canEditDelete && isEventActive && (
               <button
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 flex-shrink-0"
                 onClick={() => setIsEditing(true)}
+                aria-label="Редактировать"
               >
                 <Pencil className="h-4 w-4" />
               </button>
             )}
           </div>
-          <p className="text-sm mt-1">
+          <p className="text-sm mt-1 break-words min-w-0">
             Ответственный:{" "}
             {purchase.responsible_login
               ? `${purchase.responsible_name || ""} ${
@@ -132,27 +133,29 @@ export const PurchaseCard = ({
           </p>
         </CardHeader>
 
-        <CardContent className="flex justify-between items-center relative flex-wrap gap-4">
-          <div className="relative">
+        <CardContent className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 min-w-0">
+          <div className="relative w-full min-w-0">
             {purchase.purchase_description && (
               <button
                 onClick={() => onToggleDescription(purchase.purchase_id)}
-                className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+                className="flex items-center text-sm text-gray-700 hover:text-gray-900 w-full min-w-0"
               >
-                <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
+                <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
                   {isOpen ? (
                     <ChevronUp className="w-3 h-3" />
                   ) : (
                     <ChevronDown className="w-3 h-3" />
                   )}
                 </span>
-                Описание
+                <span className="text-left break-words overflow-hidden text-ellipsis min-w-0">
+                  Описание
+                </span>
               </button>
             )}
 
             {isOpen && (
               <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 break-words whitespace-pre-line">
                   {purchase.purchase_description || "Описание не добавлено"}
                 </p>
               </div>
@@ -161,7 +164,7 @@ export const PurchaseCard = ({
 
           {/* Показываем кнопки только для активных мероприятий */}
           {isEventActive && (
-            <div className="flex gap-2 ml-auto">
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end min-w-0">
               {canEditDelete && (
                 <>
                   <Button
@@ -169,6 +172,7 @@ export const PurchaseCard = ({
                     size="sm"
                     onClick={() => setIsDeleteDialogOpen(true)}
                     disabled={isDeleting}
+                    className="min-w-0"
                   >
                     Удалить
                   </Button>
@@ -177,7 +181,7 @@ export const PurchaseCard = ({
                     isOpen={isDeleteDialogOpen}
                     onOpenChange={setIsDeleteDialogOpen}
                     title="Удалить покупку?"
-                    description={`Вы уверены, что хотите удалить покупку "${purchase.purchase_name}"?`}
+                    description={`Вы уверены, что хотите удалить "${purchase.purchase_name}"?`}
                     onConfirm={handleDeletePurchase}
                     confirmLabel={isDeleting ? "Удаление..." : "Удалить"}
                     cancelLabel="Отмена"
@@ -192,6 +196,7 @@ export const PurchaseCard = ({
                     size="sm"
                     onClick={() => setIsTakeDialogOpen(true)}
                     disabled={isTaking}
+                    className="min-w-0"
                   >
                     Взять покупку
                   </Button>
@@ -200,7 +205,7 @@ export const PurchaseCard = ({
                     isOpen={isTakeDialogOpen}
                     onOpenChange={setIsTakeDialogOpen}
                     title="Взять покупку?"
-                    description={`Вы уверены, что хотите взять покупку "${purchase.purchase_name}"?`}
+                    description={`Вы уверены, что хотите взять "${purchase.purchase_name}"?`}
                     onConfirm={handleTakePurchase}
                     confirmLabel={isTaking ? "Принятие..." : "Взять"}
                     cancelLabel="Отмена"
@@ -214,8 +219,8 @@ export const PurchaseCard = ({
 
       {/* Модалка редактирования покупки */}
       {isEditing && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <ItemModalForm
               defaultValues={{
                 name: purchase.purchase_name,

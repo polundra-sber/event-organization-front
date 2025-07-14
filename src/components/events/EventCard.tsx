@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 
 import { Button } from "@/components/ui/button";
 import {
@@ -171,28 +171,32 @@ export const EventCard = ({
   const dialogContent = getDialogContent();
 
   return (
-    <div className={cn("w-full", className)}>
-      <Card className="hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
+     <div className={cn("w-full max-w-full", className)}>
+      <Card className="hover:shadow-md transition-shadow duration-200 h-full flex flex-col min-w-0"> {/* Добавлен min-w-0 */}
         <Link href={`/events/${event_id}`} className="hover:no-underline">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold line-clamp-2">
+            {/* Название - исправленный перенос */}
+            <CardTitle className="text-lg font-semibold break-words overflow-hidden text-ellipsis">
               {event_name}
             </CardTitle>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground whitespace-nowrap">
               {formattedDate}
               {timeString}
             </div>
           </CardHeader>
 
-          <CardContent className="flex-1 space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">📍</span>
-              <span className="line-clamp-1">{location}</span>
+          <CardContent className="flex-1 space-y-2 overflow-hidden">
+            {/* Локация - исправленный перенос */}
+            <div className="flex items-start gap-2 text-sm min-w-0">
+              <span className="text-muted-foreground flex-shrink-0">📍</span>
+              <span className="break-words overflow-hidden min-w-0">
+                {location}
+              </span>
             </div>
 
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">👤</span>
-              <span>
+              <span className="whitespace-nowrap">
                 Роль: <span className="font-medium">{role_name}</span>
               </span>
             </div>
@@ -200,7 +204,7 @@ export const EventCard = ({
             {event_status_name && (
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">📊</span>
-                <span>
+                <span className="whitespace-nowrap">
                   Статус:{" "}
                   <span
                     className={cn(
@@ -218,7 +222,7 @@ export const EventCard = ({
 
         {!isCompleted && (
           <CardFooter className="justify-end pt-3 border-t">
-            <div className="flex">{getActionButtons()}</div>
+            <div className="flex flex-wrap gap-2">{getActionButtons()}</div>
           </CardFooter>
         )}
       </Card>

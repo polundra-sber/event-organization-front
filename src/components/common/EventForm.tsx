@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { ButtonToMain } from "@/components/common/ButtonToMain";
 import { useState, useEffect } from "react";
@@ -58,31 +57,48 @@ export function EventForm({
     event_name: "",
     event_date: "",
     event_time: "",
+    location: "",
   });
 
-  // Заполняем форму начальными данными при редактировании
   useEffect(() => {
     if (initialData) {
       setFormData({
-        event_name: initialData.event_name,
-        event_description: initialData.event_description,
-        event_date: initialData.event_date,
-        event_time: initialData.event_time,
-        location: initialData.location,
-        chat_link: initialData.chat_link,
+        event_name: initialData.event_name || "",
+        event_description: initialData.event_description || "",
+        event_date: initialData.event_date || "",
+        event_time: initialData.event_time || "",
+        location: initialData.location || "",
+        chat_link: initialData.chat_link || "",
       });
     }
   }, [initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    
+    if (name === "event_name" && value.length > 100) {
+      setErrors(prev => ({
+        ...prev,
+        event_name: "Максимум 100 символов"
+      }));
+      return;
+    }
+    
+    if (name === "location" && value.length > 100) {
+      setErrors(prev => ({
+        ...prev,
+        location: "Максимум 100 символов"
+      }));
+      return;
+    }
+
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
 
     if (errors[name as keyof typeof errors]) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         [name]: "",
       }));
@@ -92,7 +108,7 @@ export function EventForm({
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
     const formattedDate = format(date, "dd/MM/yyyy");
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       event_date: formattedDate,
     }));
@@ -100,19 +116,19 @@ export function EventForm({
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       event_time: value,
     }));
 
     const timeValidation = validateEventTime(value);
     if (!timeValidation.isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         event_time: timeValidation.error || "",
       }));
     } else {
-      setErrors((prev) => ({ ...prev, event_time: "" }));
+      setErrors(prev => ({ ...prev, event_time: "" }));
     }
   };
 
@@ -120,23 +136,37 @@ export function EventForm({
     let valid = true;
 
     if (!formData.event_name.trim()) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         event_name: "Введите название мероприятия",
+      }));
+      valid = false;
+    } else if (formData.event_name.length > 100) {
+      setErrors(prev => ({
+        ...prev,
+        event_name: "Максимум 100 символов",
+      }));
+      valid = false;
+    }
+
+    if (formData.location.length > 100) {
+      setErrors(prev => ({
+        ...prev,
+        location: "Максимум 100 символов",
       }));
       valid = false;
     }
 
     const dateValidation = validateEventDate(formData.event_date);
     if (!dateValidation.isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         event_date: dateValidation.error || "",
       }));
       valid = false;
     }
 
-    setErrors((prev) => ({ ...prev, event_time: "" }));
+    setErrors(prev => ({ ...prev, event_time: "" }));
 
     return valid;
   };
@@ -148,7 +178,6 @@ export function EventForm({
     if (!validateForm()) return;
 
     try {
-      // Функция для преобразования пустых строк в null
       const transformEmptyToNull = (value: string) =>
         value.trim() === "" ? null : value;
 
@@ -194,11 +223,12 @@ export function EventForm({
         <FormInput
           name="event_name"
           label="Название мероприятия"
-          placeholder="Введите название"
+          placeholder="Введите название (максимум 100 символов)"
           value={formData.event_name}
           onChange={handleChange}
           error={errors.event_name}
           required
+          maxLength={100}
         />
 
         <FormInput
@@ -209,7 +239,6 @@ export function EventForm({
           onChange={handleChange}
         />
 
-        {/* Дата мероприятия (обязательная) */}
         <div className="bg-my-light-green p-4 rounded-xl space-y-1">
           <label className="text-sm text-gray-500">
             <RequiredFieldLabel text="Дата мероприятия" />
@@ -263,7 +292,6 @@ export function EventForm({
           )}
         </div>
 
-        {/* Время мероприятия (необязательное) */}
         <div className="bg-my-light-green p-4 rounded-xl space-y-1">
           <label className="text-sm text-gray-500">Время начала</label>
           <div className="relative flex items-center">
@@ -314,9 +342,11 @@ export function EventForm({
         <FormInput
           name="location"
           label="Место проведения"
-          placeholder="Введите место"
+          placeholder="Введите место (максимум 100 символов)"
           value={formData.location}
           onChange={handleChange}
+          error={errors.location}
+          maxLength={100}
         />
 
         <FormInput

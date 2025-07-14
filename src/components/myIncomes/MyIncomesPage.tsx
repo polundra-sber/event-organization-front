@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   useGetMyIncomesListQuery,
@@ -58,48 +56,53 @@ export const MyIncomesPageContent = () => {
   if (isError) return <p>Ошибка загрузки</p>;
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain className="mb-10" />
+    <div className="p-4 min-h-screen bg-gray-50 w-full max-w-full overflow-hidden">
+      <ButtonToMain className="mb-5" />
 
-      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black">Мне должны</label>
+      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4 w-full max-w-full">
+        <label className="text-lg font-bold text-my-black break-all">
+          Мне должны
+        </label>
       </div>
 
-      <div className="flex justify-start mb-4">
+      <div className="flex justify-start mb-4 w-full max-w-full">
         <FilterButton onClick={() => setIsFilterOpen(true)} />
       </div>
 
       {filteredIncomes.length === 0 ? (
         <p className="text-gray-500 text-center py-8">Никто не должен</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full max-w-full">
           {filteredIncomes.map((income) => (
-            <Card key={income.debt_id} className="p-4">
-              <div className="mb-2 font-bold text-lg">{income.event_name}</div>
+            <Card key={income.debt_id} className="w-full max-w-full overflow-hidden p-4">
+              <div className="mb-2 font-bold text-lg break-all">
+                {income.event_name}
+              </div>
 
-              <CardContent className="flex items-center gap-4 flex-wrap">
-                <Avatar className="w-12 h-12 border border-my-dark-green">
-                  <AvatarFallback>
-                    {getInitials(income.payer_name, income.payer_surname)}
-                  </AvatarFallback>
-                </Avatar>
+              <CardContent className="p-0 flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full max-w-full">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <Avatar className="w-12 h-12 border border-my-dark-green flex-shrink-0">
+                    <AvatarFallback>
+                      {getInitials(income.payer_name, income.payer_surname)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap ml-auto">
-                  {income.debt_amount ? `${income.debt_amount} ₽` : "0 ₽"}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold mt-1 break-all">
+                      {income.payer_name || "Имя отсутствует"} {income.payer_surname || ""}
+                    </div>
+                    <div className="text-sm mt-1 font-medium break-all">
+                      Статус: {income.debt_status_name}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex-1 min-w-[200px]">
-                  <div className="font-semibold">
-                    {income.payer_name || "Имя отсутствует"}{" "}
-                    {income.payer_surname || ""}
-                  </div>
-                  <div className="text-sm mt-1 font-medium">
-                    Статус: {income.debt_status_name}
-                  </div>
+                <div className="bg-my-yellow-green font-bold text-lg px-4 py-2 rounded-xl whitespace-nowrap ml-auto sm:ml-0 flex-shrink-0">
+                  {income.debt_amount ? `${income.debt_amount} ₽` : "0 ₽"}
                 </div>
               </CardContent>
 
-              <div className="mt-4">
+              <div className="mt-4 w-full">
                 <Button
                   variant="dark_green"
                   size="sm"
@@ -116,7 +119,7 @@ export const MyIncomesPageContent = () => {
                       toast.error("Ошибка при изменении статуса");
                     }
                   }}
-                  className="w-full"
+                  className="w-full max-w-full"
                 >
                   Получен
                 </Button>

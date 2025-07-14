@@ -16,11 +16,8 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-
 import { FilterButton } from "@/components/common/FilterButton";
 import { FilterModal } from "@/components/common/FilterModal";
-
-// Импортируем твой диалог
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 import { Loader } from "../common/Loader";
 
@@ -28,14 +25,15 @@ export const MyStuffsPageContent = () => {
   const { data = [], isLoading, isError } = useGetMyStuffsListQuery();
   const [denyStuff] = useDenyStuffInMyStuffsListMutation();
 
-  const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(
-    null
-  );
-
+  const [openedDescriptionId, setOpenedDescriptionId] = useState<number | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [selectedStuff, setSelectedStuff] = useState<{
+    stuff_id: number;
+    stuff_name: string;
+  } | null>(null);
 
   const allEvents = Array.from(new Set(data.map((stuff) => stuff.event_name)));
-
   const filterOptions = allEvents.map((event) => ({
     id: event,
     label: event,
@@ -53,23 +51,15 @@ export const MyStuffsPageContent = () => {
     setOpenedDescriptionId((prev) => (prev === id ? null : id));
   };
 
-  // --- Добавляем состояния для модалки ---
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [selectedStuff, setSelectedStuff] = useState<{
-    stuff_id: number;
-    stuff_name: string;
-  } | null>(null);
-
-  const handleDeny = async (event_id: number, stuff_id: number) => {
+  const handleDeny = async (stuff_id: number) => {
     try {
-      await denyStuff({ event_id, stuff_id }).unwrap();
+      await denyStuff({ stuff_id }).unwrap();
       toast.success("Вы отказались от вещи");
     } catch {
       toast.error("Ошибка при отказе");
     }
   };
 
-  // Открыть диалог
   const openConfirmDialog = (stuff: {
     stuff_id: number;
     stuff_name: string;
@@ -78,10 +68,9 @@ export const MyStuffsPageContent = () => {
     setConfirmDialogOpen(true);
   };
 
-  // Подтвердить отказ
   const handleConfirmDeny = async () => {
     if (selectedStuff) {
-      await handleDeny(selectedStuff.event_id, selectedStuff.stuff_id);
+      await handleDeny(selectedStuff.stuff_id);
       setConfirmDialogOpen(false);
       setSelectedStuff(null);
     }
@@ -97,7 +86,6 @@ export const MyStuffsPageContent = () => {
       .map(([id]) => id);
 
     if (activeEvents.length === 0) return true;
-
     return activeEvents.includes(stuff.event_name);
   });
 
@@ -106,15 +94,20 @@ export const MyStuffsPageContent = () => {
     return <p className="text-center text-red-500">Ошибка загрузки</p>;
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain />
-      <div className="flex items-center justify-center  bg-my-yellow-green  px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black text-lg">
+    <div className="p-4 min-h-screen bg-gray-50 max-w-full overflow-x-hidden">
+      <ButtonToMain className="mb-5" />
+      
+      <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
+        <label className="text-lg font-bold text-my-black">
           Мои вещи
         </label>
       </div>
+
       <div className="mb-4">
-        <FilterButton onClick={() => setIsFilterOpen(true)} label="Фильтры" />
+        <FilterButton 
+          onClick={() => setIsFilterOpen(true)} 
+          label="Фильтры" 
+        />
       </div>
 
       <FilterModal
@@ -127,22 +120,24 @@ export const MyStuffsPageContent = () => {
         withSearch
       />
 
-      {filteredData.length === 0 && (
+      {filteredData.length === 0 ? (
         <p className="text-gray-500 text-center py-8">
-          Нет вещей под выбранный фильтр
+          {data.length === 0 ? "У вас нет вещей" : "Нет вещей под выбранный фильтр"}
         </p>
-      )}
+      ) : (
+        <div className="space-y-4">
+          {filteredData.map((stuff) => {
+            const isOpen = openedDescriptionId === stuff.stuff_id;
 
-      <div className="space-y-4">
-        {filteredData.map((stuff) => {
-          const isOpen = openedDescriptionId === stuff.stuff_id;
-
-          return (
-            <div key={stuff.stuff_id}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>{stuff.event_name}</CardTitle>
-                  <CardDescription>{stuff.stuff_name}</CardDescription>
+            return (
+              <Card key={stuff.stuff_id} className="w-full max-w-full min-w-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="break-words min-w-0">
+                    {stuff.event_name}
+                  </CardTitle>
+                  <CardDescription className="text-black break-words min-w-0">
+                    {stuff.stuff_name}
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent className="flex justify-between items-center relative">
@@ -190,12 +185,11 @@ export const MyStuffsPageContent = () => {
                   </Button>
                 </CardContent>
               </Card>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Диалог подтверждения */}
       <ConfirmationDialog
         isOpen={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}

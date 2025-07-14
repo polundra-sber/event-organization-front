@@ -1,3 +1,5 @@
+"use client";
+
 import {
   TaskListItem,
   TaskListItemResponsible,
@@ -8,7 +10,6 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
 } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
@@ -63,7 +64,6 @@ export const TaskCard = ({
   // Форматирование даты для отображения
   const formatDisplayDate = (dateString: string | null) => {
     if (!dateString) return "";
-
     try {
       const [year, month, day] = dateString.split("-");
       return `${day}.${month}.${year}`;
@@ -126,31 +126,32 @@ export const TaskCard = ({
 
   return (
     <>
-      <Card>
+      <Card className="w-full max-w-full min-w-0">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-lg font-semibold line-clamp-2">
+          <div className="flex justify-between items-start gap-2 min-w-0">
+            <CardTitle className="text-lg font-semibold break-words overflow-hidden text-ellipsis min-w-0">
               {task.task_name}
             </CardTitle>
             {canEditDelete && isEventActive && (
               <button
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 flex-shrink-0"
                 onClick={() => setIsEditing(true)}
+                aria-label="Редактировать"
               >
                 <Pencil className="h-4 w-4" />
               </button>
             )}
           </div>
-          <CardDescription className="text-black">
+          <p className="text-sm text-black break-words min-w-0">
             Срок: {displayDate} {displayTime}
-          </CardDescription>
-          <p className="text-sm mt-1">
+          </p>
+          <p className="text-sm mt-1 break-words min-w-0">
             Статус:{" "}
             <span className={isCompleted ? "text-green-600" : "text-blue-600"}>
               {task.task_status_name}
             </span>
           </p>
-          <p className="text-sm mt-1">
+          <p className="text-sm mt-1 break-words min-w-0">
             Ответственный:{" "}
             {task.responsible_login
               ? `${task.responsible_name || ""} ${
@@ -160,36 +161,37 @@ export const TaskCard = ({
           </p>
         </CardHeader>
 
-        <CardContent className="flex justify-between items-center relative flex-wrap gap-4">
-          <div className="relative">
+        <CardContent className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 min-w-0">
+          <div className="relative w-full min-w-0">
             {task.task_description && (
               <button
                 onClick={() => onToggleDescription(task.task_id)}
-                className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+                className="flex items-center text-sm text-gray-700 hover:text-gray-900 w-full min-w-0"
               >
-                <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
+                <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
                   {isOpen ? (
                     <ChevronUp className="w-3 h-3" />
                   ) : (
                     <ChevronDown className="w-3 h-3" />
                   )}
                 </span>
-                Описание
+                <span className="text-left break-words overflow-hidden text-ellipsis min-w-0">
+                  Описание
+                </span>
               </button>
             )}
 
             {isOpen && (
               <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 break-words whitespace-pre-line">
                   {task.task_description || "Описание не добавлено"}
                 </p>
               </div>
             )}
           </div>
 
-          {/* Показываем кнопки только для активных мероприятий */}
           {isEventActive && (
-            <div className="flex gap-2 ml-auto">
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end min-w-0">
               {canEditDelete && (
                 <>
                   <Button
@@ -197,6 +199,7 @@ export const TaskCard = ({
                     size="sm"
                     onClick={() => setIsDeleteDialogOpen(true)}
                     disabled={isDeleting}
+                    className="min-w-0"
                   >
                     Удалить
                   </Button>
@@ -205,7 +208,7 @@ export const TaskCard = ({
                     isOpen={isDeleteDialogOpen}
                     onOpenChange={setIsDeleteDialogOpen}
                     title="Удалить задачу?"
-                    description={`Вы уверены, что хотите удалить задачу "${task.task_name}"?`}
+                    description={`Вы уверены, что хотите удалить "${task.task_name}"?`}
                     onConfirm={handleDeleteTask}
                     confirmLabel={isDeleting ? "Удаление..." : "Удалить"}
                     cancelLabel="Отмена"
@@ -220,6 +223,7 @@ export const TaskCard = ({
                     size="sm"
                     onClick={() => setIsTakeDialogOpen(true)}
                     disabled={isTaking}
+                    className="min-w-0"
                   >
                     Взять задачу
                   </Button>
@@ -228,7 +232,7 @@ export const TaskCard = ({
                     isOpen={isTakeDialogOpen}
                     onOpenChange={setIsTakeDialogOpen}
                     title="Взять задачу?"
-                    description={`Вы уверены, что хотите взять задачу "${task.task_name}"?`}
+                    description={`Вы уверены, что хотите взять "${task.task_name}"?`}
                     onConfirm={handleTakeTask}
                     confirmLabel={isTaking ? "Принятие..." : "Взять"}
                     cancelLabel="Отмена"
@@ -240,10 +244,9 @@ export const TaskCard = ({
         </CardContent>
       </Card>
 
-      {/* Модалка редактирования задачи */}
       {isEditing && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <ItemModalForm
               defaultValues={{
                 name: task.task_name,

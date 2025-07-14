@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { EventStatus } from "@/lib/api/types/event-types";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface EventPreviewCardProps {
   event_id: number;
@@ -48,23 +49,25 @@ export const EventPreviewCard = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-lg">{event_name}</CardTitle>
+    <Card className="w-full max-w-full min-w-0">
+      <CardHeader className="min-w-0">
+        <CardTitle className="text-lg break-words overflow-hidden">
+          {event_name}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="text-sm">
+      <CardContent className="space-y-2 min-w-0">
+        <div className="text-sm whitespace-nowrap">
           <span className="text-muted-foreground">Дата: </span>
           <span>
             {formattedDate}
             {timeString}
           </span>
         </div>
-        <div className="text-sm">
+        <div className="text-sm min-w-0">
           <span className="text-muted-foreground">Место: </span>
-          <span>{location}</span>
+          <span className="break-words">{location}</span>
         </div>
-        <div className="text-sm">
+        <div className="text-sm whitespace-nowrap">
           <span className="text-muted-foreground">Статус: </span>
           <span
             className={cn(
@@ -88,7 +91,3 @@ export const EventPreviewCard = ({
     </Card>
   );
 };
-
-function cn(...args: string[]) {
-  return args.filter(Boolean).join(" ");
-}

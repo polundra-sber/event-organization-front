@@ -114,10 +114,11 @@ export const MyTasksPageContent = () => {
   if (isError) return <p>Ошибка загрузки</p>;
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50">
-      <ButtonToMain className="mb-10" />
+    <div className="p-4 min-h-screen bg-gray-50 max-w-full overflow-x-hidden">
+      <ButtonToMain className="mb-5"/>
+      
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4">
-        <label className="text-lg font-bold text-my-black text-lg">
+        <label className="text-lg font-bold text-my-black">
           Мои задачи
         </label>
       </div>
@@ -135,53 +136,57 @@ export const MyTasksPageContent = () => {
             const deadlineString = formatTaskDeadline(task);
 
             return (
-              <Card key={task.task_id}>
-                <CardHeader>
-                  <CardTitle>{task.event_name}</CardTitle>
-                  <CardDescription className="text-black">
+              <Card key={task.task_id} className="w-full max-w-full min-w-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="break-words min-w-0">
+                    {task.event_name}
+                  </CardTitle>
+                  <CardDescription className="text-black break-words min-w-0">
                     {task.task_name}
                   </CardDescription>
-                  <CardDescription className="text-black">
-                    Срок завершения задачи: {deadlineString}
+                  <CardDescription className="text-black break-words min-w-0">
+                    Срок: {deadlineString}
                   </CardDescription>
-                  <p className="text-sm mt-1">
-                    Статус: {task.task_status_name}
+                  <p className="text-sm mt-1 break-words min-w-0">
+                    Статус:{" "}
+                    <span className={task.task_status_name === "выполнена" ? "text-green-600" : "text-blue-600"}>
+                      {task.task_status_name}
+                    </span>
                   </p>
                 </CardHeader>
 
-                <CardContent className="flex justify-between items-center relative flex-wrap gap-4">
-                  <div className="relative">
+                <CardContent className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 min-w-0">
+                  <div className="relative w-full min-w-0">
                     {task.task_description && (
                       <button
                         onClick={() => toggleDescription(task.task_id)}
-                        className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+                        className="flex items-center text-sm text-gray-700 hover:text-gray-900 w-full min-w-0"
                       >
-                        <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2">
-                          {isOpen ? (
-                            <ChevronUp className="w-3 h-3" />
-                          ) : (
-                            <ChevronDown className="w-3 h-3" />
-                          )}
+                        <span className="w-5 h-5 border border-gray-400 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+                          {isOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                         </span>
-                        Описание
+                        <span className="text-left break-words overflow-hidden text-ellipsis min-w-0">
+                          Описание
+                        </span>
                       </button>
                     )}
 
                     {isOpen && (
                       <div className="absolute left-0 mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 break-words whitespace-pre-line">
                           {task.task_description || "Описание не добавлено"}
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex gap-2 ml-auto">
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end min-w-0">
                     {task.task_status_name !== "выполнена" && (
                       <Button
                         variant="light_green"
                         size="sm"
                         onClick={() => openConfirmDialog(task)}
+                        className="min-w-0"
                       >
                         Отказаться
                       </Button>
@@ -200,6 +205,7 @@ export const MyTasksPageContent = () => {
                             toast.error("Ошибка при изменении статуса");
                           }
                         }}
+                        className="min-w-0"
                       >
                         Выполнено
                       </Button>
