@@ -1,8 +1,7 @@
 import { setupWorker } from "msw/browser";
 import { handlers } from "./handlers";
 
-// инициализируем только в браузере
-if (typeof window !== "undefined") {
+if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
   const worker = setupWorker(...handlers);
   worker.start({
     onUnhandledRequest: "bypass", // Игнорируем незамоканные запросы
