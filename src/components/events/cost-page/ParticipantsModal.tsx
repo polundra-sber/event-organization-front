@@ -21,29 +21,40 @@ export const ParticipantsModal = ({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="max-w-[95vw] sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Участники покупки</DialogTitle>
+          <DialogTitle className="text-left">Участники покупки</DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
-          <Loader />
+          <div className="flex justify-center py-4">
+            <Loader />
+          </div>
         ) : participants?.length ? (
-          <ul className="space-y-2">
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
             {participants.map((participant) => (
-              <li key={participant.login} className="flex items-center justify-between p-2 border rounded">
-                <div>
-                  <p className="font-medium">
-                    {participant.name} {participant.surname}
+              <div 
+                key={participant.login} 
+                className="border rounded-lg p-3 w-full"
+              >
+                <div className="flex flex-col sm:flex-row justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium break-words whitespace-normal">
+                      {participant.name} {participant.surname}
+                    </p>
+                    <p className="text-sm text-gray-500 break-words whitespace-normal">
+                      {participant.email}
+                    </p>
+                  </div>
+                  <p className="text-sm text-gray-500 break-all sm:break-words sm:whitespace-normal">
+                    {participant.login}
                   </p>
-                  <p className="text-sm text-gray-500">{participant.email}</p>
                 </div>
-                <span className="text-sm text-gray-500">{participant.login}</span>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
-          <p className="text-gray-500 text-center">Участников нет</p>
+          <p className="text-gray-500 text-center py-4">Участников нет</p>
         )}
       </DialogContent>
     </Dialog>

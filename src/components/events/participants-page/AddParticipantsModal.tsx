@@ -52,14 +52,12 @@ export const AddParticipantsModal = ({
     { skip: debouncedSearch.length === 0 }
   );
 
-  // Объединяем загруженных пользователей с новыми результатами
   useEffect(() => {
     if (users) {
       setLoadedUsers((prev) => {
         if (page === 0) {
           return users;
         } else {
-          // Убираем дубликаты на случай, если они есть
           const newUsers = users.filter(
             (user) => !prev.some((u) => u.login === user.login)
           );
@@ -67,7 +65,7 @@ export const AddParticipantsModal = ({
         }
       });
     }
-  }, [users, page]); // Убрана зависимость от loadedUsers
+  }, [users, page]);
 
   const handleSelectUser = useCallback((user: UserDemo) => {
     setSelectedUsers((prev) =>
@@ -114,7 +112,6 @@ export const AddParticipantsModal = ({
 
   const canLoadMore = users?.length === PAGE_SIZE;
 
-  // Фильтруем уже выбранных пользователей из списка
   const filteredLoadedUsers = useMemo(() => {
     return loadedUsers.filter(
       (user) => !selectedUsers.some((u) => u.login === user.login)
@@ -143,7 +140,6 @@ export const AddParticipantsModal = ({
             onChange={(e) => setSearchText(e.target.value)}
           />
 
-          {/* Компактное отображение выбранных участников */}
           {selectedUsers.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -166,7 +162,9 @@ export const AddParticipantsModal = ({
                       variant="outline"
                       className="px-2 py-0.5 text-xs flex items-center gap-1"
                     >
-                      {user.name} {user.surname}
+                      <span className="inline-block max-w-[120px] truncate">
+                        {user.name} {user.surname}
+                      </span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -183,7 +181,6 @@ export const AddParticipantsModal = ({
             </div>
           )}
 
-          {/* Список пользователей */}
           <ScrollArea className="h-64 rounded-md border">
             {debouncedSearch.length === 0 ? (
               <div className="flex justify-center p-4">
@@ -212,27 +209,26 @@ export const AddParticipantsModal = ({
                       }`}
                       onClick={() => !isExisting && handleSelectUser(user)}
                     >
-                      <div>
-                        <p className="font-medium">
+                      <div className="min-w-0">
+                        <p className="font-medium break-all">
                           {user.name} {user.surname}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground break-all">
                           {user.login} • {user.email}
                         </p>
                       </div>
 
                       {isExisting ? (
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground whitespace-nowrap">
                           Уже участник
                         </span>
                       ) : selectedUsers.some((u) => u.login === user.login) ? (
-                        <Check className="h-5 w-5 text-green-500" />
+                        <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
                       ) : null}
                     </div>
                   );
                 })}
 
-                {/* Кнопка "Загрузить еще" */}
                 {canLoadMore && (
                   <div className="p-3 flex justify-center">
                     <Button

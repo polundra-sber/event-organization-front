@@ -46,15 +46,17 @@ export const ParticipantCard = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex-1">
-        <p className="font-medium text-my-black">
+    <div className="flex justify-between p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+      {/* Левая колонка — имя и email, в столбик */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <p className="font-medium text-my-black break-words">
           {participant.surname} {participant.name}
         </p>
-        <p className="text-sm text-gray-600">{participant.email}</p>
+        <p className="text-sm text-gray-600 break-words">{participant.email}</p>
       </div>
 
-      <div className="flex items-center gap-3 ml-4">
+      {/* Правая колонка — роли/звезды/кнопки */}
+      <div className="flex items-center gap-3 ml-4 shrink-0">
         {isParticipantCreator ? (
           <span className="text-sm text-gray-500 px-2 py-1 bg-gray-100 rounded">
             Создатель

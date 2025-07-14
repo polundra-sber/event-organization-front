@@ -48,73 +48,6 @@ type FilterModalProps<T extends Record<string, boolean>> =
   | FilterModalPropsSingle<T>
   | FilterModalPropsMulti<T>;
 
-
-/**
- * FilterModal — универсальный модальный компонент для выбора фильтров.
- *
- * Поддерживает два режима:
- * - "single": один список опций.
- * - "multi": список категорий с опциями внутри.
- *
- * @template T Тип фильтров: Record<string, boolean>
- *
- * @param {object} props
- * @param {boolean} props.isOpen - Открыта ли модалка.
- * @param {(open: boolean) => void} props.onOpenChange - Изменяет состояние открытия.
- * @param {T} props.initialFilters - Начальные выбранные фильтры: ключ — id опции, значение — выбрана ли.
- * @param {(filters: T) => void} props.onApply - Вызывается при применении фильтров.
- * @param {string} [props.title] - Заголовок модалки. По умолчанию: "Фильтры".
- * @param {"single"} [props.mode] - Режим single: отображает один список фильтров.
- * @param {FilterOption[]} [props.options] - Список фильтров (для single).
- * @param {boolean} [props.withSearch] - Включить поиск (для single или категории).
- * @param {"multi"} [props.mode] - Режим multi: список категорий.
- * @param {CategoryOption[]} [props.categories] - Список категорий с опциями (для multi).
- *
- * @example
- * // Single mode
- * <FilterModal
- *   isOpen={isOpen}
- *   onOpenChange={setIsOpen}
- *   initialFilters={{ draft: true, published: false }}
- *   onApply={(filters) => console.log(filters)}
- *   options={[
- *     { id: "draft", label: "Черновик" },
- *     { id: "published", label: "Опубликовано" },
- *   ]}
- *   withSearch={true}
- * />
- *
- * @example
- * // Multi mode
- * <FilterModal
- *   isOpen={isOpen}
- *   onOpenChange={setIsOpen}
- *   initialFilters={{ draft: true, event1: true }}
- *   onApply={(filters) => console.log(filters)}
- *   mode="multi"
- *   categories={[
- *     {
- *       id: "status",
- *       label: "Статус",
- *       options: [
- *         { id: "draft", label: "Черновик" },
- *         { id: "published", label: "Опубликовано" },
- *       ],
- *     },
- *     {
- *       id: "event",
- *       label: "Мероприятие",
- *       withSearch: true,
- *       options: [
- *         { id: "event1", label: "Конференция A" },
- *         { id: "event2", label: "Семинар B" },
- *       ],
- *     },
- *   ]}
- * />
- */
-
-
 export function FilterModal<T extends Record<string, boolean>>({
   isOpen,
   onOpenChange,
@@ -129,8 +62,8 @@ export function FilterModal<T extends Record<string, boolean>>({
 
   useEffect(() => {
     setTempFilters(initialFilters);
-    setActiveCategory(null); // Сбрасываем активную категорию при открытии
-    setSearch(""); // Сбрасываем поиск при открытии
+    setActiveCategory(null);
+    setSearch("");
   }, [isOpen, initialFilters]);
 
   const handleFilterChange = (id: keyof T, checked: boolean) => {
@@ -176,9 +109,15 @@ export function FilterModal<T extends Record<string, boolean>>({
     return [];
   };
 
+  // Функция для сокращения длинных названий в выбранных фильтрах
+  const truncateLabel = (label: string, maxLength: number = 20) => {
+    if (label.length <= maxLength) return label;
+    return `${label.substring(0, maxLength)}...`;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -194,81 +133,82 @@ export function FilterModal<T extends Record<string, boolean>>({
         )}
 
         {/* multi mode */}
-{props.mode === "multi" && (
-  <>
-    {activeCategory === null ? (
-      <div className="space-y-4">
-        {props.categories.map((category) => {
-          const selectedInCategory = category.options.filter(
-            (option) => tempFilters[option.id as keyof T]
-          );
+        {props.mode === "multi" && (
+          <>
+            {activeCategory === null ? (
+              <div className="space-y-4">
+                {props.categories.map((category) => {
+                  const selectedInCategory = category.options.filter(
+                    (option) => tempFilters[option.id as keyof T]
+                  );
 
-          return (
-            <div key={category.id}>
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                onClick={() => setActiveCategory(category.id)}
-              >
-                {category.label}
-              </Button>
+                  return (
+                    <div key={category.id} className="space-y-1">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-between"
+                        onClick={() => setActiveCategory(category.id)}
+                      >
+                        <span className="truncate">{category.label}</span>
+                      </Button>
 
-              {selectedInCategory.length > 0 && (
-                <div className="mt-1 text-sm text-gray-700">
-                  {selectedInCategory.slice(0, 3).map((option, index) => (
-                    <span key={option.id}>
-                      {option.label}
-                      {index < selectedInCategory.slice(0, 3).length - 1 ? ", " : ""}
-                    </span>
-                  ))}
-                  {selectedInCategory.length > 3 && "…"}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      // это твоя часть с чекбоксами внутри активной категории, оставляешь без изменений
-      <div className="space-y-4 max-h-40 overflow-y-auto">
-        {filteredOptions().length > 0 ? (
-          filteredOptions().map((option) => (
-            <div key={option.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={option.id}
-                checked={tempFilters[option.id as keyof T] ?? false}
-                onCheckedChange={(checked) =>
-                  handleFilterChange(option.id as keyof T, !!checked)
-                }
-                className="border-my-dark-green data-[state=checked]:bg-my-dark-green data-[state=checked]:border-my-dark-green"
-              />
-              <Label htmlFor={option.id}>{option.label}</Label>
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">Ничего не найдено</p>
+                      {selectedInCategory.length > 0 && (
+                        <div className="text-sm text-gray-700 line-clamp-1">
+                          {selectedInCategory.map((option, index) => (
+                            <span key={option.id}>
+                              {truncateLabel(option.label, 15)}
+                              {index < selectedInCategory.length - 1 ? ", " : ""}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-60 overflow-y-auto">
+                {filteredOptions().length > 0 ? (
+                  filteredOptions().map((option) => (
+                    <div key={option.id} className="flex items-start space-x-2">
+                      <Checkbox
+                        id={option.id}
+                        checked={tempFilters[option.id as keyof T] ?? false}
+                        onCheckedChange={(checked) =>
+                          handleFilterChange(option.id as keyof T, !!checked)
+                        }
+                        className="mt-1 border-my-dark-green data-[state=checked]:bg-my-dark-green data-[state=checked]:border-my-dark-green"
+                      />
+                      <Label htmlFor={option.id} className="whitespace-normal break-words">
+                        {option.label}
+                      </Label>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">Ничего не найдено</p>
+                )}
+              </div>
+            )}
+          </>
         )}
-      </div>
-    )}
-  </>
-)}
-
 
         {/* single mode */}
         {(!props.mode || props.mode === "single") && (
-          <div className="space-y-4 max-h-40 overflow-y-auto">
+          <div className="space-y-4 max-h-60 overflow-y-auto">
             {filteredOptions().length > 0 ? (
               filteredOptions().map((option) => (
-                <div key={option.id} className="flex items-center space-x-2">
+                <div key={option.id} className="flex items-start space-x-2">
                   <Checkbox
                     id={option.id}
                     checked={tempFilters[option.id as keyof T] ?? false}
                     onCheckedChange={(checked) =>
                       handleFilterChange(option.id as keyof T, !!checked)
                     }
-                    className="border-my-dark-green data-[state=checked]:bg-my-dark-green data-[state=checked]:border-my-dark-green"
+                    className="mt-1 border-my-dark-green data-[state=checked]:bg-my-dark-green data-[state=checked]:border-my-dark-green"
                   />
-                  <Label htmlFor={option.id}>{option.label}</Label>
+                  <Label htmlFor={option.id} className="whitespace-normal break-words">
+                    {option.label}
+                  </Label>
                 </div>
               ))
             ) : (
@@ -287,7 +227,7 @@ export function FilterModal<T extends Record<string, boolean>>({
             </>
           ) : (
             <Button variant="dark_green" onClick={() => setActiveCategory(null)} className="w-full">
-              Выбрать
+              Назад
             </Button>
           )}
         </DialogFooter>

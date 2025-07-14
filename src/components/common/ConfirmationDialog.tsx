@@ -80,15 +80,16 @@ export const ConfirmationDialog = ({
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>
-        {/* Можно передать любую кнопку через asChild */}
         <button className="hidden">Триггер</button>
       </AlertDialogTrigger>
 
-      <AlertDialogContent>
+      <AlertDialogContent className="max-w-[95vw] sm:max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogTitle className="whitespace-normal break-all text-left">
+            {title}
+          </AlertDialogTitle>
           {description ? (
-            <AlertDialogDescription className="text-sm text-muted-foreground">
+            <AlertDialogDescription className="text-sm text-muted-foreground whitespace-normal break-all text-left">
               {description}
             </AlertDialogDescription>
           ) : (

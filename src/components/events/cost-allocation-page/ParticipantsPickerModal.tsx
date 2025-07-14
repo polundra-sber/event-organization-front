@@ -86,7 +86,7 @@ export function ParticipantsPickerModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4 max-h-[80vh] flex flex-col">
+      <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4 max-h-[80vh] flex flex-col border border-gray-200 shadow-lg">
         <h2 className="text-lg font-bold mb-4">Выберите участников</h2>
         
         <Command shouldFilter={false} className="flex-1 overflow-hidden">
@@ -121,7 +121,7 @@ export function ParticipantsPickerModal({
           
           <CommandEmpty>Участник не найден</CommandEmpty>
           
-          <CommandGroup className="overflow-y-auto max-h-[300px]">
+          <CommandGroup className="overflow-y-auto max-h-[300px] border rounded-md p-1">
             {isLoading ? (
               <div className="py-2 text-center text-sm text-gray-500">
                 Загрузка участников...
@@ -132,16 +132,23 @@ export function ParticipantsPickerModal({
                   key={participant.login}
                   value={participant.login}
                   onSelect={() => toggleSelect(participant.login)}
+                    className={cn(
+    "whitespace-normal break-words px-3 py-3 hover:bg-gray-50",
+    "border border-gray-200 rounded-md mb-2 shadow-sm transition-colors"
+  )}
+
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 flex-shrink-0",
                       selected.includes(participant.login)
                         ? "opacity-100"
                         : "opacity-0"
                     )}
                   />
-                  {getDisplayName(participant)}
+                  <span className="min-w-0">
+                    {getDisplayName(participant)}
+                  </span>
                 </CommandItem>
               ))
             )}

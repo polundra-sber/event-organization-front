@@ -1,4 +1,3 @@
-// src/app/profile/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,6 +18,12 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ConfirmationDialog } from "../common/ConfirmationDialog";
 import { LogOut } from "lucide-react";
+import {
+  validateEmail,
+  validateName,
+  validateSurname,
+  validateMoneyTransfer,
+} from "@/lib/validation/auth-validation";
 
 export const ProfilePageContent = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +42,7 @@ export const ProfilePageContent = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     toast.success("Вы успешно вышли из профиля");
-    router.push("/"); // Перенаправляем на главную
+    router.push("/");
   };
 
   useEffect(() => {
@@ -46,26 +51,32 @@ export const ProfilePageContent = () => {
     }
   }, [profile]);
 
-  const validateEmail = (email: string) => {
-    if (!email) {
-      setEmailError("Email не может быть пустым");
-      return false;
-    }
-    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    if (!emailRegex.test(email)) {
-      setEmailError("Введите корректный email адрес");
-      return false;
-    }
-    setEmailError(null);
-    return true;
-  };
+  const validateForm = () => {
+    if (!editedProfile) return false;
 
-  const validateNames = () => {
-    if (!editedProfile?.name.trim() || !editedProfile?.surname.trim()) {
-      setNameError("Имя и фамилия не могут быть пустыми");
+    // Validate name
+    const nameValidation = validateName(editedProfile.name);
+    if (!nameValidation.valid) {
+      setNameError(nameValidation.message || null);
       return false;
     }
+
+    // Validate surname
+    const surnameValidation = validateSurname(editedProfile.surname);
+    if (!surnameValidation.valid) {
+      setNameError(surnameValidation.message || null);
+      return false;
+    }
+
+    // Validate email
+    const emailValidation = validateEmail(editedProfile.email);
+    if (!emailValidation.valid) {
+      setEmailError(emailValidation.message || null);
+      return false;
+    }
+
     setNameError(null);
+    setEmailError(null);
     return true;
   };
 
@@ -73,12 +84,13 @@ export const ProfilePageContent = () => {
     const value = e.target.value;
     if (!editedProfile) return;
     setEditedProfile({ ...editedProfile, email: value });
-    if (value) validateEmail(value);
+    const { valid, message } = validateEmail(value);
+    setEmailError(valid ? null : message || null);
   };
 
   const toggleEdit = async () => {
     if (isEditing) {
-      if (!validateNames() || !validateEmail(editedProfile?.email || "")) {
+      if (!validateForm()) {
         return;
       }
 
@@ -146,7 +158,7 @@ export const ProfilePageContent = () => {
                 }
                 placeholder="Имя"
                 className="w-full bg-white"
-                maxLength={32}
+                maxLength={50}
               />
               <Input
                 value={editedProfile.surname}
@@ -158,14 +170,16 @@ export const ProfilePageContent = () => {
                 }
                 placeholder="Фамилия"
                 className="w-full bg-white"
-                maxLength={32}
+                maxLength={50}
               />
               {nameError && <p className="text-red-600 text-xs">{nameError}</p>}
             </div>
           ) : (
             <div className="space-y-1 min-w-0">
-              <p className="text-lg truncate overflow-hidden">{profile.name}</p>
-              <p className="text-lg truncate overflow-hidden">
+              <p className="text-lg break-words whitespace-normal">
+                {profile.name}
+              </p>
+              <p className="text-lg break-words whitespace-normal">
                 {profile.surname}
               </p>
             </div>
@@ -175,7 +189,9 @@ export const ProfilePageContent = () => {
 
       <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
         <label className="text-sm text-gray-500">Логин</label>
-        <p className="text-gray-900 truncate">{profile.login}</p>
+        <p className="text-gray-900 break-words whitespace-normal">
+          {profile.login}
+        </p>
       </div>
 
       <div className="bg-my-light-green p-4 rounded-xl space-y-1 mb-4">
@@ -187,13 +203,16 @@ export const ProfilePageContent = () => {
               onChange={handleEmailChange}
               placeholder="example@example.com"
               className="bg-white"
+              maxLength={254}
             />
             {emailError && (
               <p className="text-red-600 text-xs mt-1">{emailError}</p>
             )}
           </>
         ) : (
-          <p className="text-gray-900 truncate">{profile.email}</p>
+          <p className="text-gray-900 break-words whitespace-normal">
+            {profile.email}
+          </p>
         )}
       </div>
 
@@ -215,7 +234,7 @@ export const ProfilePageContent = () => {
             className="bg-white"
           />
         ) : (
-          <p className="text-gray-900 line-clamp-4 break-words">
+          <p className="text-gray-900 break-words whitespace-normal">
             {profile.comment_money_transfer || "-"}
           </p>
         )}
