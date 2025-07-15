@@ -263,7 +263,7 @@ export const RegisterForm = () => {
               value={formData.comment_money_transfer}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Например: Сбербанк 1234 5678 9012 3456"
+              placeholder="Сбербанк +79991234567"
               className="h-11"
             />
             {fieldErrors.comment_money_transfer && (
