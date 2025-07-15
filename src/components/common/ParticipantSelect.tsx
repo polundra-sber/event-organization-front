@@ -73,24 +73,37 @@ export function ParticipantSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
+          className={cn(
+            "w-full justify-between truncate text-left",
+            className
+          )}
         >
-          {selectedParticipant
-            ? getDisplayName(selectedParticipant)
-            : placeholder}
+          <span className="truncate block w-[calc(100%-20px)]">
+            {selectedParticipant
+              ? getDisplayName(selectedParticipant)
+              : placeholder}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command shouldFilter={false}>
+      <PopoverContent 
+        className="w-[var(--radix-popover-trigger-width)] p-0"
+        align="start"
+        side="bottom" // Изменено с default на "bottom"
+        sideOffset={4} // Небольшой отступ от триггера
+        avoidCollisions={false} // Отключаем автоматическое изменение позиции
+      >
+        <Command shouldFilter={false} className="max-h-[250px] overflow-hidden">
           <CommandInput
             placeholder="Поиск по логину, email, имени или фамилии..."
             className="h-9"
             value={searchValue}
             onValueChange={setSearchValue}
           />
-          <CommandEmpty>Участник не найден</CommandEmpty>
-          <CommandGroup className="max-h-64 overflow-y-auto">
+          <CommandEmpty className="py-2 px-4 text-sm text-muted-foreground">
+            Участник не найден
+          </CommandEmpty>
+          <CommandGroup className="overflow-y-auto max-h-[250px]">
             <CommandItem
               key="none"
               value=""
@@ -99,14 +112,15 @@ export function ParticipantSelect({
                 setOpen(false);
                 setSearchValue("");
               }}
+              className="whitespace-normal break-words min-w-0"
             >
               <Check
                 className={cn(
-                  "mr-2 h-4 w-4",
+                  "mr-2 h-4 w-4 flex-shrink-0",
                   value === null ? "opacity-100" : "opacity-0"
                 )}
               />
-              Не назначен
+              <span className="flex-1 min-w-0">Не назначен</span>
             </CommandItem>
             {filteredParticipants.map((participant) => (
               <CommandItem
@@ -119,14 +133,17 @@ export function ParticipantSelect({
                   setOpen(false);
                   setSearchValue("");
                 }}
+                className="whitespace-normal break-words min-w-0"
               >
                 <Check
                   className={cn(
-                    "mr-2 h-4 w-4",
+                    "mr-2 h-4 w-4 flex-shrink-0",
                     value === participant.login ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {getDisplayName(participant)}
+                <span className="flex-1 min-w-0">
+                  {getDisplayName(participant)}
+                </span>
               </CommandItem>
             ))}
           </CommandGroup>
