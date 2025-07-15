@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useGetMyPurchasesListQuery,
   useEditPurchaseCostMutation,
@@ -54,6 +54,14 @@ export const MyPurchasesPageContent = () => {
     event_id: number;
     purchase_name: string;
   } | null>(null);
+  const [tempCosts, setTempCosts] = useState<Record<number, string>>({});
+
+  // Сбрасываем временные стоимости при закрытии окна без сохранения
+  useEffect(() => {
+    if (!openedCostId) {
+      setTempCosts({});
+    }
+  }, [openedCostId]);
 
   const toggleDescription = (id: number) => {
     setOpenedDescriptionId((prev) => (prev === id ? null : id));
@@ -231,8 +239,8 @@ export const MyPurchasesPageContent = () => {
             const isOpen = openedDescriptionId === purchase.purchase_id;
             const isCostOpen = openedCostId === purchase.purchase_id;
             const isSelected = selectedPurchases.includes(purchase.purchase_id);
-            const currentCostStr =
-              costs[purchase.purchase_id] ?? purchase.cost.toString();
+            const currentCostStr = costs[purchase.purchase_id] ?? purchase.cost.toString();
+            const tempCostStr = tempCosts[purchase.purchase_id] ?? currentCostStr;
 
             return (
               <div
@@ -329,9 +337,7 @@ export const MyPurchasesPageContent = () => {
                       >
                         <Plus size={16} />
                         <span>
-                          {isCostOpen
-                            ? "Скрыть стоимость"
-                            : "Добавить стоимость"}
+                          {Number(currentCostStr) > 0 ? "Изменить стоимость" : "Добавить стоимость"}
                         </span>
                       </button>
                       {isCostOpen && (
@@ -339,10 +345,9 @@ export const MyPurchasesPageContent = () => {
                           <div className="flex items-center gap-2">
                             <input
                               type="text" // Изменено с number на text для лучшего контроля
-                              value={currentCostStr}
+                              value={tempCostStr}
                               onChange={(e) => {
                                 const val = e.target.value;
-
                                 // Удаляем все символы, кроме цифр и точки
                                 let cleaned = val.replace(/[^\d.]/g, "");
 
@@ -385,7 +390,7 @@ export const MyPurchasesPageContent = () => {
                                   result === "" ||
                                   /^\d*\.?\d*$/.test(result)
                                 ) {
-                                  setCosts((prev) => ({
+                                  setTempCosts((prev) => ({
                                     ...prev,
                                     [purchase.purchase_id]: result,
                                   }));
@@ -393,18 +398,17 @@ export const MyPurchasesPageContent = () => {
                               }}
                               className="border px-2 py-1 w-full"
                               autoFocus
-                              inputMode="decimal" // Показываем цифровую клавиатуру на мобильных устройствах
+                              inputMode="decimal"
                             />
                             <Button
                               size="sm"
-                              onClick={() =>
+                              onClick={() => {
                                 handleEditCost(
                                   purchase.event_id,
                                   purchase.purchase_id,
-                                  costs[purchase.purchase_id] ??
-                                    purchase.cost.toString()
-                                )
-                              }
+                                  tempCosts[purchase.purchase_id] ?? currentCostStr
+                                );
+                              }}
                             >
                               Сохранить
                             </Button>
