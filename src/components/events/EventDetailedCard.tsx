@@ -52,6 +52,16 @@ export const EventDetailedCard = ({
         </CardHeader>
 
         <CardContent className="space-y-2 overflow-hidden">
+          {/* Добавленный блок с ID мероприятия */}
+          <div className="flex items-center gap-2 text-sm md:text-base">
+            <span className="text-muted-foreground">🔢</span>
+            <span className="whitespace-nowrap">
+              ID мероприятия:{" "}
+              <span className="break-words font-medium">
+                {event.event_id.toString()}
+              </span>
+            </span>
+          </div>
           {event.location && (
             <div className="flex items-start gap-2 text-sm md:text-base min-w-0">
               <span className="text-muted-foreground flex-shrink-0">📍</span>
