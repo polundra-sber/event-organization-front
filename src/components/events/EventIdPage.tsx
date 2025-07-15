@@ -64,7 +64,7 @@ export function EventPage({ eventId }: EventPageProps) {
         <ButtonToMain />
         {isCreator && isActive && (
           <Button
-            variant="outline"
+            variant="light_green"
             size="icon"
             className="h-12 w-12 rounded-full -mt-7"
           >
