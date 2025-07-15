@@ -15,6 +15,7 @@ import { EventRole } from "@/lib/api/types/event-types";
 import { ParticipantsPickerModal } from "./ParticipantsPickerModal";
 import { CostAllocationCard } from "./CostAllocationCard";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
+import { Loader } from "@/components/common/Loader";
 
 interface EventCostAllocationPageContentProps {
   event_id: number;
@@ -23,8 +24,11 @@ interface EventCostAllocationPageContentProps {
 export const EventCostAllocationPageContent = ({
   event_id,
 }: EventCostAllocationPageContentProps) => {
-  const { data: allocations = [], isLoading, isError } =
-    useGetCostAllocationListQuery(event_id);
+  const {
+    data: allocations = [],
+    isLoading,
+    isError,
+  } = useGetCostAllocationListQuery(event_id);
   const { data: metadata } = useGetUserMetadataQuery(event_id);
 
   const [addParticipants] = useAddParticipantsForPurchaseMutation();
@@ -47,7 +51,7 @@ export const EventCostAllocationPageContent = ({
   const handleAddParticipants = async (logins: string[]) => {
     try {
       await Promise.all(
-        selectedIds.map(id => 
+        selectedIds.map((id) =>
           addParticipants({
             event_id,
             purchase_id: id,
@@ -79,12 +83,13 @@ export const EventCostAllocationPageContent = ({
   const allHaveParticipants = useMemo(() => {
     return (
       allocations.length > 0 &&
-      allocations.every(item => item.countParticipants > 0)
+      allocations.every((item) => item.countParticipants > 0)
     );
   }, [allocations]);
 
-  if (isLoading) return <p className="text-center p-4">Загрузка...</p>;
-  if (isError) return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
+  if (isLoading) return <Loader />;
+  if (isError)
+    return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
 
   return (
     <div className="relative min-h-screen flex flex-col bg-gray-50">
@@ -116,9 +121,11 @@ export const EventCostAllocationPageContent = ({
               <Button
                 variant="outline"
                 className="flex-1 min-w-0"
-                onClick={() => setSelectedIds(allocations.map(a => a.purchase_id))}
+                onClick={() =>
+                  setSelectedIds(allocations.map((a) => a.purchase_id))
+                }
               >
-                Выбрать всех
+                Выбрать все
               </Button>
               <Button
                 variant="outline"

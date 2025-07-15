@@ -15,6 +15,7 @@ import { EventRole, EventStatus } from "@/lib/api/types/event-types";
 import { ItemModalForm } from "@/components/common/ItemModalForm";
 import { toast } from "sonner";
 import { PurchaseListItemCreator } from "@/lib/api/types/purchases-types";
+import { Loader } from "@/components/common/Loader";
 
 interface EventPurchasesPageContentProps {
   event_id: number;
@@ -66,8 +67,9 @@ export const EventPurchasesPageContent = ({
     }
   };
 
-  if (isLoading) return <p className="text-center p-4">Загрузка...</p>;
-  if (isError) return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
+  if (isLoading) return <Loader />;
+  if (isError)
+    return <p className="text-red-500 text-center p-4">Ошибка загрузки</p>;
 
   return (
     <div className="p-4 min-h-screen bg-gray-50 max-w-full overflow-x-hidden">
@@ -84,11 +86,13 @@ export const EventPurchasesPageContent = ({
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <Button variant="bright_green" asChild>
-          <Link href={`/events/${event_id}/cost-allocation-list`}>
-            Расходы
-          </Link>
-        </Button>
+        {userRole === "создатель" && (
+          <Button variant="bright_green" asChild>
+            <Link href={`/events/${event_id}/cost-allocation-list`}>
+              Расходы
+            </Link>
+          </Button>
+        )}
         {canEditDelete && (
           <Button
             variant="bright_green"

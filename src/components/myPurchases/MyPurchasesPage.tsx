@@ -46,8 +46,9 @@ export const MyPurchasesPageContent = () => {
   const [selectedPurchases, setSelectedPurchases] = useState<number[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [openedReceiptsPurchaseId, setOpenedReceiptsPurchaseId] =
-    useState<number | null>(null);
+  const [openedReceiptsPurchaseId, setOpenedReceiptsPurchaseId] = useState<
+    number | null
+  >(null);
   const [selectedPurchase, setSelectedPurchase] = useState<{
     purchase_id: number;
     event_id: number;
@@ -158,8 +159,8 @@ export const MyPurchasesPageContent = () => {
       // Если все проверки пройдены, загружаем файлы
       for (const purchase_id of selectedPurchases) {
         const event_id =
-          data?.purchases.find((p) => p.purchase_id === purchase_id)?.event_id ||
-          0;
+          data?.purchases.find((p) => p.purchase_id === purchase_id)
+            ?.event_id || 0;
         await addReceipt({
           event_id,
           purchase_id,
@@ -210,7 +211,9 @@ export const MyPurchasesPageContent = () => {
     <div className="p-4 min-h-screen bg-gray-50 w-full max-w-full overflow-hidden">
       <ButtonToMain className="mb-5" />
       <div className="flex items-center justify-center bg-my-yellow-green px-6 py-3 rounded-xl mb-4 w-full max-w-full">
-        <h1 className="text-lg font-bold text-my-black break-all">Мои покупки</h1>
+        <h1 className="text-lg font-bold text-my-black break-all">
+          Мои покупки
+        </h1>
       </div>
       <div className="flex justify-between items-center mb-4 w-full max-w-full">
         <FilterButton onClick={() => setIsFilterOpen(true)} />
@@ -243,128 +246,196 @@ export const MyPurchasesPageContent = () => {
                   className="mt-4 flex-shrink-0"
                 />
 
-<Card className="flex-1 min-w-0 relative">
-  {/* Заголовок карточки: только event_name и чеки */}
-  <CardHeader className="flex flex-row justify-between items-start min-w-0 pb-2">
-    <CardTitle className="break-all">{purchase.event_name}</CardTitle>
-    {purchase.has_receipt && (
-      <Button
-        variant="ghost"
-        className="text-green-600 hover:text-green-800 p-0 h-auto flex-shrink-0"
-        onClick={() => setOpenedReceiptsPurchaseId(purchase.purchase_id)}
-      >
-        <Receipt className="h-4 w-4 mr-1" />
-        Чеки
-      </Button>
-    )}
-  </CardHeader>
+                <Card className="flex-1 min-w-0 relative">
+                  {/* Заголовок карточки: только event_name и чеки */}
+                  <CardHeader className="flex flex-row justify-between items-start min-w-0 pb-2">
+                    <CardTitle className="break-all">
+                      {purchase.event_name}
+                    </CardTitle>
+                    {purchase.has_receipt && (
+                      <Button
+                        variant="ghost"
+                        className="text-green-600 hover:text-green-800 p-0 h-auto flex-shrink-0"
+                        onClick={() =>
+                          setOpenedReceiptsPurchaseId(purchase.purchase_id)
+                        }
+                      >
+                        <Receipt className="h-4 w-4 mr-1" />
+                        Чеки
+                      </Button>
+                    )}
+                  </CardHeader>
 
-  {/* Блок с основной информацией о покупке */}
-  <CardContent className="flex flex-col gap-4 min-w-0 pt-0">
-    <div className="border-t pt-3">
-      <CardDescription className="text-black break-all">
-        {purchase.purchase_name}
-      </CardDescription>
+                  {/* Блок с основной информацией о покупке */}
+                  <CardContent className="flex flex-col gap-4 min-w-0 pt-0">
+                    <div className="border-t pt-3">
+                      <CardDescription className="text-black break-all">
+                        {purchase.purchase_name}
+                      </CardDescription>
 
-      {/* Отображение стоимости под названием */}
-      {currentCostStr !== "" && (
-        <p className="text-sm text-gray-600 mt-1">
-          Текущая стоимость:{" "}
-          <span className="font-medium">{currentCostStr} ₽</span>
-        </p>
-      )}
+                      {/* Отображение стоимости под названием */}
+                      {currentCostStr &&
+                        currentCostStr !== "0" &&
+                        currentCostStr !== "null" && (
+                          <p className="text-sm text-gray-600 mt-1">
+                            Текущая стоимость:{" "}
+                            <span className="font-medium">
+                              {currentCostStr} ₽
+                            </span>
+                          </p>
+                        )}
 
-      <CardDescription className="text-black break-all mt-1">
-        Ответственный: {purchase.responsible_name} {purchase.responsible_surname}
-      </CardDescription>
-    </div>
+                      <CardDescription className="text-black break-all mt-1">
+                        Ответственный:{" "}
+                        {purchase.responsible_login
+                          ? `${purchase.responsible_name || ""} ${
+                              purchase.responsible_surname || ""
+                            }`.trim()
+                          : "не назначен"}
+                      </CardDescription>
+                    </div>
 
-    {/* Блок "Описание" */}
-    {purchase.purchase_description && (
-      <div className="relative">
-        <button
-          onClick={() => toggleDescription(purchase.purchase_id)}
-          className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
-        >
-          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          <span>Описание</span>
-        </button>
-        {isOpen && (
-          <div className="absolute left-0 top-full mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
-            <p className="text-sm text-gray-600 break-words whitespace-pre-line">
-              {purchase.purchase_description}
-            </p>
-          </div>
-        )}
-      </div>
-    )}
+                    {/* Блок "Описание" */}
+                    {purchase.purchase_description && (
+                      <div className="relative">
+                        <button
+                          onClick={() =>
+                            toggleDescription(purchase.purchase_id)
+                          }
+                          className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
+                        >
+                          {isOpen ? (
+                            <ChevronUp size={16} />
+                          ) : (
+                            <ChevronDown size={16} />
+                          )}
+                          <span>Описание</span>
+                        </button>
+                        {isOpen && (
+                          <div className="absolute left-0 top-full mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                            <p className="text-sm text-gray-600 break-words whitespace-pre-line">
+                              {purchase.purchase_description}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-    {/* Блок "Добавить стоимость" */}
-    <div className="relative">
-      <button
-        onClick={() => toggleCost(purchase.purchase_id)}
-        className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
-      >
-        <Plus size={16} />
-        <span>{isCostOpen ? "Скрыть стоимость" : "Добавить стоимость"}</span>
-      </button>
-      {isCostOpen && (
-        <div className="absolute left-0 top-full mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={currentCostStr}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === "" || /^\d*$/.test(val)) {
-                  setCosts((prev) => ({
-                    ...prev,
-                    [purchase.purchase_id]: val,
-                  }));
-                }
-              }}
-              className="border px-2 py-1 w-full"
-              autoFocus
-            />
-            <Button
-              size="sm"
-              onClick={() =>
-                handleEditCost(
-                  purchase.event_id,
-                  purchase.purchase_id,
-                  costs[purchase.purchase_id] ?? purchase.cost.toString()
-                )
-              }
-            >
-              Сохранить
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
+                    {/* Блок "Добавить стоимость" */}
+                    <div className="relative">
+                      <button
+                        onClick={() => toggleCost(purchase.purchase_id)}
+                        className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
+                      >
+                        <Plus size={16} />
+                        <span>
+                          {isCostOpen
+                            ? "Скрыть стоимость"
+                            : "Добавить стоимость"}
+                        </span>
+                      </button>
+                      {isCostOpen && (
+                        <div className="absolute left-0 top-full mt-1 w-64 bg-white p-4 border border-gray-200 rounded-md shadow-lg z-10">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text" // Изменено с number на text для лучшего контроля
+                              value={currentCostStr}
+                              onChange={(e) => {
+                                const val = e.target.value;
 
-    {/* Кнопка "Отказаться" */}
-    <div className="flex justify-end">
-      {purchase.responsible_login === user_login &&
-        (Number(currentCostStr) === 0 || isNaN(Number(currentCostStr))) && (
-          <Button
-            variant="dark_green"
-            size="sm"
-            onClick={() =>
-              openConfirmDialog({
-                purchase_id: purchase.purchase_id,
-                event_id: purchase.event_id,
-                purchase_name: purchase.purchase_name,
-              })
-            }
-            className="w-full sm:w-auto"
-          >
-            Отказаться
-          </Button>
-        )}
-    </div>
-  </CardContent>
-</Card>
+                                // Удаляем все символы, кроме цифр и точки
+                                let cleaned = val.replace(/[^\d.]/g, "");
+
+                                // Удаляем лишние точки (оставляем только первую)
+                                const parts = cleaned.split(".");
+                                if (parts.length > 2) {
+                                  cleaned =
+                                    parts[0] + "." + parts.slice(1).join("");
+                                }
+
+                                // Удаляем ведущие нули (кроме случая "0.")
+                                if (
+                                  cleaned.startsWith("0") &&
+                                  cleaned.length > 1 &&
+                                  cleaned[1] !== "."
+                                ) {
+                                  cleaned = cleaned.substring(1);
+                                }
+
+                                // Разделяем на части до и после точки
+                                const [beforeDot, afterDot] =
+                                  cleaned.split(".");
+
+                                // Ограничиваем длину части до точки (8 цифр)
+                                const limitedBefore = beforeDot
+                                  ? beforeDot.slice(0, 8)
+                                  : "";
+
+                                // Ограничиваем длину части после точки (2 цифры)
+                                let limitedAfter = "";
+                                if (afterDot !== undefined) {
+                                  limitedAfter = "." + afterDot.slice(0, 2);
+                                }
+
+                                // Собираем обратно
+                                const result = limitedBefore + limitedAfter;
+
+                                // Проверяем, что результат валидный (либо пустая строка, либо число)
+                                if (
+                                  result === "" ||
+                                  /^\d*\.?\d*$/.test(result)
+                                ) {
+                                  setCosts((prev) => ({
+                                    ...prev,
+                                    [purchase.purchase_id]: result,
+                                  }));
+                                }
+                              }}
+                              className="border px-2 py-1 w-full"
+                              autoFocus
+                              inputMode="decimal" // Показываем цифровую клавиатуру на мобильных устройствах
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() =>
+                                handleEditCost(
+                                  purchase.event_id,
+                                  purchase.purchase_id,
+                                  costs[purchase.purchase_id] ??
+                                    purchase.cost.toString()
+                                )
+                              }
+                            >
+                              Сохранить
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Кнопка "Отказаться" */}
+                    <div className="flex justify-end">
+                      {purchase.responsible_login === user_login &&
+                        (Number(currentCostStr) === 0 ||
+                          isNaN(Number(currentCostStr))) && (
+                          <Button
+                            variant="dark_green"
+                            size="sm"
+                            onClick={() =>
+                              openConfirmDialog({
+                                purchase_id: purchase.purchase_id,
+                                event_id: purchase.event_id,
+                                purchase_name: purchase.purchase_name,
+                              })
+                            }
+                            className="w-full sm:w-auto"
+                          >
+                            Отказаться
+                          </Button>
+                        )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             );
           })}
@@ -428,9 +499,8 @@ export const MyPurchasesPageContent = () => {
         <ReceiptViewer
           purchaseId={openedReceiptsPurchaseId}
           eventId={
-            purchases.find(
-              (p) => p.purchase_id === openedReceiptsPurchaseId
-            )?.event_id || 0
+            purchases.find((p) => p.purchase_id === openedReceiptsPurchaseId)
+              ?.event_id || 0
           }
           onClose={() => setOpenedReceiptsPurchaseId(null)}
         />
@@ -448,17 +518,26 @@ export const MyPurchasesPageContent = () => {
             id: "responsible",
             label: "Ответственный",
             withSearch: true,
-            options: Array.from(
-              new Map(
-                purchases.map((p) => [
-                  `responsible_${p.responsible_login}`,
-                  {
-                    id: `responsible_${p.responsible_login}`,
-                    label: `${p.responsible_name} ${p.responsible_surname}`,
-                  },
-                ])
-              ).values()
-            ),
+            options: [
+              // Добавляем вариант "Не назначен"
+              { id: "responsible_null", label: "Не назначен" },
+              // Фильтруем уникальных ответственных, исключая null
+              ...Array.from(
+                new Map(
+                  purchases
+                    .filter((p) => p.responsible_login) // Исключаем записи без ответственного
+                    .map((p) => [
+                      `responsible_${p.responsible_login}`,
+                      {
+                        id: `responsible_${p.responsible_login}`,
+                        label: `${p.responsible_name || ""} ${
+                          p.responsible_surname || ""
+                        }`.trim(),
+                      },
+                    ])
+                ).values()
+              ),
+            ],
           },
           {
             id: "event",

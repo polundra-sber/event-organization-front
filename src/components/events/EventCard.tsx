@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +35,7 @@ export const EventCard = ({
   event_name,
   event_date,
   event_time,
-  location = "место не указано",
+  location,
   role_name,
   event_status_name = "активно",
   onLeave,
@@ -171,8 +171,10 @@ export const EventCard = ({
   const dialogContent = getDialogContent();
 
   return (
-     <div className={cn("w-full max-w-full", className)}>
-      <Card className="hover:shadow-md transition-shadow duration-200 h-full flex flex-col min-w-0"> {/* Добавлен min-w-0 */}
+    <div className={cn("w-full max-w-full", className)}>
+      <Card className="hover:shadow-md transition-shadow duration-200 h-full flex flex-col min-w-0">
+        {" "}
+        {/* Добавлен min-w-0 */}
         <Link href={`/events/${event_id}`} className="hover:no-underline">
           <CardHeader className="pb-3">
             {/* Название - исправленный перенос */}
@@ -186,13 +188,15 @@ export const EventCard = ({
           </CardHeader>
 
           <CardContent className="flex-1 space-y-2 overflow-hidden">
-            {/* Локация - исправленный перенос */}
-            <div className="flex items-start gap-2 text-sm min-w-0">
-              <span className="text-muted-foreground flex-shrink-0">📍</span>
-              <span className="break-words overflow-hidden min-w-0">
-                {location}
-              </span>
-            </div>
+            {/* Локация - отображаем только если location не null */}
+            {location && (
+              <div className="flex items-start gap-2 text-sm min-w-0">
+                <span className="text-muted-foreground flex-shrink-0">📍</span>
+                <span className="break-words overflow-hidden min-w-0">
+                  {location}
+                </span>
+              </div>
+            )}
 
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">👤</span>
@@ -219,7 +223,6 @@ export const EventCard = ({
             )}
           </CardContent>
         </Link>
-
         {!isCompleted && (
           <CardFooter className="justify-end pt-3 border-t">
             <div className="flex flex-wrap gap-2">{getActionButtons()}</div>
