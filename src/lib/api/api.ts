@@ -7,8 +7,13 @@ import {
 import { toast } from "sonner";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "/api",
-  prepareHeaders: (headers) => {
+  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  prepareHeaders: (headers, { endpoint }) => {
+    // Не добавляем токен для эндпоинтов входа и регистрации
+    if (endpoint === "login" || endpoint === "register") {
+      return headers;
+    }
+
     const token = localStorage.getItem("token");
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
@@ -24,7 +29,13 @@ const baseQueryWithAuthCheck: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
 
-  if (result.error?.status === 401) {
+  // Определяем, является ли запрос auth-запросом
+  const isAuthRequest =
+    typeof args !== "string" &&
+    (args.url?.endsWith("/auth/login") || args.url?.endsWith("/auth/register"));
+
+  // Обрабатываем общую 401 только для НЕ auth-запросов
+  if (result.error?.status === 401 && !isAuthRequest) {
     localStorage.removeItem("token");
     toast.error("Сессия истекла. Пожалуйста, войдите снова");
     window.location.href = "/";
@@ -35,7 +46,7 @@ const baseQueryWithAuthCheck: BaseQueryFn<
 
 export const api = createApi({
   reducerPath: "api",
-  baseQuery: baseQueryWithAuthCheck, // Используем модифицированный baseQuery
+  baseQuery: baseQueryWithAuthCheck,
   tagTypes: [
     "Event",
     "MyStuff",
