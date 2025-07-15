@@ -71,7 +71,7 @@ export const EventPreviewCard = ({
           <span className="text-muted-foreground">Статус: </span>
           <span
             className={cn(
-              isCompleted ? "text-green-600" : "text-blue-600",
+              isCompleted ? "text-blue-600" : "text-green-600",
               "font-medium"
             )}
           >

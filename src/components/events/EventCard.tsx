@@ -213,7 +213,7 @@ export const EventCard = ({
                   <span
                     className={cn(
                       "font-medium",
-                      isCompleted ? "text-green-600" : "text-blue-600"
+                      isCompleted ? "text-blue-600" : "text-green-600"
                     )}
                   >
                     {event_status_name}
